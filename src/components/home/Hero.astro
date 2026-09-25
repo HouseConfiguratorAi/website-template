@@ -1,0 +1,184 @@
+---
+import { home } from '@/config/content';
+import { rich } from '@/lib/text';
+import { getVehicle, vehicleUrl } from '@/lib/inventory';
+import Media from '@/components/ui/Media.astro';
+import Arrow from '@/components/ui/Arrow.astro';
+
+const h = home.hero;
+const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : undefined;
+---
+
+<section class="hero" data-tone="dark" data-scene="through" aria-labelledby="hero-title">
+  <div class="hero__media" aria-hidden="false">
+    <div class="hero__drift">
+      <div class="hero__settle" data-intro="settle">
+        <Media
+          src={h.image}
+          mobileSrc={h.imageMobile}
+          alt={h.imageAlt}
+          priority
+          sizes="100vw"
+          focal="70% 60%"
+          mobileFocal="50% 80%"
+        />
+      </div>
+    </div>
+  </div>
+  <div class="hero__veil" aria-hidden="true"></div>
+
+  <div class="hero__content">
+    <p class="t-eyebrow eyebrow-row" data-intro style="--intro:250ms">{h.eyebrow}</p>
+    <h1 id="hero-title" class="t-display hero__title" data-intro style="--intro:250ms" set:html={rich(h.headline)} />
+    <p class="hero__support t-subhead" data-intro style="--intro:400ms">{h.supporting}</p>
+    <div class="hero__actions" data-intro style="--intro:550ms">
+      <a class="btn btn--primary" href={h.primary.href}>{h.primary.label}<Arrow /></a>
+      <a class="btn btn--ghost" href={h.secondary.href}>{h.secondary.label}</a>
+    </div>
+  </div>
+
+  <div class="hero__foot t-meta" data-intro="fade" style="--intro:900ms">
+    {
+      captionVehicle && (
+        <a class="hero__caption link" href={vehicleUrl(captionVehicle)}>
+          <span class="muted">In the hall</span> {captionVehicle.brand} {captionVehicle.model} · {captionVehicle.variant}
+        </a>
+      )
+    }
+    <span class="hero__scroll muted" aria-hidden="true">Scroll <i></i></span>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    overflow: clip;
+    isolation: isolate;
+  }
+
+  .hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+
+  .hero__drift,
+  .hero__settle {
+    height: 100%;
+  }
+
+  /* Camera drift: the photograph moves slower than the page. */
+  .hero__drift {
+    transform: translate3d(0, calc(var(--p, 0) * 16%), 0);
+    will-change: transform;
+  }
+
+  .hero__veil {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(to right, rgb(10 9 8 / 0.62) 0%, rgb(10 9 8 / 0.2) 42%, transparent 62%),
+      linear-gradient(to top, rgb(10 9 8 / 0.7) 0%, transparent 38%);
+  }
+
+  .hero__content {
+    align-self: end;
+    width: min(100% - 2 * var(--gutter), var(--w-gallery));
+    margin-inline: auto;
+    padding-top: calc(var(--header-h) + var(--s-8));
+    padding-bottom: var(--s-8);
+    display: grid;
+    justify-items: start;
+    gap: var(--s-5);
+  }
+
+  .hero__title {
+    max-width: 8.6em;
+    margin-top: var(--s-2);
+  }
+
+  .hero__support {
+    max-width: 30rem;
+    color: color-mix(in srgb, var(--fg) 82%, transparent);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+  }
+
+  .hero__foot {
+    width: min(100% - 2 * var(--gutter), var(--w-gallery));
+    margin-inline: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--s-5);
+    padding-block: var(--s-5);
+    border-top: 1px solid var(--border);
+  }
+
+  .hero__scroll {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-size: 0.6875rem;
+  }
+
+  .hero__scroll i {
+    position: relative;
+    width: 1px;
+    height: 28px;
+    background: var(--border);
+    overflow: hidden;
+  }
+
+  :global(.motion) .hero__scroll i::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--fg);
+    animation: scroll-cue 2.4s var(--ease-smooth) 1.6s infinite;
+  }
+
+  @keyframes scroll-cue {
+    0% { transform: translateY(-100%); }
+    60%, 100% { transform: translateY(100%); }
+  }
+
+  /* Mobile has its own composition: the tall crop puts the car low,
+     so the words sit at the top and the car anchors the bottom. */
+  @media (max-width: 47.99rem) {
+    .hero {
+      min-height: 100svh;
+    }
+    .hero__content {
+      align-self: start;
+      padding-top: calc(var(--header-h) + var(--s-7));
+      gap: var(--s-4);
+    }
+    .hero__veil {
+      background:
+        linear-gradient(to bottom, rgb(10 9 8 / 0.78) 0%, rgb(10 9 8 / 0.35) 45%, transparent 62%),
+        linear-gradient(to top, rgb(10 9 8 / 0.55) 0%, transparent 25%);
+    }
+    .hero__actions .btn {
+      flex: 1 1 auto;
+    }
+    /* One clear action on phones keeps the car visible below. */
+    .hero__actions .btn--ghost {
+      display: none;
+    }
+    .hero__scroll {
+      display: none;
+    }
+  }
+</style>

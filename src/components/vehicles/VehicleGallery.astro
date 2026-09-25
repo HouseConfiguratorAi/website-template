@@ -1,0 +1,279 @@
+---
+/**
+ * Editorial gallery: photographs are laid out like a magazine spread —
+ * a full-width profile, an asymmetric pair, a wide detail — instead of a
+ * thumbnail carousel. Any photograph opens a full-screen viewer with
+ * keyboard, button and swipe navigation.
+ */
+import type { VehicleImage } from '@/data/vehicles';
+import Media from '@/components/ui/Media.astro';
+
+interface Props { images: VehicleImage[]; title: string }
+const { images, title } = Astro.props;
+
+// Frame shapes cycle so any number of photographs keeps a rhythm.
+const frames = ['wide', 'pair-a', 'pair-b', 'inset', 'tall', 'wide'] as const;
+const sizes: Record<(typeof frames)[number], string> = {
+  wide: '100vw',
+  'pair-a': '(min-width: 64rem) 58vw, 100vw',
+  'pair-b': '(min-width: 64rem) 36vw, 100vw',
+  inset: '(min-width: 64rem) 75vw, 100vw',
+  tall: '(min-width: 64rem) 50vw, 100vw',
+};
+---
+
+{
+  images.length > 0 && (
+    <section class="gallery" data-tone="dark" aria-label={`${title} — photographs`} data-gallery>
+      <ul class="gallery__grid" role="list">
+        {images.map((img, i) => {
+          const frame = frames[i % frames.length];
+          return (
+            <li class={`gallery__item gallery__item--${frame}`}>
+              <button type="button" class="gallery__open media" data-open={i} data-reveal="image" data-cursor="Open" aria-label={`Open photograph ${i + 1} of ${images.length}: ${img.alt}`}>
+                <Media src={img.src} alt={img.alt} focal={img.focal} sizes={sizes[frame]} />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+
+      <dialog class="viewer" data-viewer aria-label={`${title} — photograph viewer`} data-tone="dark">
+        <div class="viewer__track" data-track>
+          {images.map((img, i) => (
+            <figure class="viewer__slide" data-slide={i} hidden={i !== 0}>
+              <Media src={img.src} alt={img.alt} sizes="100vw" focal={img.focal} />
+              <figcaption class="t-caption">{img.alt}</figcaption>
+            </figure>
+          ))}
+        </div>
+        <div class="viewer__ui">
+          <p class="t-meta" aria-live="polite"><span data-current>1</span> / {images.length}</p>
+          <div class="viewer__nav">
+            <button type="button" class="viewer__btn" data-prev aria-label="Previous photograph">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" /></svg>
+            </button>
+            <button type="button" class="viewer__btn" data-next aria-label="Next photograph">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" /></svg>
+            </button>
+            <button type="button" class="viewer__btn" data-close aria-label="Close viewer">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" /></svg>
+            </button>
+          </div>
+        </div>
+      </dialog>
+    </section>
+  )
+}
+
+<style>
+  .gallery {
+    padding-block: var(--section-m);
+  }
+
+  .gallery__grid {
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    width: min(100% - 2 * var(--gutter), var(--w-gallery));
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gutter);
+  }
+
+  .gallery__open {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: zoom-in;
+  }
+
+  .gallery__open :global(img) {
+    transition: transform 1400ms var(--ease-emphasis);
+  }
+
+  .gallery__open:hover :global(img) {
+    transform: scale(1.025);
+  }
+
+  .gallery__item--wide {
+    grid-column: 1 / -1;
+    aspect-ratio: 16 / 8;
+  }
+  .gallery__item--pair-a {
+    grid-column: 1 / span 7;
+    aspect-ratio: 4 / 5;
+  }
+  .gallery__item--pair-b {
+    grid-column: 9 / -1;
+    aspect-ratio: 4 / 5;
+    align-self: end;
+  }
+  .gallery__item--inset {
+    grid-column: 2 / span 10;
+    aspect-ratio: 3 / 2;
+    margin-block: var(--s-8);
+  }
+  .gallery__item--tall {
+    grid-column: 4 / span 6;
+    aspect-ratio: 4 / 5;
+  }
+
+  @media (max-width: 47.99rem) {
+    .gallery__item {
+      grid-column: 1 / -1 !important;
+      margin-block: 0 !important;
+    }
+    .gallery__item--wide {
+      aspect-ratio: 4 / 3;
+    }
+    .gallery__item--pair-b {
+      grid-column: 3 / -1 !important;
+    }
+  }
+
+  /* ---- Viewer ---- */
+  .viewer {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    display: none;
+    opacity: 0;
+    transition:
+      opacity 350ms var(--ease-standard),
+      display 350ms allow-discrete,
+      overlay 350ms allow-discrete;
+  }
+
+  .viewer[open] {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    opacity: 1;
+  }
+
+  @starting-style {
+    .viewer[open] {
+      opacity: 0;
+    }
+  }
+
+  .viewer::backdrop {
+    background: #000;
+  }
+
+  .viewer__track {
+    position: relative;
+    min-height: 0;
+    touch-action: pan-y;
+  }
+
+  .viewer__slide {
+    position: absolute;
+    inset: var(--s-5) var(--gutter) 0;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: var(--s-3);
+  }
+
+  .viewer__slide :global(picture) {
+    min-height: 0;
+  }
+
+  .viewer__slide[hidden] {
+    display: none;
+  }
+
+  .viewer__slide :global(img) {
+    object-fit: contain !important;
+  }
+
+  .viewer__slide figcaption {
+    text-align: center;
+  }
+
+  :global(.motion) .viewer__slide:not([hidden]) {
+    animation: fade-in 450ms var(--ease-standard);
+  }
+
+  .viewer__ui {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--s-4) var(--gutter) max(var(--s-4), env(safe-area-inset-bottom));
+  }
+
+  .viewer__nav {
+    display: flex;
+    gap: 4px;
+  }
+
+  .viewer__btn {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    transition: border-color var(--dur-micro);
+  }
+
+  .viewer__btn:hover {
+    border-color: var(--fg);
+  }
+
+  .viewer__btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  :global(html:has(.viewer[open])) {
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((root) => {
+    const viewer = root.querySelector<HTMLDialogElement>('[data-viewer]')!;
+    const slides = [...viewer.querySelectorAll<HTMLElement>('[data-slide]')];
+    const current = viewer.querySelector<HTMLElement>('[data-current]')!;
+    let index = 0;
+    let opener: HTMLElement | null = null;
+
+    const show = (i: number) => {
+      index = (i + slides.length) % slides.length;
+      slides.forEach((s, n) => (s.hidden = n !== index));
+      current.textContent = String(index + 1);
+      // Load the full image in the viewer eagerly.
+      slides[index].querySelector('img')?.setAttribute('loading', 'eager');
+    };
+
+    root.querySelectorAll<HTMLElement>('[data-open]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        opener = btn;
+        show(Number(btn.dataset.open));
+        viewer.showModal();
+      }),
+    );
+    viewer.querySelector('[data-prev]')!.addEventListener('click', () => show(index - 1));
+    viewer.querySelector('[data-next]')!.addEventListener('click', () => show(index + 1));
+    viewer.querySelector('[data-close]')!.addEventListener('click', () => viewer.close());
+    viewer.addEventListener('close', () => opener?.focus());
+    viewer.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') show(index + 1);
+      if (e.key === 'ArrowLeft') show(index - 1);
+    });
+
+    // Swipe
+    let startX = 0;
+    const track = viewer.querySelector<HTMLElement>('[data-track]')!;
+    track.addEventListener('pointerdown', (e) => (startX = e.clientX));
+    track.addEventListener('pointerup', (e) => {
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 50) show(index + (dx < 0 ? 1 : -1));
+    });
+  });
+</script>

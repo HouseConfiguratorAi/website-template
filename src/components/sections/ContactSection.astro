@@ -1,0 +1,69 @@
+---
+import { contact } from '@/config/site';
+import { rich } from '@/lib/text';
+import ContactForm from '@/components/sections/ContactForm.astro';
+
+interface Props {
+  eyebrow: string;
+  headline: string;
+  body?: string;
+  vehicle?: string;
+  headingLevel?: 'h1' | 'h2';
+  id?: string;
+}
+const { eyebrow, headline, body, vehicle, headingLevel: H = 'h2', id = 'enquire' } = Astro.props;
+---
+
+<section class="contact" data-tone="light" id={id}>
+  <div class="container container--gallery contact__grid">
+    <div class="contact__intro">
+      <p class="t-eyebrow eyebrow-row" data-reveal="fade">{eyebrow}</p>
+      <H class="t-headline" data-reveal set:html={rich(headline)} />
+      {body && <p class="t-lead contact__body" data-reveal>{body}</p>}
+      <div class="contact__direct t-small" data-reveal>
+        <a class="link" href={`mailto:${contact.email}`}>{contact.email}</a>
+        <a class="link" href={`tel:${contact.phoneHref}`}>{contact.phone}</a>
+      </div>
+    </div>
+    <div class="contact__form" data-reveal style="--delay:120ms">
+      <ContactForm vehicle={vehicle} idPrefix={id} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact {
+    padding-block: var(--section-l);
+  }
+  .contact__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--s-8);
+  }
+  .contact__intro {
+    grid-column: 1 / span 5;
+    display: grid;
+    gap: var(--s-5);
+    align-content: start;
+  }
+  .contact__body {
+    max-width: 24em;
+  }
+  .contact__direct {
+    display: grid;
+    justify-items: start;
+    gap: 4px;
+    margin-top: var(--s-5);
+  }
+  .contact__form {
+    grid-column: 7 / -1;
+    padding-top: var(--s-4);
+  }
+  @media (max-width: 63.99rem) {
+    .contact__intro,
+    .contact__form {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

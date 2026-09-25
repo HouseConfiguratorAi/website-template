@@ -1,0 +1,128 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import { getImage } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Media from '@/components/ui/Media.astro';
+import JournalCard from '@/components/sections/JournalCard.astro';
+import FinalCTA from '@/components/sections/FinalCTA.astro';
+import { getPosts, postUrl, type Post } from '@/lib/journal';
+import { formatDate } from '@/lib/format';
+import { articleLd, breadcrumbLd } from '@/lib/seo';
+import { resolveMedia } from '@/lib/media';
+import { site } from '@/config/site';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}) satisfies GetStaticPaths;
+
+interface Props { post: Post }
+const { post } = Astro.props;
+const d = post.data;
+const { Content } = await render(post);
+const more = (await getPosts()).filter((p) => p.id !== post.id).slice(0, 2);
+
+const m = resolveMedia(d.cover);
+const ldImage = m?.type === 'local' ? new URL((await getImage({ src: m.meta, width: 1600, format: 'jpg' })).src, site.url).href : undefined;
+---
+
+<BaseLayout
+  title={d.title}
+  description={d.excerpt}
+  image={d.cover}
+  type="article"
+  jsonLd={[
+    articleLd({ title: d.title, description: d.excerpt, date: d.date, url: postUrl(post), image: ldImage, author: d.author }),
+    breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Journal', path: '/journal' }, { name: d.title, path: postUrl(post) }]),
+  ]}
+>
+  <Fragment slot="head">
+    <meta property="article:published_time" content={d.date.toISOString()} />
+    <meta property="article:section" content={d.category} />
+  </Fragment>
+
+  <article>
+    <header class="ahead" data-tone="dark">
+      <div class="container container--editorial ahead__inner">
+        <p class="t-eyebrow ahead__meta" data-intro style="--intro:150ms">
+          <a class="link" href="/journal">Journal</a>
+          <span class="muted">{d.category}</span>
+          <time class="muted" datetime={d.date.toISOString()}>{formatDate(d.date)}</time>
+          {d.readingTime && <span class="muted">{d.readingTime} min read</span>}
+        </p>
+        <h1 class="t-headline" data-intro style="--intro:250ms">{d.title}</h1>
+        <p class="t-lead ahead__excerpt" data-intro style="--intro:400ms">{d.excerpt}</p>
+      </div>
+      <div class="ahead__media media container container--gallery">
+        <Media src={d.cover} alt={d.coverAlt} sizes="(min-width: 100rem) 1600px, 100vw" priority transitionName={`post-${post.id}`} />
+      </div>
+    </header>
+
+    <section class="abody" data-tone="light">
+      <div class="container container--editorial prose">
+        <Content />
+      </div>
+    </section>
+  </article>
+
+  <section class="amore" data-tone="light" aria-labelledby="more-title">
+    <div class="container container--gallery">
+      <h2 id="more-title" class="t-eyebrow eyebrow-row">More from the journal</h2>
+      <ul class="amore__grid" role="list">
+        {more.map((p, i) => <li><JournalCard post={p} variant="grid" delay={i * 90} /></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <FinalCTA />
+</BaseLayout>
+
+<style>
+  .ahead {
+    padding-top: calc(var(--header-h) + var(--section-m));
+  }
+  .ahead__inner {
+    display: grid;
+    gap: var(--s-6);
+    padding-bottom: var(--section-s);
+  }
+  .ahead__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+  }
+  .ahead__excerpt {
+    color: color-mix(in srgb, var(--fg) 80%, transparent);
+  }
+  .ahead__media {
+    aspect-ratio: 16 / 9;
+    margin-bottom: calc(var(--section-s) * -1);
+    position: relative;
+    z-index: 1;
+  }
+  .abody {
+    padding-top: calc(var(--section-s) + var(--section-m));
+    padding-bottom: var(--section-m);
+  }
+  .amore {
+    padding-bottom: var(--section-l);
+  }
+  .amore__grid {
+    margin-top: var(--s-7);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gutter);
+  }
+  .amore__grid :global(.jcard__media) {
+    aspect-ratio: 3 / 2 !important;
+  }
+  @media (max-width: 47.99rem) {
+    .ahead__media {
+      aspect-ratio: 4 / 3;
+    }
+    .amore__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

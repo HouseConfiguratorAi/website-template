@@ -1,0 +1,52 @@
+---
+/** Typographic opening scene for inner pages. */
+import { rich } from '@/lib/text';
+interface Props {
+  eyebrow: string;
+  headline: string;
+  lead?: string;
+  size?: 'display' | 'headline';
+}
+const { eyebrow, headline, lead, size = 'display' } = Astro.props;
+---
+
+<section class="intro" data-tone="dark">
+  <div class="container container--gallery intro__grid">
+    <p class="t-eyebrow eyebrow-row" data-intro style="--intro:150ms">{eyebrow}</p>
+    <h1 class={`t-${size} intro__title`} data-intro style="--intro:250ms" set:html={rich(headline)} />
+    {lead && <p class="t-lead intro__lead" data-intro style="--intro:400ms">{lead}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .intro {
+    padding-top: calc(var(--header-h) + var(--section-m));
+    padding-bottom: var(--section-m);
+  }
+  .intro__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--s-6);
+    align-items: end;
+  }
+  .intro__grid > :global(*) {
+    grid-column: 1 / -1;
+  }
+  .intro__title {
+    grid-column: 1 / span 9;
+    max-width: 11em;
+  }
+  .intro__lead {
+    grid-column: 1 / span 6;
+    color: color-mix(in srgb, var(--fg) 80%, transparent);
+    max-width: 30em;
+  }
+  @media (max-width: 63.99rem) {
+    .intro__title,
+    .intro__lead {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

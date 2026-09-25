@@ -1,0 +1,132 @@
+---
+/**
+ * Art-directed responsive image.
+ * - `src` / `mobileSrc`: media keys or URLs. `mobileSrc` is served below 768px,
+ *   so a 16:9 desktop frame can become a 4:5 crop on phones.
+ * - `focal` / `mobileFocal`: CSS object-position for the crop.
+ * - Missing or unknown images render an elegant placeholder instead of breaking layout.
+ * The component fills its parent: size the parent (aspect-ratio / height).
+ */
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { resolveMedia } from '@/lib/media';
+
+interface Props {
+  src?: string | null;
+  mobileSrc?: string | null;
+  alt: string;
+  sizes?: string;
+  focal?: string;
+  mobileFocal?: string;
+  priority?: boolean;
+  class?: string;
+  /** Label shown when the image is missing. */
+  placeholder?: string;
+  /** view-transition-name for shared-element page transitions. */
+  transitionName?: string;
+  widths?: number[];
+}
+
+const {
+  src,
+  mobileSrc,
+  alt,
+  sizes = '100vw',
+  focal = '50% 50%',
+  mobileFocal,
+  priority = false,
+  class: className,
+  placeholder = 'Photography to follow',
+  transitionName,
+  widths = [480, 800, 1200, 1600, 2000, 2560],
+} = Astro.props;
+
+const main = resolveMedia(src);
+const mobile = resolveMedia(mobileSrc);
+
+async function srcset(meta: ImageMetadata, format: 'avif' | 'webp', list: number[]) {
+  const ws = [...new Set([...list.filter((w) => w < meta.width), Math.min(meta.width, list[list.length - 1])])];
+  const imgs = await Promise.all(ws.map((width) => getImage({ src: meta, width, format, quality: format === 'avif' ? 58 : 74 })));
+  return imgs.map((img, i) => `${img.src} ${ws[i]}w`).join(', ');
+}
+
+let sources: { media?: string; type: string; srcset: string }[] = [];
+let fallback: { src: string; srcset: string; width: number; height: number } | null = null;
+
+if (main?.type === 'local') {
+  if (mobile?.type === 'local') {
+    const mw = [480, 800, 1200];
+    sources.push({ media: '(max-width: 47.99rem)', type: 'image/avif', srcset: await srcset(mobile.meta, 'avif', mw) });
+    sources.push({ media: '(max-width: 47.99rem)', type: 'image/webp', srcset: await srcset(mobile.meta, 'webp', mw) });
+  }
+  sources.push({ type: 'image/avif', srcset: await srcset(main.meta, 'avif', widths) });
+  const webp = await srcset(main.meta, 'webp', widths);
+  sources.push({ type: 'image/webp', srcset: webp });
+  const base = await getImage({ src: main.meta, width: Math.min(1600, main.meta.width), format: 'jpg', quality: 78 });
+  fallback = { src: base.src, srcset: webp, width: main.meta.width, height: main.meta.height };
+}
+
+const style = [
+  `--focal:${focal}`,
+  mobileFocal ? `--focal-m:${mobileFocal}` : '',
+  transitionName ? `view-transition-name:${transitionName}` : '',
+]
+  .filter(Boolean)
+  .join(';');
+---
+
+{
+  main?.type === 'local' && fallback ? (
+    <picture class:list={['media-picture', className]} style={style}>
+      {sources.map((s) => (
+        <source media={s.media} type={s.type} srcset={s.srcset} sizes={sizes} />
+      ))}
+      <img
+        src={fallback.src}
+        width={fallback.width}
+        height={fallback.height}
+        alt={alt}
+        sizes={sizes}
+        loading={priority ? 'eager' : 'lazy'}
+        decoding={priority ? 'sync' : 'async'}
+        fetchpriority={priority ? 'high' : 'auto'}
+      />
+    </picture>
+  ) : main?.type === 'remote' ? (
+    <picture class:list={['media-picture', className]} style={style}>
+      {mobile?.type === 'remote' && <source media="(max-width: 47.99rem)" srcset={mobile.src} />}
+      <img src={main.src} alt={alt} loading={priority ? 'eager' : 'lazy'} decoding="async" />
+    </picture>
+  ) : (
+    <div class:list={['media-placeholder', className]} role="img" aria-label={alt || placeholder} style={style}>
+      <div class="media-placeholder__inner">
+        <svg viewBox="0 0 240 70" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+          <path d="M8 52h18m44 0h96m44 0h22c3 0 5-2 5-5v-6c0-4-2-7-6-8l-26-6c-12-9-25-15-44-16H98C84 11 70 17 58 26l-34 5c-8 1-14 6-15 14l-1 7" />
+          <circle cx="48" cy="52" r="12" />
+          <circle cx="188" cy="52" r="12" />
+          <path d="M72 28h52l-2-13M130 28h40c-10-8-22-12-36-13" />
+        </svg>
+        <span class="t-eyebrow">{placeholder}</span>
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .media-picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .media-picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--focal, 50% 50%);
+  }
+  @media (max-width: 47.99rem) {
+    .media-picture img {
+      object-position: var(--focal-m, var(--focal, 50% 50%));
+    }
+  }
+</style>

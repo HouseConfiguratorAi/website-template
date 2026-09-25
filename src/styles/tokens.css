@@ -1,0 +1,105 @@
+/* =====================================================================
+   DESIGN TOKENS
+   Colour values come from src/config/theme.ts (injected as --dark-* /
+   --light-*). Everything here is structure: type, space, layout, motion.
+   ===================================================================== */
+
+:root {
+  /* ---- Type families ---- */
+  --font-serif: 'Newsreader Variable', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-sans: 'Archivo Variable', 'Helvetica Neue', Arial, system-ui, sans-serif;
+
+  /* ---- Type scale (fluid, 375px → 1600px) ----
+     Contrast is the point: a 160px statement next to 12px metadata. */
+  --fs-display: clamp(3.4rem, 1.5rem + 8.4vw, 10.5rem);   /* ~54 → 168 */
+  --fs-headline: clamp(2.6rem, 1.45rem + 4.9vw, 6rem);    /* ~42 → 96 */
+  --fs-title: clamp(2rem, 1.35rem + 2.75vw, 4rem);        /* ~32 → 64 */
+  --fs-subhead: clamp(1.3rem, 1.1rem + 0.85vw, 1.875rem); /* ~21 → 30 */
+  --fs-lead: clamp(1.2rem, 1.08rem + 0.55vw, 1.6rem);     /* ~19 → 26 */
+  --fs-body: clamp(1rem, 0.97rem + 0.14vw, 1.125rem);     /* 16 → 18 */
+  --fs-small: 0.9375rem;                                  /* 15 */
+  --fs-caption: 0.8125rem;                                /* 13 */
+  --fs-eyebrow: 0.75rem;                                  /* 12 */
+  --fs-nav: 0.875rem;                                     /* 14 */
+  --fs-price: clamp(1.125rem, 1.02rem + 0.4vw, 1.5rem);
+
+  --lh-tight: 0.94;
+  --lh-snug: 1.12;
+  --lh-body: 1.62;
+
+  /* ---- Spacing scale ---- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --s-10: 128px;
+  --s-11: 160px;
+  --s-12: 200px;
+  /* Section rhythm — generous on purpose. */
+  --section-xl: clamp(128px, 6rem + 9vw, 280px);
+  --section-l: clamp(96px, 4.5rem + 6vw, 200px);
+  --section-m: clamp(72px, 3.5rem + 4vw, 144px);
+  --section-s: clamp(48px, 2.5rem + 2.5vw, 96px);
+
+  /* ---- Containers ---- */
+  --gutter: clamp(20px, 0.8rem + 2.6vw, 56px);
+  --w-editorial: 46rem;   /* ~736px */
+  --w-standard: 86rem;    /* ~1376px */
+  --w-gallery: 100rem;    /* 1600px */
+  --header-h: 76px;
+
+  /* ---- Motion ---- */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-smooth: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-emphasis: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-micro: 200ms;
+  --dur-standard: 520ms;
+  --dur-large: 950ms;
+
+  /* ---- Layers ---- */
+  --z-header: 50;
+  --z-overlay: 80;
+  --z-cursor: 90;
+}
+
+@media (max-width: 47.99rem) {
+  :root {
+    --header-h: 64px;
+  }
+}
+
+/* ---- Tones ----
+   A section declares data-tone="dark" or "light"; every component inside
+   reads the semantic tokens below. */
+:root,
+[data-tone='dark'] {
+  --bg: var(--dark-bg);
+  --surface: var(--dark-surface);
+  --fg: var(--dark-fg);
+  --muted: var(--dark-muted);
+  --accent: var(--dark-accent);
+  --accent-contrast: var(--dark-accent-contrast);
+  --border: var(--dark-border);
+  color-scheme: dark;
+}
+
+[data-tone='light'] {
+  --bg: var(--light-bg);
+  --surface: var(--light-surface);
+  --fg: var(--light-fg);
+  --muted: var(--light-muted);
+  --accent: var(--light-accent);
+  --accent-contrast: var(--light-accent-contrast);
+  --border: var(--light-border);
+  color-scheme: light;
+}
+
+[data-tone] {
+  background-color: var(--bg);
+  color: var(--fg);
+}

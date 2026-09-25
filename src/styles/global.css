@@ -1,0 +1,6 @@
+@import '@fontsource-variable/newsreader/standard.css';
+@import '@fontsource-variable/newsreader/standard-italic.css';
+@import '@fontsource-variable/archivo/standard.css';
+@import './tokens.css';
+@import './base.css';
+@import './motion.css';

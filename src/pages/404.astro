@@ -1,0 +1,41 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Arrow from '@/components/ui/Arrow.astro';
+---
+
+<BaseLayout title="Page not found" description="This page does not exist." noindex>
+  <section class="nf" data-tone="dark">
+    <div class="container container--gallery nf__inner">
+      <p class="t-eyebrow eyebrow-row" data-intro style="--intro:150ms">Error 404</p>
+      <h1 class="t-display" data-intro style="--intro:250ms">This road does not go <em>anywhere.</em></h1>
+      <p class="t-lead muted" data-intro style="--intro:400ms">The page may have moved, or the car it described has found a new home.</p>
+      <div class="nf__actions" data-intro style="--intro:550ms">
+        <a class="btn btn--primary" href="/vehicles">Explore the collection <Arrow /></a>
+        <a class="btn btn--ghost" href="/">Back to the start</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf {
+    min-height: 88svh;
+    display: grid;
+    align-items: end;
+    padding-top: calc(var(--header-h) + var(--section-m));
+    padding-bottom: var(--section-m);
+  }
+  .nf__inner {
+    display: grid;
+    gap: var(--s-6);
+    justify-items: start;
+  }
+  .nf__inner h1 {
+    max-width: 10em;
+  }
+  .nf__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+</style>

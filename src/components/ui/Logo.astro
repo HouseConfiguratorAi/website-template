@@ -1,0 +1,50 @@
+---
+/**
+ * Brand mark. Configured in src/config/site.ts → site.logo.
+ * The wordmark is typeset, so it inherits the section colour; an image
+ * logo is constrained by height so any aspect ratio fits the header.
+ */
+import { site } from '@/config/site';
+interface Props { class?: string; size?: 'header' | 'large' }
+const { class: className, size = 'header' } = Astro.props;
+const logo = site.logo;
+// Long names get tighter tracking so they still fit the header.
+const len = logo.text.length;
+const tracking = len <= 10 ? 0.34 : len <= 16 ? 0.22 : 0.14;
+---
+{
+  logo.type === 'image' && logo.src ? (
+    <img class:list={['logo-img', `logo--${size}`, className]} src={logo.src} alt={logo.alt} />
+  ) : (
+    <span class:list={['wordmark', `logo--${size}`, className]} style={`--tracking:${tracking}em`}>{logo.text}</span>
+  )
+}
+<style>
+  .wordmark {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-weight: 560;
+    font-stretch: 125%;
+    letter-spacing: var(--tracking, 0.34em);
+    text-transform: uppercase;
+    line-height: 1.2;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .wordmark.logo--header {
+    font-size: 0.9rem;
+  }
+  .wordmark.logo--large {
+    font-size: clamp(1.4rem, 1rem + 1.8vw, 2.4rem);
+  }
+  .logo-img.logo--header {
+    height: 26px;
+    width: auto;
+  }
+  .logo-img.logo--large {
+    height: 56px;
+    width: auto;
+  }
+</style>

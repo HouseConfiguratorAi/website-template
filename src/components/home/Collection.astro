@@ -1,0 +1,94 @@
+---
+import type { Vehicle } from '@/lib/inventory';
+import { home } from '@/config/content';
+import SectionHead from '@/components/ui/SectionHead.astro';
+import VehicleCard from '@/components/vehicles/VehicleCard.astro';
+
+interface Props { vehicles: Vehicle[] }
+const { vehicles } = Astro.props;
+
+/**
+ * An editorial rhythm instead of identical cards: a wide frame, a tall
+ * frame set lower, then the reverse. The pattern repeats for any count.
+ */
+const pattern = [
+  { slot: 'a', ratio: '3 / 2', image: 'cover', size: 'large', sizes: '(min-width: 64rem) 58vw, 100vw' },
+  { slot: 'b', ratio: '4 / 5', image: 'portrait', size: 'medium', sizes: '(min-width: 64rem) 33vw, 86vw' },
+  { slot: 'c', ratio: '4 / 5', image: 'portrait', size: 'medium', sizes: '(min-width: 64rem) 33vw, 86vw' },
+  { slot: 'd', ratio: '16 / 10', image: 'cover', size: 'large', sizes: '(min-width: 64rem) 58vw, 100vw' },
+] as const;
+---
+
+<section class="collection" data-tone="light">
+  <div class="container container--gallery">
+    <SectionHead
+      eyebrow={home.collection.eyebrow}
+      headline={home.collection.headline}
+      body={home.collection.body}
+      cta={home.collection.cta}
+      split
+    />
+    <ul class="collection__grid" role="list">
+      {
+        vehicles.map((v, i) => {
+          const p = pattern[i % pattern.length];
+          return (
+            <li class={`collection__item slot-${p.slot}`}>
+              <VehicleCard vehicle={v} ratio={p.ratio} image={p.image} size={p.size} sizes={p.sizes} />
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .collection {
+    padding-block: var(--section-l);
+  }
+
+  .collection__grid {
+    list-style: none;
+    padding: 0;
+    margin: var(--section-m) 0 0;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--section-s);
+  }
+
+  .slot-a {
+    grid-column: 1 / span 7;
+  }
+  .slot-b {
+    grid-column: 9 / span 4;
+    margin-top: 32%;
+  }
+  .slot-c {
+    grid-column: 2 / span 4;
+  }
+  .slot-d {
+    grid-column: 6 / -1;
+    margin-top: 18%;
+  }
+
+  @media (max-width: 47.99rem) {
+    .collection__grid {
+      row-gap: var(--s-8);
+    }
+    .collection__item {
+      margin-top: 0 !important;
+    }
+    .slot-a,
+    .slot-d {
+      grid-column: 1 / -1;
+    }
+    .slot-b {
+      grid-column: 3 / -1;
+    }
+    .slot-c {
+      grid-column: 1 / span 10;
+    }
+  }
+</style>

@@ -1,0 +1,19 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageIntro from '@/components/sections/PageIntro.astro';
+import ContactSection from '@/components/sections/ContactSection.astro';
+import LocationSection from '@/components/sections/LocationSection.astro';
+import { contact } from '@/config/site';
+import { dealerLd, breadcrumbLd } from '@/lib/seo';
+---
+
+<BaseLayout
+  title="Contact"
+  description={`Visit the showroom in ${contact.address.city}, call ${contact.phone} or send us a message.`}
+  image="location-hall"
+  jsonLd={[dealerLd(), breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Contact', path: '/contact' }])]}
+>
+  <PageIntro eyebrow="Contact" headline="Looking for something *specific?*" lead="Ask about a car in the collection, one that is not, or anything in between. We reply personally, usually the same day." />
+  <ContactSection eyebrow="Write to us" headline="Start with a *message.*" body="Or call us during opening hours. Viewings outside those hours are possible by appointment." />
+  <LocationSection />
+</BaseLayout>

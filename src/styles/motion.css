@@ -1,0 +1,150 @@
+/* =====================================================================
+   MOTION
+   Three levels:  micro (hover, 200ms) · medium (entrances, ~520ms)
+                  · large (hero, image scenes, ~950ms).
+   Initial "hidden" states only apply when <html> has .motion — added by
+   JS when prefers-reduced-motion is not set and ?motion=off is absent.
+   Without it, everything renders in its final state.
+   ===================================================================== */
+
+/* ---- Reveal on enter ---- */
+.motion [data-reveal] {
+  transition:
+    opacity var(--dur-standard) var(--ease-standard),
+    transform var(--dur-large) var(--ease-emphasis),
+    clip-path var(--dur-large) var(--ease-emphasis);
+  transition-delay: var(--delay, 0ms);
+}
+
+.motion [data-reveal]:not(.is-in) {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+}
+
+.motion [data-reveal='fade']:not(.is-in) {
+  transform: none;
+}
+
+/* Images uncover from the bottom edge, like a print being slid out.
+   The clip sits on the child: IntersectionObserver ignores a fully
+   clipped target, so the observed frame itself must stay unclipped. */
+.motion [data-reveal='image'],
+.motion [data-reveal='image']:not(.is-in) {
+  opacity: 1;
+  transform: none;
+}
+
+.motion [data-reveal='image'] > * {
+  transition: clip-path 1100ms var(--ease-emphasis);
+  transition-delay: var(--delay, 0ms);
+}
+
+.motion [data-reveal='image']:not(.is-in) > * {
+  clip-path: inset(100% 0 0 0);
+}
+
+.motion [data-reveal='image'] img {
+  transition: transform 1600ms var(--ease-emphasis);
+  transition-delay: var(--delay, 0ms);
+}
+
+.motion [data-reveal='image']:not(.is-in) img {
+  transform: scale(1.12);
+}
+
+/* ---- Word-by-word (used sparingly: the statement only) ---- */
+.motion [data-words] .w {
+  display: inline-block;
+  transition:
+    opacity 700ms var(--ease-standard),
+    transform 900ms var(--ease-emphasis);
+  transition-delay: calc(var(--i, 0) * 55ms + var(--delay, 0ms));
+}
+
+.motion [data-words]:not(.is-in) .w {
+  opacity: 0;
+  transform: translate3d(0, 0.32em, 0);
+}
+
+/* ---- Page-load sequence for opening scenes ----
+   0.00 background · 0.15 image drift · 0.25 headline · 0.40 copy · 0.55 CTA · 0.70 nav */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes settle {
+  from {
+    transform: scale(1.08);
+  }
+}
+
+.motion [data-intro] {
+  animation: rise-in 1000ms var(--ease-emphasis) both;
+  animation-delay: var(--intro, 0ms);
+}
+
+.motion [data-intro='fade'] {
+  animation-name: fade-in;
+  animation-duration: 900ms;
+}
+
+.motion [data-intro='settle'] {
+  animation: fade-in 600ms var(--ease-standard) both, settle 2600ms var(--ease-emphasis) both;
+  animation-delay: 0ms, 150ms;
+}
+
+/* ---- Cross-document view transitions (Chrome, Edge, Safari 18.2+) ----
+   A vehicle image in a card shares its view-transition-name with the
+   hero of the detail page, so it appears to expand into the new page.
+   Browsers without support simply navigate. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-standard);
+}
+
+::view-transition-group(*) {
+  animation-duration: 700ms;
+  animation-timing-function: var(--ease-emphasis);
+}
+
+::view-transition-old(*),
+::view-transition-new(*) {
+  height: 100%;
+  object-fit: cover;
+  overflow: clip;
+}
+
+.site-header {
+  view-transition-name: site-header;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
