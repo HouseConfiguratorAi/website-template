@@ -67,12 +67,13 @@ for (const img of v.images.slice(0, 4)) {
   image={cover?.src}
   type="product"
   noindex={isSold}
+  dock={isSold}
   jsonLd={[
     vehicleLd(v, ldImages),
     breadcrumbLd([
       { name: 'Home', path: '/' },
-      { name: 'Aanbod', path: '/aanbod' },
-      { name: title, path: `/aanbod/${v.slug}` },
+      { name: 'Voorraad', path: '/voorraad' },
+      { name: title, path: `/voorraad/${v.slug}` },
     ]),
   ]}
 >
@@ -98,13 +99,13 @@ for (const img of v.images.slice(0, 4)) {
       <div class="vd-bar-top">
         <nav class="vd-crumbs t-meta" aria-label="Kruimelpad">
           <ol role="list">
-            <li><a class="link" href="/aanbod">Aanbod</a></li>
+            <li><a class="link" href="/voorraad">Voorraad</a></li>
             <li aria-current="page">{v.brand} {v.model}</li>
           </ol>
         </nav>
         <p class="vd-facts t-meta muted">
           <span>Ref. {v.id}</span>
-          {v.listed && <span>Geplaatst {formatDate(new Date(v.listed))}</span>}
+          {v.listed && <span class="vd-facts__listed">Geplaatst {formatDate(new Date(v.listed))}</span>}
           <span>{v.status === 'incoming' ? 'Keuring volgt' : 'Gekeurd'}</span>
           <button type="button" class="vd-copy" data-copy-link>Kopieer link</button>
         </p>
@@ -154,7 +155,7 @@ for (const img of v.images.slice(0, 4)) {
       <div class="vd-notice" data-tone="light">
         <div class="container container--gallery">
           <p class="t-body">
-            Deze auto is verkocht en blijft hier staan als onderdeel van ons archief. <a class="link" href="/aanbod">Bekijk wat nu beschikbaar is</a> of{' '}
+            Deze auto is verkocht en blijft hier staan als onderdeel van ons archief. <a class="link" href="/voorraad">Bekijk wat nu beschikbaar is</a> of{' '}
             <a class="link" href="/diensten#zoekopdracht">vraag ons een vergelijkbare te zoeken</a>.
           </p>
         </div>
@@ -202,12 +203,15 @@ for (const img of v.images.slice(0, 4)) {
           <h2 class="t-title" data-reveal>Uitrusting</h2>
           <div class="vd-equipment__groups">
             {v.features.map((g, i) => (
-              <div class="vd-equipment__group" data-reveal style={`--delay:${i * 80}ms`}>
-                <h3 class="t-eyebrow muted">{g.group}</h3>
+              <details class="vd-equipment__group" open data-reveal style={`--delay:${i * 80}ms`}>
+                <summary>
+                  <h3 class="t-eyebrow muted">{g.group}</h3>
+                  <span class="vd-equipment__count t-meta muted">{g.items.length}</span>
+                </summary>
                 <ul role="list">
                   {g.items.map((item) => <li>{item}</li>)}
                 </ul>
-              </div>
+              </details>
             ))}
           </div>
         </div>
@@ -470,9 +474,28 @@ for (const img of v.images.slice(0, 4)) {
     align-content: start;
   }
 
+  .vd-equipment__group summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-4);
+    list-style: none;
+    /* Always open on larger screens: the summary is a heading, not a control. */
+    pointer-events: none;
+  }
+
+  .vd-equipment__group summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .vd-equipment__count {
+    display: none;
+  }
+
   .vd-equipment__group ul {
     display: grid;
     gap: 10px;
+    margin-top: var(--s-4);
     font-size: var(--fs-small);
   }
 
@@ -531,8 +554,53 @@ for (const img of v.images.slice(0, 4)) {
     .vd-head__actions .btn {
       flex: 1 1 100%;
     }
+    /* Phones: equipment groups fold, so the page stays short. */
     .vd-equipment__groups {
       grid-template-columns: 1fr;
+      gap: 0;
+      border-top: 1px solid var(--border);
+    }
+    .vd-equipment {
+      gap: var(--s-6);
+    }
+    .vd-equipment__group {
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .vd-equipment__group summary {
+      pointer-events: auto;
+      cursor: pointer;
+      align-items: center;
+      min-height: 56px;
+    }
+    .vd-equipment__count {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .vd-equipment__count::after {
+      content: '+';
+      font-size: 1.125rem;
+      line-height: 1;
+      color: var(--fg);
+      transition: transform 400ms var(--ease-emphasis);
+    }
+    .vd-equipment__group[open] .vd-equipment__count::after {
+      transform: rotate(45deg);
+    }
+    .vd-equipment__group ul {
+      margin: 0 0 var(--s-5);
+    }
+    /* Facts line: fewer items, no separators. */
+    .vd-facts {
+      gap: 4px 14px;
+    }
+    .vd-facts > span + span::before,
+    .vd-copy::before {
+      content: none;
+    }
+    .vd-facts__listed {
+      display: none;
     }
 
     .vd-bar {
@@ -562,6 +630,11 @@ for (const img of v.images.slice(0, 4)) {
 </style>
 
 <script>
+  // Phones: fold all equipment groups but the first.
+  if (matchMedia('(max-width: 47.99rem)').matches) {
+    document.querySelectorAll<HTMLDetailsElement>('.vd-equipment__group').forEach((d, i) => i > 0 && (d.open = false));
+  }
+
   // Copy the page link, with a short confirmation.
   document.querySelectorAll<HTMLButtonElement>('[data-copy-link]').forEach((btn) => {
     btn.addEventListener('click', async () => {

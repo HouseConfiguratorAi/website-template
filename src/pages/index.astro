@@ -16,7 +16,7 @@ import { getFeaturedVehicle, getListedVehicles } from '@/lib/inventory';
 import { dealerLd } from '@/lib/seo';
 
 const featured = await getFeaturedVehicle();
-// The homepage shows photographed cars only; incoming cars live on /aanbod.
+// The homepage shows photographed cars only; incoming cars live on /voorraad.
 const listed = await getListedVehicles();
 const collection = listed.filter((v) => v.slug !== featured.slug && v.images.length).slice(0, 4);
 // One name per model for the flowing band.

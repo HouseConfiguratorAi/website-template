@@ -4,7 +4,7 @@
  * photograph edge to edge, four key figures, then price and actions.
  */
 import type { Vehicle } from '@/lib/inventory';
-import { coverImage, imageOfKind, vehicleUrl } from '@/lib/inventory';
+import { coverImage, vehicleUrl } from '@/lib/inventory';
 import { formatPrice } from '@/lib/format';
 import { keyFigures } from '@/lib/specs';
 import { home } from '@/config/content';
@@ -17,7 +17,6 @@ import KeyFigures from '@/components/vehicles/KeyFigures.astro';
 interface Props { vehicle: Vehicle }
 const { vehicle: v } = Astro.props;
 const cover = coverImage(v);
-const portrait = imageOfKind(v, 'portrait');
 ---
 
 <section class="featured" data-tone="dark" aria-labelledby="featured-title">
@@ -32,7 +31,6 @@ const portrait = imageOfKind(v, 'portrait');
       <div class="featured__zoom">
         <Media
           src={cover?.src}
-          mobileSrc={portrait?.src}
           alt={cover?.alt ?? ''}
           sizes="100vw"
           focal="48% 58%"
@@ -151,7 +149,17 @@ const portrait = imageOfKind(v, 'portrait');
 
   @media (max-width: 47.99rem) {
     .featured__media {
-      aspect-ratio: 4 / 5;
+      aspect-ratio: 4 / 3;
+    }
+    .featured__head {
+      padding-bottom: var(--s-6);
+    }
+    .featured__info {
+      gap: var(--s-7);
+      padding-top: var(--s-6);
+    }
+    .featured__summary {
+      font-size: var(--fs-body);
     }
     .featured__actions {
       width: 100%;

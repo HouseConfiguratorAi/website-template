@@ -18,18 +18,18 @@ const models = [...new Map((await getListedVehicles()).map((v) => [`${v.brand} $
     </div>
 
     <div class="site-footer__cols">
-      <nav class="site-footer__col" aria-label="Aanbod">
-        <h2 class="t-eyebrow">Aanbod</h2>
+      <nav class="site-footer__col" aria-label="Voorraad">
+        <h2 class="t-eyebrow">Voorraad</h2>
         <ul role="list">
           {models.map((v) => <li><a class="link" href={vehicleUrl(v)}>{v.brand} {v.model}</a></li>)}
-          <li><a class="link site-footer__all" href="/aanbod">Volledig aanbod</a></li>
+          <li><a class="link site-footer__all" href="/voorraad">Volledige voorraad</a></li>
         </ul>
       </nav>
 
       <nav class="site-footer__col" aria-label="Footer">
         <h2 class="t-eyebrow">Oberhall</h2>
         <ul role="list">
-          {navigation.primary.filter((i) => i.href !== '/aanbod').map((item) => <li><a class="link" href={item.href}>{item.label}</a></li>)}
+          {navigation.primary.filter((i) => i.href !== '/voorraad').map((item) => <li><a class="link" href={item.href}>{item.label}</a></li>)}
         </ul>
       </nav>
 

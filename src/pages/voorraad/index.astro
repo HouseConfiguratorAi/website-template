@@ -1,0 +1,485 @@
+---
+/**
+ * Voorraad — the complete inventory.
+ * Status tiles doubling as quick filters, a sticky toolbar (search, filters,
+ * sort, grid/list view), and a results list rendered on the server so every
+ * car is visible and indexable without JavaScript.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import VehicleCard from '@/components/vehicles/VehicleCard.astro';
+import VehicleFilters from '@/components/vehicles/VehicleFilters.astro';
+import Heading from '@/components/ui/Heading.astro';
+import Arrow from '@/components/ui/Arrow.astro';
+import { getListedVehicles, statusLabel } from '@/lib/inventory';
+import { breadcrumbLd } from '@/lib/seo';
+import { site, contact } from '@/config/site';
+import { formatDate, formatPrice } from '@/lib/format';
+
+const vehicles = await getListedVehicles();
+const count = vehicles.length;
+const updated = vehicles.map((v) => v.listed).filter(Boolean).sort().at(-1);
+const words = ['Geen', 'Eén', 'Twee', 'Drie', 'Vier', 'Vijf', 'Zes', 'Zeven', 'Acht', 'Negen', 'Tien', 'Elf', 'Twaalf'];
+const countWord = words[count] ?? String(count);
+
+const byStatus = (['available', 'reserved', 'incoming'] as const)
+  .map((status) => ({ status, n: vehicles.filter((v) => v.status === status).length }))
+  .filter((s) => s.n > 0);
+const prices = vehicles.map((v) => v.price).filter((p): p is number => p != null);
+const priceRange = prices.length ? `${formatPrice(Math.min(...prices))} – ${formatPrice(Math.max(...prices))}` : '';
+---
+
+<BaseLayout
+  title="Voorraad"
+  description={`${countWord} geselecteerde sport- en GT-auto’s op voorraad bij ${site.name} in Amsterdam. Gekeurd, gedocumenteerd en gefotografeerd.`}
+  image="journal-collection"
+  jsonLd={breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Voorraad', path: '/voorraad' }])}
+>
+  <section class="inv-intro" data-tone="dark">
+    <div class="container inv-intro__inner">
+      <p class="inv-intro__label" data-intro="fade" style="--intro:150ms">
+        <span class="t-eyebrow">Voorraad</span>
+        {updated && <span class="t-meta muted">Bijgewerkt {formatDate(new Date(updated))}</span>}
+      </p>
+      <Heading as="h1" size="display" text={`${countWord} auto’s. *Elk* bewust gekozen.`} reveal="load" delay={200} class="inv-intro__title" />
+      <p class="t-lead inv-intro__lead" data-intro style="--intro:400ms">
+        Elke auto is gekeurd, gedocumenteerd en staat in onze showroom in {contact.address.city}. Vraag van elke auto het volledige dossier op.
+      </p>
+    </div>
+
+    <!-- Status tiles: a summary of the stock that also filters it. -->
+    <div class="container container--gallery" data-intro style="--intro:550ms">
+      <fieldset class="inv-stats">
+        <legend class="sr-only">Toon op status</legend>
+        <label class="inv-stat">
+          <input type="radio" name="status" value="" data-f checked />
+          <span class="inv-stat__n">{count}</span>
+          <span class="inv-stat__k t-meta">Op voorraad</span>
+        </label>
+        {
+          byStatus.map((s) => (
+            <label class="inv-stat">
+              <input type="radio" name="status" value={s.status} data-f />
+              <span class="inv-stat__n">{s.n}</span>
+              <span class="inv-stat__k t-meta status-dot" data-status={s.status}>{statusLabel[s.status]}</span>
+            </label>
+          ))
+        }
+        {
+          priceRange && (
+            <div class="inv-stat inv-stat--static">
+              <span class="inv-stat__range">{priceRange}</span>
+              <span class="inv-stat__k t-meta">Prijsklasse, incl. btw</span>
+            </div>
+          )
+        }
+      </fieldset>
+    </div>
+  </section>
+
+  <section class="inv" data-tone="dark" aria-label="Auto’s op voorraad">
+    <VehicleFilters vehicles={vehicles} />
+
+    <div class="container container--gallery">
+      <ul class="inv__results" role="list" data-results data-view="grid">
+        {
+          vehicles.map((v, i) => (
+            <li
+              class="inv__item"
+              data-vehicle
+              data-status={v.status}
+              data-make={v.brand}
+              data-model={v.model}
+              data-body={v.bodyType}
+              data-fuel={v.fuel}
+              data-transmission={v.transmission}
+              data-price={v.price ?? ''}
+              data-year={v.year}
+              data-mileage={v.mileage}
+              data-order={i}
+              data-photo={v.images.length ? '' : undefined}
+              data-search={`${v.brand} ${v.model} ${v.variant ?? ''} ${v.year} ${v.exteriorColor} ${v.bodyType} ${v.fuel} ${v.transmission} ${v.id}`.toLowerCase()}
+            >
+              <VehicleCard vehicle={v} ratio="3 / 2" sizes="(min-width: 64rem) 50vw, 100vw" headingLevel="h2" />
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="inv__empty" data-empty hidden>
+        <p class="t-title">Geen auto’s gevonden.</p>
+        <p class="t-body muted">Probeer minder filters — of vertel ons wat u zoekt, dan gaan wij op zoek.</p>
+        <div class="inv__empty-actions">
+          <button class="btn btn--primary" type="button" data-clear>Wis filters</button>
+          <a class="link-arrow" href="/contact">Laat ons zoeken</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Closing offer: the search service for cars that are not in stock. -->
+  <section class="inv-search" data-tone="light">
+    <div class="container inv-search__inner">
+      <p class="t-eyebrow muted">Zoekopdracht</p>
+      <Heading as="h2" size="headline" text="Niet gevonden wat u *zoekt?*" />
+      <p class="t-body muted inv-search__body">
+        De meeste bijzondere auto’s komen nooit online. Vertel ons welke auto, uitvoering en kleur u zoekt — wij zoeken in privécollecties en specialistische netwerken en keuren voordat we iets aanraden.
+      </p>
+      <div class="inv-search__actions">
+        <a class="btn btn--primary" href="/diensten#zoekopdracht">Start een zoekopdracht <Arrow /></a>
+        <a class="btn btn--ghost" href={`tel:${contact.phoneHref}`}>Bel {contact.phone}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .inv-intro {
+    padding-top: calc(var(--header-h) + var(--section-s));
+    padding-bottom: var(--s-8);
+  }
+
+  .inv-intro__inner {
+    display: grid;
+    justify-items: center;
+    gap: var(--s-5);
+    text-align: center;
+  }
+
+  .inv-intro__label {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+  }
+
+  .inv-intro__inner > :global(.inv-intro__title) {
+    max-width: 14ch;
+    font-size: clamp(2.2rem, 0.9rem + 5.2vw, 7rem);
+  }
+
+  .inv-intro__lead {
+    max-width: 32em;
+    color: color-mix(in srgb, var(--fg) 80%, transparent);
+  }
+
+  /* ---- Status tiles ---- */
+  .inv-stats {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    margin: var(--s-8) 0 0;
+    padding: 0;
+    border: 0;
+    border-top: 1px solid var(--border);
+    min-width: 0;
+  }
+
+  .inv-stat {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    padding: var(--s-5) var(--s-5) var(--s-4);
+    cursor: pointer;
+    transition: background-color var(--dur-micro) var(--ease-standard);
+  }
+
+  .inv-stat + .inv-stat {
+    border-left: 1px solid var(--border);
+  }
+
+  .inv-stat input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  /* The selected tile is marked with a red bar along its top edge. */
+  .inv-stat::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -1px;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 500ms var(--ease-emphasis);
+  }
+
+  .inv-stat:has(input:checked)::before {
+    transform: scaleX(1);
+  }
+
+  .inv-stat:hover:not(.inv-stat--static) {
+    background: color-mix(in srgb, var(--fg) 4%, transparent);
+  }
+
+  .inv-stat:has(input:focus-visible) {
+    outline: 2px solid var(--accent-ink);
+    outline-offset: -2px;
+  }
+
+  .inv-stat--static {
+    cursor: default;
+  }
+
+  .inv-stat__n {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1.4rem + 2vw, 3.5rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .inv-stat__range {
+    font-size: clamp(1rem, 0.9rem + 0.5vw, 1.375rem);
+    line-height: 1.1;
+    min-height: clamp(2rem, 1.4rem + 2vw, 3.5rem);
+    display: flex;
+    align-items: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .inv-stat__k {
+    color: var(--muted);
+  }
+
+  .inv-stat:has(input:checked) .inv-stat__k {
+    color: var(--fg);
+  }
+
+  /* ---- Results ---- */
+  .inv {
+    padding-bottom: var(--section-m);
+  }
+
+  .inv__results {
+    list-style: none;
+    margin: var(--s-8) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-9) var(--gutter);
+  }
+
+  /* Grid view: every fifth visible car takes the full width — a pause in the catalogue. */
+  .inv__results[data-view='grid'] .inv__item[data-photo]:nth-child(5n + 1 of :not([hidden])) {
+    grid-column: 1 / -1;
+  }
+
+  .inv__results[data-view='grid'] .inv__item[data-photo]:nth-child(5n + 1 of :not([hidden])) :global(.vcard__media) {
+    aspect-ratio: 21 / 9 !important;
+  }
+
+  .inv__item[hidden] {
+    display: none;
+  }
+
+  /* List view: one row per car — photo, identity, specs, price. */
+  .inv__results[data-view='list'] {
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .inv__results[data-view='list'] .inv__item {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .inv__results[data-view='list'] :global(.card-link) {
+    grid-template-columns: minmax(180px, 26%) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--s-6);
+    padding-block: var(--s-5);
+  }
+
+  .inv__results[data-view='list'] :global(.vcard__media) {
+    aspect-ratio: 3 / 2 !important;
+  }
+
+  .inv__results[data-view='list'] :global(.vcard__body) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--s-6);
+    align-items: center;
+  }
+
+  .inv__results[data-view='list'] :global(.vcard__body > *) {
+    grid-column: 1;
+  }
+
+  .inv__results[data-view='list'] :global(.vcard__foot) {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    flex-direction: column;
+    align-items: flex-end;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .inv__results[data-view='list'] :global(.vcard__price) {
+    font-size: var(--fs-price);
+  }
+
+  .inv__results[data-view='list'] :global(.vcard__top) {
+    justify-content: flex-start;
+  }
+
+  .inv__empty {
+    display: grid;
+    justify-items: start;
+    gap: var(--s-5);
+    padding-block: var(--section-m);
+    max-width: 40rem;
+  }
+
+  .inv__empty[hidden] {
+    display: none;
+  }
+
+  .inv__empty-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-6);
+    margin-top: var(--s-4);
+  }
+
+  /* ---- Search service ---- */
+  .inv-search {
+    padding-block: var(--section-m);
+  }
+
+  .inv-search__inner {
+    display: grid;
+    justify-items: center;
+    gap: var(--s-5);
+    text-align: center;
+  }
+
+  .inv-search__body {
+    max-width: 36rem;
+  }
+
+  .inv-search__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--s-3);
+    margin-top: var(--s-3);
+  }
+
+  @media (max-width: 63.99rem) {
+    .inv-stats {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .inv-stat:nth-child(odd of .inv-stat) {
+      border-left: 0;
+    }
+    .inv-stat:nth-child(n + 3 of .inv-stat) {
+      border-top: 1px solid var(--border);
+    }
+    .inv-stat--static {
+      grid-column: 1 / -1;
+      border-left: 0 !important;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .inv-intro {
+      padding-bottom: var(--s-6);
+    }
+    .inv-intro__lead {
+      font-size: var(--fs-body);
+    }
+    /* Phones: the tiles become one compact row of four, the price range steps back. */
+    .inv-stats {
+      margin-top: var(--s-6);
+      grid-auto-flow: column;
+      grid-template-columns: none;
+      grid-auto-columns: minmax(0, 1fr);
+    }
+    .inv-stat {
+      padding: var(--s-4) 6px var(--s-3);
+      justify-items: center;
+      text-align: center;
+      gap: 6px;
+    }
+    .inv-stat + .inv-stat {
+      border-left: 1px solid var(--border) !important;
+      border-top: 0 !important;
+    }
+    .inv-stat--static {
+      display: none;
+    }
+    .inv-stat__n {
+      font-size: 1.75rem;
+    }
+    .inv-stat__k {
+      font-size: 0.5625rem;
+      letter-spacing: 0.04em;
+    }
+    .inv-stat__k.status-dot {
+      flex-direction: column;
+      gap: 4px;
+    }
+    .inv-intro__inner > :global(.inv-intro__title) {
+      font-size: 2.25rem;
+    }
+    .inv-intro__lead {
+      font-size: var(--fs-small);
+    }
+    .inv__results {
+      grid-template-columns: 1fr;
+      row-gap: var(--s-8);
+      margin-top: var(--s-6);
+    }
+    .inv__results[data-view='grid'] .inv__item[data-photo]:nth-child(5n + 1 of :not([hidden])) :global(.vcard__media) {
+      aspect-ratio: 3 / 2 !important;
+    }
+    /* Phone list: compact rows, photo left, essentials right — six cars per screen. */
+    .inv__results[data-view='list'] :global(.card-link) {
+      grid-template-columns: 42% minmax(0, 1fr);
+      gap: var(--s-4);
+      padding-block: var(--s-4);
+    }
+    .inv__results[data-view='list'] :global(.vcard__body) {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+    .inv__results[data-view='list'] :global(.vcard__foot) {
+      grid-column: 1;
+      grid-row: auto;
+      flex-direction: row;
+      align-items: center;
+      margin-top: 6px;
+    }
+    .inv__results[data-view='list'] :global(.vcard__title) {
+      font-size: 1.125rem;
+    }
+    .inv__results[data-view='list'] :global(.vcard__variant),
+    .inv__results[data-view='list'] :global(.vcard__more),
+    .inv__results[data-view='list'] :global(.vcard__meta div:last-child) {
+      display: none;
+    }
+    .inv__results[data-view='list'] :global(.vcard__price) {
+      font-size: var(--fs-small);
+    }
+    .inv__results[data-view='list'] :global(.vcard__flag) {
+      top: 6px;
+      left: 6px;
+      padding: 4px 6px;
+      font-size: 0.5625rem;
+    }
+    .inv-search__actions {
+      width: 100%;
+    }
+    .inv-search__actions .btn {
+      flex: 1 1 100%;
+    }
+  }
+</style>

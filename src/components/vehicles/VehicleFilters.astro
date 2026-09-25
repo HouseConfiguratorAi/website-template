@@ -34,9 +34,9 @@ const mileageSteps = [5000, 10000, 25000, 50000, 100000].filter((m) => m <= Math
 <div class="fbar" data-filters>
   <div class="container container--gallery fbar__inner">
     <div class="fbar__search">
-      <label class="sr-only" for="f-q">Zoek in het aanbod</label>
+      <label class="sr-only" for="f-q">Zoek in de voorraad</label>
       <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" /><path d="M13 13l5 5" stroke="currentColor" /></svg>
-      <input id="f-q" type="search" name="q" placeholder="Zoek op merk, model, kleur" autocomplete="off" data-f />
+      <input id="f-q" type="search" name="q" placeholder="Merk, model of kleur" autocomplete="off" data-f />
     </div>
 
     <div class="fbar__inline">
@@ -68,12 +68,38 @@ const mileageSteps = [5000, 10000, 25000, 50000, 100000].filter((m) => m <= Math
 
     <button class="fbar__more" type="button" data-open-panel aria-haspopup="dialog" aria-controls="filter-panel">
       <svg viewBox="0 0 20 14" aria-hidden="true"><path d="M0 3h20M0 11h20" stroke="currentColor" /><circle cx="6" cy="3" r="2.2" fill="var(--bg)" stroke="currentColor" /><circle cx="14" cy="11" r="2.2" fill="var(--bg)" stroke="currentColor" /></svg>
-      Filters <span class="fbar__badge" data-active-count hidden></span>
+      <span class="fbar__more-label">Filters</span> <span class="fbar__badge" data-active-count hidden></span>
     </button>
+
+    <fieldset class="fview" data-view-toggle>
+      <legend class="sr-only">Weergave</legend>
+      <label class="fview__opt">
+        <input type="radio" name="view" value="grid" checked />
+        <svg viewBox="0 0 18 18" aria-hidden="true"><rect x="1" y="1" width="7" height="7" fill="none" stroke="currentColor" /><rect x="10" y="1" width="7" height="7" fill="none" stroke="currentColor" /><rect x="1" y="10" width="7" height="7" fill="none" stroke="currentColor" /><rect x="10" y="10" width="7" height="7" fill="none" stroke="currentColor" /></svg>
+        <span class="sr-only">Galerij</span>
+      </label>
+      <label class="fview__opt">
+        <input type="radio" name="view" value="list" />
+        <svg viewBox="0 0 18 18" aria-hidden="true"><rect x="1" y="2" width="5" height="4" fill="none" stroke="currentColor" /><path d="M8 4h9" stroke="currentColor" /><rect x="1" y="12" width="5" height="4" fill="none" stroke="currentColor" /><path d="M8 14h9" stroke="currentColor" /></svg>
+        <span class="sr-only">Lijst</span>
+      </label>
+    </fieldset>
   </div>
   <div class="container container--gallery fbar__status">
     <p class="t-meta muted" data-count aria-live="polite">{vehicles.length} auto’s</p>
-    <button class="t-meta link" type="button" data-clear hidden>Alles wissen</button>
+    <div class="fbar__status-end">
+      <button class="t-meta link" type="button" data-clear hidden>Alles wissen</button>
+      <label class="fbar__msort">
+        <span class="t-meta muted">Sorteer</span>
+        <select name="sort" data-f>
+          <option value="">Aanbevolen</option>
+          <option value="price-asc">Prijs, laag naar hoog</option>
+          <option value="price-desc">Prijs, hoog naar laag</option>
+          <option value="year-desc">Nieuwste eerst</option>
+          <option value="mileage-asc">Laagste kilometerstand</option>
+        </select>
+      </label>
+    </div>
   </div>
 </div>
 
@@ -86,6 +112,16 @@ const mileageSteps = [5000, 10000, 25000, 50000, 100000].filter((m) => m <= Math
   </div>
 
   <div class="fpanel__body">
+    <div class="ffield">
+      <label for="p-sort">Sorteer op</label>
+      <select id="p-sort" name="sort" data-f>
+          <option value="">Aanbevolen</option>
+          <option value="price-asc">Prijs, laag naar hoog</option>
+          <option value="price-desc">Prijs, hoog naar laag</option>
+          <option value="year-desc">Nieuwste eerst</option>
+          <option value="mileage-asc">Laagste kilometerstand</option>
+      </select>
+    </div>
     <div class="ffield">
       <label for="p-make">Merk</label>
       <select id="p-make" name="make" data-f>
@@ -259,6 +295,99 @@ const mileageSteps = [5000, 10000, 25000, 50000, 100000].filter((m) => m <= Math
     height: 14px;
   }
 
+  .fview {
+    display: flex;
+    margin: 0;
+    padding: 0 0 0 var(--s-4);
+    border: 0;
+    border-left: 1px solid var(--border);
+  }
+
+  .fview__opt {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    min-height: 44px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color var(--dur-micro);
+  }
+
+  .fview__opt input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .fview__opt svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .fview__opt:hover,
+  .fview__opt:has(input:checked) {
+    color: var(--fg);
+  }
+
+  .fview__opt:has(input:checked)::after {
+    content: '';
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 6px;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  .fview__opt:has(input:focus-visible) {
+    outline: 2px solid var(--accent-ink);
+    outline-offset: -2px;
+  }
+
+  .fbar__status-end {
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+  }
+
+  .fbar__msort {
+    position: relative;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .fbar__msort select {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 8px 20px 8px 0;
+    min-height: 40px;
+    /* 16px: iOS zooms into smaller form controls on focus. */
+    font-size: 1rem;
+    color: var(--fg);
+  }
+
+  .fbar__msort::after {
+    content: '';
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-right: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+
+  .fbar__msort select option {
+    background: var(--bg);
+    color: var(--fg);
+  }
+
   .fbar__badge {
     display: inline-grid;
     place-items: center;
@@ -287,6 +416,36 @@ const mileageSteps = [5000, 10000, 25000, 50000, 100000].filter((m) => m <= Math
   @media (max-width: 63.99rem) {
     .fbar__inline {
       display: none;
+    }
+    .fbar__msort {
+      display: inline-flex;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .fbar__inner {
+      gap: var(--s-3);
+      min-height: 56px;
+    }
+    .fbar__search {
+      flex-basis: 0;
+    }
+    .fbar__more-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+    .fbar__more {
+      padding-inline: 10px;
+    }
+    .fview {
+      padding-left: 0;
+    }
+    .fview__opt {
+      width: 40px;
     }
   }
 
@@ -485,7 +644,7 @@ const mileageSteps = [5000, 10000, 25000, 50000, 100000].filter((m) => m <= Math
 
 <script>
   type State = Record<string, string>;
-  const KEYS = ['q', 'make', 'model', 'body', 'fuel', 'transmission', 'priceMax', 'yearMin', 'mileageMax', 'sort'];
+  const KEYS = ['q', 'status', 'make', 'model', 'body', 'fuel', 'transmission', 'priceMax', 'yearMin', 'mileageMax', 'sort'];
 
   const root = document.querySelector<HTMLElement>('[data-filters]');
   const panel = document.querySelector<HTMLDialogElement>('[data-panel]');
@@ -508,6 +667,19 @@ const mileageSteps = [5000, 10000, 25000, 50000, 100000].filter((m) => m <= Math
 
     let state: State = readUrl();
 
+    // Grid or list. The choice is kept in the URL and remembered on this device.
+    const viewInputs = [...document.querySelectorAll<HTMLInputElement>('[data-view-toggle] input')];
+    const stored = (() => { try { return localStorage.getItem('inventory-view'); } catch { return null; } })();
+    let view = new URLSearchParams(location.search).get('view') || stored || 'grid';
+    const setView = (v: string) => {
+      view = v === 'list' ? 'list' : 'grid';
+      list.dataset.view = view;
+      viewInputs.forEach((i) => (i.checked = i.value === view));
+      try { localStorage.setItem('inventory-view', view); } catch { /* private mode */ }
+    };
+    setView(view);
+    viewInputs.forEach((i) => i.addEventListener('change', () => { setView(i.value); apply(); }));
+
     // Keep every control with the same name in sync (inline bar ↔ panel).
     const render = () => {
       for (const c of controls) {
@@ -528,6 +700,7 @@ const mileageSteps = [5000, 10000, 25000, 50000, 100000].filter((m) => m <= Math
         const price = d.price ? Number(d.price) : null;
         const ok =
           terms.every((t) => d.search!.includes(t)) &&
+          (!state.status || d.status === state.status) &&
           (!state.make || d.make === state.make) &&
           (!state.model || d.model === state.model) &&
           (!state.body || d.body === state.body) &&
@@ -570,6 +743,7 @@ const mileageSteps = [5000, 10000, 25000, 50000, 100000].filter((m) => m <= Math
 
       const params = new URLSearchParams();
       KEYS.forEach((k) => state[k] && params.set(k, state[k]));
+      if (view === 'list') params.set('view', 'list');
       const qs = params.toString();
       history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
     };

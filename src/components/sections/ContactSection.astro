@@ -56,8 +56,13 @@ const { eyebrow, index, headline, body, vehicle, headingLevel: H = 'h2', id = 'a
   .contact__direct {
     display: grid;
     justify-items: start;
-    gap: 4px;
-    margin-top: var(--s-5);
+    gap: 0;
+    margin-top: var(--s-4);
+  }
+  .contact__direct a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
   }
   .contact__form {
     grid-column: 7 / -1;

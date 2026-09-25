@@ -17,7 +17,7 @@ export const home = {
     eyebrow: 'Amsterdam — Geselecteerde automobielen',
     headline: 'Het wachten *waard.*',
     supporting: 'Een kleine collectie sport- en GT-auto’s. Elke auto gekeurd, gedocumenteerd en met een reden gekozen.',
-    primary: { label: 'Ontdek het aanbod', href: '/aanbod' },
+    primary: { label: 'Bekijk de voorraad', href: '/voorraad' },
     secondary: { label: 'Ons verhaal', href: '/over-ons' },
     image: 'hero-wide',
     imageMobile: 'hero-tall',
@@ -37,7 +37,7 @@ export const home = {
     eyebrow: 'De collectie',
     headline: 'Nu in de *showroom.*',
     body: 'Elke auto staat in de showroom en is klaar om te bezichtigen. Verkochte auto’s verdwijnen van de lijst — de goede blijven zelden lang.',
-    cta: { label: 'Bekijk het volledige aanbod', href: '/aanbod' },
+    cta: { label: 'Bekijk de voorraad', href: '/voorraad' },
   },
   philosophy: {
     eyebrow: 'Filosofie',
@@ -74,7 +74,7 @@ export const home = {
   },
   final: {
     headline: 'Vind een auto die het *rijden waard* is.',
-    cta: { label: 'Ontdek de collectie', href: '/aanbod' },
+    cta: { label: 'Ontdek de collectie', href: '/voorraad' },
     image: 'final-scene',
     imageAlt: 'Een auto rijdt naar een lichtspleet aan het einde van een donkere hal, achterlichten gloeiend',
   },
