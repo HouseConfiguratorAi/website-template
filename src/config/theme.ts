@@ -5,9 +5,10 @@
  * Components never contain hard-coded colours — they read semantic
  * tokens (--bg, --fg, --muted, --accent …) that change per section tone.
  *
- * Each section on a page is either `dark` or `light`. A theme defines
- * both tones, so the rhythm of dark and light scenes survives any
- * rebrand. Pick a preset, then override individual values if needed.
+ * Each section on a page is `dark`, `light` or `signal` (the brand
+ * colour, used once or twice per page). A theme defines every tone, so
+ * the rhythm of scenes survives any rebrand. Pick a preset, then
+ * override individual values if needed.
  */
 
 export type Tone = {
@@ -19,10 +20,12 @@ export type Tone = {
   foreground: string;
   /** Secondary text — captions, metadata. Must keep ≥ 4.5:1 contrast on background. */
   muted: string;
-  /** Brand accent — rules, active states, primary buttons. */
+  /** Brand accent as a fill — primary buttons, rules, active states. */
   accent: string;
-  /** Text colour on top of the accent. */
+  /** Text colour on top of the accent fill (≥ 4.5:1). */
   accentContrast: string;
+  /** Accent used as text — emphasised words, indices (≥ 4.5:1 on background). Defaults to `accent`. */
+  accentInk?: string;
   /** Hairlines and dividers. */
   border: string;
 };
@@ -31,14 +34,16 @@ export type Theme = {
   name: string;
   dark: Tone;
   light: Tone;
+  /** Brand-colour sections. Derived from the dark accent when omitted. */
+  signal?: Tone;
   type: {
-    /** 'serif' = editorial Newsreader display, 'sans' = expanded Archivo display. */
+    /** 'serif' = editorial Newsreader display, 'sans' = Archivo grotesk display. */
     display: 'serif' | 'sans';
     /** Weight of display/headline type (serif looks best 300–400, sans 500–700). */
     displayWeight: number;
     /** Letter-spacing of display type in em. */
     displayTracking: string;
-    /** Width of the sans for display, 100 = normal, 125 = fully expanded. */
+    /** Width of the sans for display: 62 = condensed, 100 = normal, 125 = expanded. */
     displayWidth: number;
     /** Use italics for emphasised words in headlines (<em>). */
     italicAccents: boolean;
@@ -48,7 +53,44 @@ export type Theme = {
 };
 
 export const presets = {
-  /** Default: dark luxury dealership — warm black, sand, cream. */
+  /** Default: racing red, pure white, deep black — precise and motorsport-led. */
+  corsa: {
+    name: 'Corsa',
+    dark: {
+      background: '#0A0A0A',
+      surface: '#161616',
+      foreground: '#FFFFFF',
+      muted: '#A3A3A3',
+      accent: '#D0021B',
+      accentContrast: '#FFFFFF',
+      accentInk: '#FF3345',
+      border: 'rgba(255, 255, 255, 0.14)',
+    },
+    light: {
+      background: '#FFFFFF',
+      surface: '#F2F2F0',
+      foreground: '#0A0A0A',
+      muted: '#5E5E5E',
+      accent: '#D0021B',
+      accentContrast: '#FFFFFF',
+      accentInk: '#C4001A',
+      border: 'rgba(10, 10, 10, 0.12)',
+    },
+    signal: {
+      background: '#C4001A',
+      surface: '#AD0017',
+      foreground: '#FFFFFF',
+      muted: '#FFDCE0',
+      accent: '#0A0A0A',
+      accentContrast: '#FFFFFF',
+      accentInk: '#FFFFFF',
+      border: 'rgba(255, 255, 255, 0.3)',
+    },
+    type: { display: 'sans', displayWeight: 640, displayTracking: '-0.045em', displayWidth: 84, italicAccents: false },
+    radius: { small: '0px', image: '0px' },
+  },
+
+  /** Dark luxury dealership — warm black, sand, cream. */
   noir: {
     name: 'Noir',
     dark: {
@@ -182,7 +224,7 @@ export type PresetName = keyof typeof presets;
  * accent colour: overrides: { dark: { accent: '#9FB4C7' } }
  */
 export const themeConfig: { preset: PresetName; overrides?: DeepPartial<Theme> } = {
-  preset: 'noir',
+  preset: 'corsa',
   overrides: {},
 };
 
@@ -198,9 +240,24 @@ export function resolveTheme(name: PresetName = themeConfig.preset, overrides = 
     ...(o as object),
     dark: { ...base.dark, ...(o.dark ?? {}) },
     light: { ...base.light, ...(o.light ?? {}) },
+    signal: { ...(base.signal ?? deriveSignal(base.dark)), ...(o.signal ?? {}) },
     type: { ...base.type, ...(o.type ?? {}) },
     radius: { ...base.radius, ...(o.radius ?? {}) },
   } as Theme;
+}
+
+/** A brand-colour tone built from the dark tone's accent, for presets that do not define one. */
+function deriveSignal(dark: Tone): Tone {
+  return {
+    background: dark.accent,
+    surface: dark.accent,
+    foreground: dark.accentContrast,
+    muted: dark.accentContrast,
+    accent: dark.background,
+    accentContrast: dark.foreground,
+    accentInk: dark.accentContrast,
+    border: 'rgba(127, 127, 127, 0.35)',
+  };
 }
 
 /** Serialises a theme into CSS custom properties. Injected once in <head>. */
@@ -213,12 +270,13 @@ export function themeToCss(theme: Theme): string {
       `--${p}-muted:${t.muted}`,
       `--${p}-accent:${t.accent}`,
       `--${p}-accent-contrast:${t.accentContrast}`,
+      `--${p}-accent-ink:${t.accentInk ?? t.accent}`,
       `--${p}-border:${t.border}`,
     ].join(';');
   const serif = theme.type.display === 'serif';
-  return `:root{${tone(theme.dark, 'dark')};${tone(theme.light, 'light')};--font-display:${
+  return `:root{${tone(theme.dark, 'dark')};${tone(theme.light, 'light')};${tone(theme.signal ?? deriveSignal(theme.dark), 'signal')};--font-display:${
     serif ? 'var(--font-serif)' : 'var(--font-sans)'
   };--display-weight:${theme.type.displayWeight};--display-tracking:${theme.type.displayTracking};--display-stretch:${
     serif ? 100 : theme.type.displayWidth
-  }%;--display-italic:${theme.type.italicAccents ? 'italic' : 'normal'};--em-accent:${theme.type.italicAccents ? 0 : 1};--radius-s:${theme.radius.small};--radius-img:${theme.radius.image}}`;
+  }%;--display-italic:${theme.type.italicAccents ? 'italic' : 'normal'};--font-lead:${serif ? 'var(--font-serif)' : 'var(--font-sans)'};--lead-weight:${serif ? 360 : 400};--lead-tracking:${serif ? '-0.005em' : '-0.015em'};--em-accent:${theme.type.italicAccents ? 0 : 1};--radius-s:${theme.radius.small};--radius-img:${theme.radius.image}}`;
 }

@@ -48,26 +48,40 @@ You never need to edit a component to rebrand. Everything lives in five places:
 
 ### Themes
 
-`src/config/theme.ts` ships five presets. Each defines a **dark** and a
-**light** tone, because every page alternates between the two:
+`src/config/theme.ts` ships six presets. Each defines a **dark**, a **light**
+and a **signal** tone (the brand colour), because every page moves between
+them:
 
-- `noir`: warm black, sand and cream, serif display (default)
+- `corsa`: racing red, pure white and deep black, condensed grotesk display (default)
+- `noir`: warm black, sand and cream, serif display
 - `atelier`: gallery white, charcoal and bronze, light serif
 - `heritage`: racing green, parchment and brass, for classic-car specialists
-- `circuit`: graphite and signal orange, expanded grotesk display, for performance
-- `studio`: pure monochrome, grotesk display, for a minimal studio
+- `circuit`: graphite and signal orange, expanded grotesk
+- `studio`: pure monochrome
 
 Switch presets with `themeConfig.preset`, then override single values:
 
 ```ts
 export const themeConfig = {
-  preset: 'heritage',
-  overrides: { dark: { accent: '#B8C4A0' } },
+  preset: 'corsa',
+  overrides: { dark: { accent: '#0057B8', accentInk: '#4D94FF' } },
 };
 ```
 
-Components only use semantic tokens (`--bg`, `--fg`, `--muted`, `--accent` …),
-so no component contains a hard-coded colour.
+Each tone separates `accent` (a fill, such as a button, which must carry white
+text) from `accentInk` (the accent used as text on the background). Keep both
+at a contrast of at least 4.5:1. The signal tone is used sparingly: the red
+band of car names and the enquiry section on the homepage. Presets without a
+signal tone get one derived from their accent.
+
+Components only use semantic tokens (`--bg`, `--fg`, `--muted`, `--accent`,
+`--accent-ink` …), so no component contains a hard-coded colour.
+
+### Typography
+
+- **Display:** Archivo, condensed and heavy (Corsa), or Newsreader (serif presets).
+- **Text:** Archivo.
+- **Technical layer:** Geist Mono for specifications, references, section numbers and metadata.
 
 ### Logo
 
@@ -137,16 +151,19 @@ data again on the server.
 
 ## Motion
 
-Motion is defined in `src/styles/motion.css` and `src/scripts/motion.ts`
-(IntersectionObserver reveals, scroll scenes driven by a single `--p` CSS
-variable, no animation library).
+Motion is defined in `src/styles/motion.css` and `src/scripts/motion.ts`,
+without an animation library.
 
-- `prefers-reduced-motion` is respected everywhere.
-- Add `?motion=off` to any URL to review the site without animation.
-- Content is never hidden without JavaScript.
-- A small "View / Drag" cursor companion appears on desktop pointers only.
+- **Headlines:** each word rises out of its own mask. Screen readers get the sentence once.
+- **Scroll scenes:** reveals, camera moves and layered depth are driven by a single `--p` CSS variable, computed only for scenes on screen.
+- **Flow band:** a band of the collection's names flows continuously, speeds up and reverses with the scroll, and slows under the pointer.
+- **Header:** it steps out of the way while reading down and returns on scroll up, with a red reading-progress line.
+- **Micro-interactions:** rolling button labels, magnetic primary buttons, card photos that drift with the pointer, and a red line drawn under a card image on hover.
+- **Page transitions:** a card image expands into the vehicle page (Chrome, Edge, Safari 18.2+).
 
----
+Pointer effects run only on desktop pointers. `prefers-reduced-motion` is
+respected everywhere, `?motion=off` shows any page without animation, and
+content is never hidden without JavaScript.
 
 ## SEO
 
@@ -167,7 +184,7 @@ tags, plus a generated 1200×630 social image. Structured data:
 - About 2 KB of JavaScript per page, with no framework runtime.
 - Images are served as AVIF/WebP at the right width, lazy-loaded below the fold, with fixed dimensions (no layout shift).
 - Scroll effects run only while their section is on screen, and animate `transform`, `opacity` and `clip-path` only.
-- Fonts account for most of the first-load weight (~360 KB). Newsreader keeps its optical-size axis, so large headlines stay refined. If you need a lighter build, import `@fontsource-variable/newsreader/wght.css` instead of `standard.css` in `src/styles/global.css` (about 190 KB smaller, slightly heavier display type).
+- Fonts: the default `corsa` theme loads Archivo and Geist Mono (about 110 KB). Serif presets add Newsreader, which is only downloaded when a theme uses it.
 
 ## Deployment
 

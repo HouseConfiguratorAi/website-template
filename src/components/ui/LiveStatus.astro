@@ -1,0 +1,111 @@
+---
+/**
+ * Live local time and open/closed status for the showroom, computed in the
+ * showroom's timezone from contact.schedule. Without JavaScript it shows the
+ * regular opening hours instead.
+ */
+import { contact } from '@/config/site';
+
+interface Props { city?: boolean; time?: boolean; class?: string }
+const { city = true, time = true, class: className } = Astro.props;
+const fallback = `${contact.hours[0].days} · ${contact.hours[0].time}`;
+---
+
+<span
+  class:list={['live t-meta', className]}
+  data-live
+  data-tz={contact.timezone}
+  data-schedule={JSON.stringify(contact.schedule)}
+  data-show-time={time ? '' : undefined}
+>
+  {city && <span class="muted">{contact.address.city}</span>}
+  <span class="live__time" data-live-time aria-hidden="true"></span>
+  <span class="live__status" data-live-status>{fallback}</span>
+</span>
+
+<style>
+  .live {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+
+  .live__time:empty {
+    display: none;
+  }
+
+  .live__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .live__status[data-state]::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.5;
+  }
+
+  .live__status[data-state='open']::before {
+    background: var(--accent-ink);
+    opacity: 1;
+    box-shadow: 0 0 0 0 var(--accent-ink);
+  }
+
+  :global(.motion) .live__status[data-state='open']::before {
+    animation: live-pulse 2.4s var(--ease-standard) infinite;
+  }
+
+  @keyframes live-pulse {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-ink) 60%, transparent); }
+    70%, 100% { box-shadow: 0 0 0 8px transparent; }
+  }
+</style>
+
+<script>
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const toMin = (t: string) => {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  };
+
+  function update(el: HTMLElement) {
+    const tz = el.dataset.tz || undefined;
+    const schedule = JSON.parse(el.dataset.schedule || '{}') as Record<string, [string, string]>;
+    const parts = new Intl.DateTimeFormat('en-GB', { timeZone: tz, weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date());
+    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
+    const day = days.indexOf(get('weekday'));
+    const now = Number(get('hour')) * 60 + Number(get('minute'));
+
+    const timeEl = el.querySelector<HTMLElement>('[data-live-time]');
+    if (timeEl && el.hasAttribute('data-show-time')) timeEl.textContent = `${get('hour')}:${get('minute')}`;
+
+    const status = el.querySelector<HTMLElement>('[data-live-status]')!;
+    const today = schedule[day];
+    if (today && now >= toMin(today[0]) && now < toMin(today[1])) {
+      status.dataset.state = 'open';
+      status.textContent = `Open now · until ${today[1]}`;
+      return;
+    }
+    // Find the next opening, looking up to a week ahead.
+    for (let i = 0; i < 8; i++) {
+      const d = (day + i) % 7;
+      const slot = schedule[d];
+      if (!slot || (i === 0 && now >= toMin(slot[0]))) continue;
+      status.dataset.state = 'closed';
+      status.textContent = `Closed · opens ${i === 0 ? 'today' : i === 1 ? 'tomorrow' : days[d]} ${slot[0]}`;
+      return;
+    }
+    status.dataset.state = 'closed';
+    status.textContent = 'By appointment';
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-live]').forEach((el) => {
+    update(el);
+    setInterval(() => update(el), 30000);
+  });
+</script>

@@ -89,7 +89,7 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--accent-ink);
   outline-offset: 3px;
 }
 
@@ -131,6 +131,7 @@ button {
 
 /* ---------------------------------------------------------------------
    Typography roles
+   Display type carries the design; mono carries the facts.
    --------------------------------------------------------------------- */
 
 .t-display,
@@ -151,19 +152,19 @@ button {
 
 .t-headline {
   font-size: var(--fs-headline);
-  line-height: 0.98;
+  line-height: 0.95;
 }
 
 .t-title {
   font-size: var(--fs-title);
-  line-height: 1.04;
+  line-height: 1.02;
 }
 
 .t-display em,
 .t-headline em,
 .t-title em {
   font-style: var(--display-italic);
-  color: color-mix(in srgb, var(--accent) calc(var(--em-accent) * 100%), currentColor);
+  color: color-mix(in srgb, var(--accent-ink) calc(var(--em-accent) * 100%), currentColor);
 }
 
 .t-subhead {
@@ -171,16 +172,16 @@ button {
   font-size: var(--fs-subhead);
   line-height: 1.3;
   font-weight: 400;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.012em;
   text-wrap: balance;
 }
 
 .t-lead {
-  font-family: var(--font-serif);
+  font-family: var(--font-lead);
   font-size: var(--fs-lead);
   line-height: 1.42;
-  font-weight: 360;
-  letter-spacing: -0.005em;
+  font-weight: var(--lead-weight);
+  letter-spacing: var(--lead-tracking);
   text-wrap: pretty;
 }
 
@@ -205,35 +206,50 @@ button {
   font-family: var(--font-sans);
   font-size: var(--fs-eyebrow);
   line-height: 1.3;
-  font-weight: 500;
-  font-stretch: 118%;
-  letter-spacing: 0.2em;
+  font-weight: 600;
+  font-stretch: 116%;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
-.t-meta {
-  font-size: var(--fs-caption);
-  line-height: 1.4;
-  font-stretch: 108%;
-  letter-spacing: 0.04em;
+/* Technical layer: specifications, references, prices in lists. */
+.t-meta,
+.t-mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  line-height: 1.45;
+  font-weight: 450;
+  letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
 }
 
 .t-price {
+  font-family: var(--font-sans);
   font-size: var(--fs-price);
   line-height: 1.1;
-  font-weight: 420;
-  font-stretch: 106%;
-  letter-spacing: -0.005em;
+  font-weight: 560;
+  font-stretch: 100%;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums lining-nums;
 }
 
-.t-index {
-  font-size: var(--fs-caption);
-  font-stretch: 112%;
-  letter-spacing: 0.1em;
+.t-spec {
+  font-family: var(--font-mono);
+  font-size: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
+  line-height: 1.3;
+  font-weight: 450;
+  letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
-  color: var(--muted);
+}
+
+.t-index {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-ink);
 }
 
 .muted {
@@ -320,26 +336,51 @@ button {
    --------------------------------------------------------------------- */
 
 .btn {
-  --btn-pad-y: 17px;
+  --btn-fill: color-mix(in srgb, var(--accent) 70%, #000);
+  --btn-fill-fg: var(--accent-contrast);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
-  min-height: 52px;
-  padding: var(--btn-pad-y) 24px;
+  gap: 16px;
+  min-height: 54px;
+  padding: 0 26px;
   border: 1px solid transparent;
   border-radius: var(--radius-s);
-  font-size: var(--fs-caption);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
   line-height: 1;
-  font-weight: 500;
-  font-stretch: 116%;
-  letter-spacing: 0.16em;
+  font-weight: 600;
+  font-stretch: 108%;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   white-space: nowrap;
   transition:
-    background-color var(--dur-micro) var(--ease-standard),
-    color var(--dur-micro) var(--ease-standard),
+    color 450ms var(--ease-emphasis),
     border-color var(--dur-micro) var(--ease-standard);
+}
+
+/* Hover: a fill wipes in from the left. */
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  background: var(--btn-fill);
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+  transition: transform 520ms var(--ease-emphasis);
+}
+
+.btn:hover::before {
+  transform: scaleX(1);
+  transform-origin: 0 50%;
+}
+
+.btn:hover {
+  color: var(--btn-fill-fg);
 }
 
 .btn--primary {
@@ -347,12 +388,16 @@ button {
   color: var(--accent-contrast);
 }
 
-.btn--primary:hover {
-  background: color-mix(in srgb, var(--accent) 86%, var(--fg));
+/* On a brand-colour section the primary button inverts on hover. */
+[data-tone='signal'] .btn--primary {
+  --btn-fill: var(--fg);
+  --btn-fill-fg: var(--bg);
 }
 
 .btn--ghost {
-  border-color: color-mix(in srgb, var(--fg) 34%, transparent);
+  --btn-fill: var(--fg);
+  --btn-fill-fg: var(--bg);
+  border-color: color-mix(in srgb, var(--fg) 30%, transparent);
   color: var(--fg);
 }
 
@@ -368,7 +413,7 @@ button {
   width: 18px;
   height: 10px;
   flex: none;
-  transition: transform var(--dur-micro) var(--ease-emphasis);
+  transition: transform 450ms var(--ease-emphasis);
 }
 
 .btn:hover .arrow,
@@ -398,22 +443,25 @@ a:hover > .arrow,
   display: inline-flex;
   align-items: center;
   gap: 14px;
-  font-size: var(--fs-caption);
-  font-weight: 500;
-  font-stretch: 116%;
-  letter-spacing: 0.16em;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-stretch: 108%;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding-block: 8px;
-  background-image: linear-gradient(currentColor, currentColor);
-  background-size: 100% 1px;
+  padding-block: 10px;
+  background-image: linear-gradient(var(--accent-ink), var(--accent-ink)), linear-gradient(currentColor, currentColor);
+  background-size: 0% 2px, 100% 1px;
   background-repeat: no-repeat;
-  background-position: 0 100%;
-  transition: background-size var(--dur-standard) var(--ease-emphasis);
+  background-position: 0 100%, 0 100%;
+  transition: background-size 600ms var(--ease-emphasis);
+}
+
+.link-arrow .arrow {
+  color: var(--accent-ink);
 }
 
 .link-arrow:hover {
-  background-size: 0% 1px;
-  background-position: 100% 100%;
+  background-size: 100% 2px, 100% 1px;
 }
 
 /* ---------------------------------------------------------------------
@@ -471,16 +519,16 @@ a:hover > .arrow,
 .eyebrow-row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   color: var(--muted);
 }
 
 .eyebrow-row::before {
   content: '';
-  width: 28px;
-  height: 1px;
-  background: currentColor;
-  opacity: 0.8;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--accent-ink);
 }
 
 .status-dot {
@@ -498,11 +546,61 @@ a:hover > .arrow,
 }
 
 .status-dot[data-status='available']::before {
-  background: var(--accent);
+  background: var(--accent-ink);
 }
 
 .status-dot[data-status='reserved']::before,
 .status-dot[data-status='incoming']::before {
   background: transparent;
   box-shadow: inset 0 0 0 1px currentColor;
+}
+
+/* Viewfinder corner marks for key photographs. Add .marks to any positioned frame. */
+.marks::before {
+  --c: rgb(255 255 255 / 0.8);
+  --l: 18px;
+  --w: 1.5px;
+  content: '';
+  position: absolute;
+  inset: clamp(10px, 1.4vw, 20px);
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--c), var(--c)) 0 0 / var(--l) var(--w),
+    linear-gradient(var(--c), var(--c)) 0 0 / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 100% 0 / var(--l) var(--w),
+    linear-gradient(var(--c), var(--c)) 100% 0 / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 0 100% / var(--l) var(--w),
+    linear-gradient(var(--c), var(--c)) 0 100% / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 100% 100% / var(--l) var(--w),
+    linear-gradient(var(--c), var(--c)) 100% 100% / var(--w) var(--l);
+  background-repeat: no-repeat;
+  transition: inset 700ms var(--ease-emphasis);
+}
+
+a:hover .marks::before,
+.marks:hover::before {
+  inset: clamp(16px, 2vw, 28px);
+}
+
+/* A mono caption set inside a photograph, bottom left. */
+.frame-caption {
+  position: absolute;
+  left: clamp(18px, 2vw, 32px);
+  bottom: clamp(16px, 1.8vw, 28px);
+  z-index: 3;
+  color: rgb(255 255 255 / 0.85);
+  pointer-events: none;
+}
+
+/* Editorial drop cap on long-form articles. */
+.prose--article > p:first-child::first-letter {
+  float: left;
+  margin: 0.06em 0.12em 0 0;
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-stretch: var(--display-stretch);
+  font-size: 4.6em;
+  line-height: 0.8;
+  color: var(--accent-ink);
 }

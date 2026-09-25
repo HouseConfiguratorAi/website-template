@@ -2,10 +2,14 @@
 /** The physical place as part of the brand: architecture first, details overlaid. */
 import { contact } from '@/config/site';
 import { home } from '@/config/content';
-import { rich } from '@/lib/text';
+import Heading from '@/components/ui/Heading.astro';
+import Label from '@/components/ui/Label.astro';
+import LiveStatus from '@/components/ui/LiveStatus.astro';
 import Media from '@/components/ui/Media.astro';
 import Arrow from '@/components/ui/Arrow.astro';
 
+interface Props { index?: string }
+const { index } = Astro.props;
 const l = home.location;
 ---
 
@@ -16,12 +20,16 @@ const l = home.location;
   <div class="location__veil" aria-hidden="true"></div>
   <div class="container container--gallery location__inner">
     <div class="location__intro">
-      <p class="t-eyebrow eyebrow-row" data-reveal="fade">{l.eyebrow}</p>
-      <h2 class="t-headline" data-reveal set:html={rich(l.headline)} />
+      <Label text={l.eyebrow} index={index} rule={false} />
+      <Heading as="h2" size="headline" text={l.headline} />
       <p class="t-body location__body" data-reveal>{l.body}</p>
     </div>
     <div class="location__card" data-reveal style="--delay:150ms">
-      <p class="location__city">{contact.address.city}</p>
+      <div class="location__top">
+        <p class="location__city">{contact.address.city}</p>
+        <p class="t-meta muted location__coords">{contact.geo.lat.toFixed(4)}° N<br />{contact.geo.lng.toFixed(4)}° E</p>
+      </div>
+      <LiveStatus city={false} />
       <dl class="location__facts">
         <div>
           <dt class="t-eyebrow muted">Address</dt>
@@ -104,6 +112,16 @@ const l = home.location;
     backdrop-filter: blur(20px);
     border: 1px solid var(--border);
     border-radius: var(--radius-img);
+  }
+  .location__top {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--s-5);
+  }
+  .location__coords {
+    text-align: right;
   }
   .location__city {
     font-family: var(--font-sans);

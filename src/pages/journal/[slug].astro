@@ -4,6 +4,7 @@ import { render } from 'astro:content';
 import { getImage } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Media from '@/components/ui/Media.astro';
+import Heading from '@/components/ui/Heading.astro';
 import JournalCard from '@/components/sections/JournalCard.astro';
 import FinalCTA from '@/components/sections/FinalCTA.astro';
 import { getPosts, postUrl, type Post } from '@/lib/journal';
@@ -51,7 +52,7 @@ const ldImage = m?.type === 'local' ? new URL((await getImage({ src: m.meta, wid
           <time class="muted" datetime={d.date.toISOString()}>{formatDate(d.date)}</time>
           {d.readingTime && <span class="muted">{d.readingTime} min read</span>}
         </p>
-        <h1 class="t-headline" data-intro style="--intro:250ms">{d.title}</h1>
+        <Heading as="h1" size="headline" text={d.title} reveal="load" delay={200} />
         <p class="t-lead ahead__excerpt" data-intro style="--intro:400ms">{d.excerpt}</p>
       </div>
       <div class="ahead__media media container container--gallery">
@@ -60,7 +61,7 @@ const ldImage = m?.type === 'local' ? new URL((await getImage({ src: m.meta, wid
     </header>
 
     <section class="abody" data-tone="light">
-      <div class="container container--editorial prose">
+      <div class="container container--editorial prose prose--article">
         <Content />
       </div>
     </section>

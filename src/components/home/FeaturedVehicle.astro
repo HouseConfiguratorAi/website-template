@@ -1,36 +1,36 @@
 ---
 import type { Vehicle } from '@/lib/inventory';
 import { coverImage, imageOfKind, vehicleUrl } from '@/lib/inventory';
-import { formatMileage, formatPower, formatPrice } from '@/lib/format';
+import { formatMileage, formatPrice } from '@/lib/format';
 import { home } from '@/config/content';
 import Media from '@/components/ui/Media.astro';
 import Arrow from '@/components/ui/Arrow.astro';
+import Label from '@/components/ui/Label.astro';
+import Heading from '@/components/ui/Heading.astro';
 
-interface Props { vehicle: Vehicle }
-const { vehicle: v } = Astro.props;
+interface Props { vehicle: Vehicle; index?: string }
+const { vehicle: v, index } = Astro.props;
 const cover = coverImage(v);
 const portrait = imageOfKind(v, 'portrait');
 const specs = [
   { k: 'Year', v: String(v.year) },
   { k: 'Mileage', v: formatMileage(v.mileage) },
-  { k: 'Power', v: formatPower(v.power) },
-  { k: 'Price', v: formatPrice(v.price) },
+  { k: 'Power', v: `${v.power.hp} hp` },
+  { k: 'Gearbox', v: v.transmission },
 ];
 ---
 
 <section class="featured" data-tone="dark" aria-labelledby="featured-title">
   <div class="container container--gallery">
+    <Label text={`${home.featured.eyebrow} — ${v.brand}`} index={index} />
     <div class="featured__masthead">
-      <p class="t-eyebrow eyebrow-row" data-reveal="fade">{home.featured.eyebrow} — {v.brand}</p>
-      <p class="t-meta muted featured__issue" data-reveal="fade">{v.id} · {v.location}</p>
+      <Heading as="h2" id="featured-title" size="display" text={v.model} class="featured__title" />
+      <p class="t-meta muted featured__ref" data-reveal="fade">Ref. {v.id}<br />{v.variant} · {v.location}</p>
     </div>
-    <h2 id="featured-title" class="featured__title t-display" data-reveal>
-      <span class="sr-only">{v.brand} </span>{v.model}
-    </h2>
   </div>
 
   <a class="featured__frame" href={vehicleUrl(v)} data-cursor="View" aria-label={`View the ${v.brand} ${v.model}`} data-scene="through">
-    <div class="featured__media media" data-reveal="image">
+    <div class="featured__media media marks" data-reveal="image">
       <div class="featured__zoom">
         <Media
           src={cover?.src}
@@ -41,49 +41,60 @@ const specs = [
           transitionName={`vehicle-${v.slug}`}
         />
       </div>
+      <span class="frame-caption t-meta">Fig. 01 — {v.brand} {v.model}, {v.exteriorColor}</span>
     </div>
   </a>
 
   <div class="container container--gallery featured__info">
     <p class="t-lead featured__summary" data-reveal>{v.summary}</p>
-    <dl class="featured__specs" data-reveal style="--delay:120ms">
-      {
-        specs.map((s) => (
-          <div>
-            <dt class="t-eyebrow muted">{s.k}</dt>
-            <dd class="t-price">{s.v}</dd>
-          </div>
-        ))
-      }
-    </dl>
-    <a class="link-arrow featured__cta" href={vehicleUrl(v)} data-reveal style="--delay:200ms">
-      View vehicle <Arrow />
-    </a>
+    <div class="featured__sheet" data-reveal style="--delay:120ms">
+      <dl class="featured__specs">
+        {
+          specs.map((s) => (
+            <div>
+              <dt class="t-meta muted">{s.k}</dt>
+              <dd class="t-spec">{s.v}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <div class="featured__offer">
+        <p>
+          <span class="t-meta muted">Price</span>
+          <span class="featured__price">{formatPrice(v.price)}</span>
+        </p>
+        <a class="btn btn--primary" href={vehicleUrl(v)}>View vehicle <Arrow /></a>
+      </div>
+    </div>
   </div>
 </section>
 
 <style>
   .featured {
-    padding-top: var(--section-l);
+    padding-top: var(--section-m);
     padding-bottom: var(--section-l);
   }
 
   .featured__masthead {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
-    gap: var(--s-5);
+    align-items: flex-end;
+    gap: var(--s-6);
+    margin-top: var(--s-6);
   }
 
-  /* The model name sits on the image like a magazine masthead. */
-  .featured__title {
+  /* The model name sits on the photograph like a magazine masthead. */
+  .featured__masthead :global(.featured__title) {
     position: relative;
     z-index: 2;
-    margin-top: var(--s-5);
-    margin-bottom: -0.34em;
-    font-size: clamp(3.4rem, 0.9rem + 10.6vw, 13rem);
-    line-height: 0.88;
-    white-space: nowrap;
+    margin-bottom: -0.2em;
+    font-size: clamp(3.6rem, 0.6rem + 12vw, 14rem);
+    line-height: 0.82;
+  }
+
+  .featured__ref {
+    text-align: right;
+    padding-bottom: var(--s-5);
   }
 
   .featured__frame {
@@ -111,48 +122,70 @@ const specs = [
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     column-gap: var(--gutter);
-    row-gap: var(--s-6);
+    row-gap: var(--s-7);
     padding-top: var(--s-7);
     align-items: start;
   }
 
   .featured__summary {
-    grid-column: 1 / span 5;
+    grid-column: 1 / span 4;
+  }
+
+  .featured__sheet {
+    grid-column: 6 / -1;
+    display: grid;
+    gap: var(--s-6);
   }
 
   .featured__specs {
-    grid-column: 7 / -1;
     display: grid;
-    grid-template-columns: repeat(4, auto);
-    justify-content: space-between;
-    gap: var(--s-5);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--border);
   }
 
   .featured__specs div {
     display: grid;
     gap: 10px;
+    padding: var(--s-4) var(--s-4) 0 0;
+  }
+
+  .featured__specs div + div {
+    padding-left: var(--s-4);
+    border-left: 1px solid var(--border);
   }
 
   .featured__specs dd {
     margin: 0;
   }
 
-  .featured__cta {
-    grid-column: 7 / -1;
-    justify-self: start;
+  .featured__offer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--s-5);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--border);
+  }
+
+  .featured__offer p {
+    display: grid;
+    gap: 8px;
+  }
+
+  .featured__price {
+    font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);
+    font-weight: 600;
+    font-stretch: 92%;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums lining-nums;
   }
 
   @media (max-width: 63.99rem) {
     .featured__summary,
-    .featured__specs,
-    .featured__cta {
+    .featured__sheet {
       grid-column: 1 / -1;
-    }
-    .featured__specs {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      justify-content: stretch;
-      padding-top: var(--s-5);
-      border-top: 1px solid var(--border);
     }
   }
 
@@ -163,8 +196,22 @@ const specs = [
     .featured__frame {
       width: 100%;
     }
-    .featured__issue {
+    .featured__ref {
       display: none;
+    }
+    .featured__specs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .featured__specs div + div:nth-child(3) {
+      padding-left: 0;
+      border-left: 0;
+    }
+    .featured__specs div:nth-child(n + 3) {
+      margin-top: var(--s-4);
+      border-top: 1px solid var(--border);
+    }
+    .featured__offer .btn {
+      width: 100%;
     }
   }
 </style>

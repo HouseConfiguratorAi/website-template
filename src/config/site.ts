@@ -63,6 +63,19 @@ export const contact = {
   /** Latitude/longitude for structured data and the directions link. */
   geo: { lat: 51.2308, lng: 4.4089 },
   directionsUrl: 'https://www.openstreetmap.org/?mlat=51.2308&mlon=4.4089#map=16/51.2308/4.4089',
+  /** IANA timezone of the showroom — used for the live local time and open/closed status. */
+  timezone: 'Europe/Brussels',
+  /**
+   * Machine-readable weekly schedule (0 = Sunday … 6 = Saturday), 24h "HH:MM".
+   * Drives the "Open now / Closed" indicator. Days without an entry are closed.
+   */
+  schedule: {
+    2: ['10:00', '18:00'],
+    3: ['10:00', '18:00'],
+    4: ['10:00', '18:00'],
+    5: ['10:00', '18:00'],
+    6: ['10:00', '16:00'],
+  } as Record<number, [string, string]>,
   hours: [
     { days: 'Tuesday – Friday', time: '10:00 – 18:00', schema: 'Tu-Fr 10:00-18:00' },
     { days: 'Saturday', time: '10:00 – 16:00', schema: 'Sa 10:00-16:00' },

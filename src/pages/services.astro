@@ -3,6 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageIntro from '@/components/sections/PageIntro.astro';
 import ContactSection from '@/components/sections/ContactSection.astro';
 import Media from '@/components/ui/Media.astro';
+import Heading from '@/components/ui/Heading.astro';
 import { services } from '@/data/services';
 import { pad } from '@/lib/format';
 import { breadcrumbLd } from '@/lib/seo';
@@ -31,7 +32,7 @@ import { breadcrumbLd } from '@/lib/seo';
           </div>
           <div class="svc__copy">
             <span class="t-index" data-reveal="fade">{pad(i + 1)}</span>
-            <h2 id={`${s.slug}-title`} class="t-headline" data-reveal>{s.title}</h2>
+            <Heading as="h2" id={`${s.slug}-title`} size="headline" text={s.title} />
             <div class="svc__body" data-reveal>
               {s.body.map((p) => <p class="t-body">{p}</p>)}
             </div>

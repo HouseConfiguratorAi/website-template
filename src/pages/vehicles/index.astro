@@ -2,12 +2,15 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import VehicleCard from '@/components/vehicles/VehicleCard.astro';
 import VehicleFilters from '@/components/vehicles/VehicleFilters.astro';
+import Heading from '@/components/ui/Heading.astro';
 import { getListedVehicles } from '@/lib/inventory';
 import { breadcrumbLd } from '@/lib/seo';
 import { site } from '@/config/site';
+import { formatDate } from '@/lib/format';
 
 const vehicles = await getListedVehicles();
 const count = vehicles.length;
+const updated = vehicles.map((v) => v.listed).filter(Boolean).sort().at(-1);
 const words = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve'];
 const countWord = words[count] ?? String(count);
 ---
@@ -20,10 +23,8 @@ const countWord = words[count] ?? String(count);
 >
   <section class="inv-intro" data-tone="dark">
     <div class="container container--gallery inv-intro__grid">
-      <p class="t-eyebrow eyebrow-row" data-intro style="--intro:150ms">The collection</p>
-      <h1 class="t-display inv-intro__title" data-intro style="--intro:250ms">
-        {countWord} cars. <em>Each</em> one chosen.
-      </h1>
+      <p class="inv-intro__label eyebrow-row" data-intro="fade" style="--intro:150ms"><span class="t-eyebrow">The collection</span><span class="t-meta muted">{count} listed{updated && ` · Updated ${formatDate(new Date(updated))}`}</span></p>
+      <Heading as="h1" size="display" text={`${countWord} cars. *Each* one chosen.`} reveal="load" delay={200} class="inv-intro__title" />
       <p class="t-lead inv-intro__lead" data-intro style="--intro:400ms">
         Every car on this page is inspected, documented and in the showroom. Ask for the full file on any of them.
       </p>
@@ -84,13 +85,20 @@ const countWord = words[count] ?? String(count);
     align-items: end;
   }
 
-  .inv-intro__grid > .t-eyebrow {
+  .inv-intro__label {
     grid-column: 1 / -1;
+    color: var(--fg);
+    padding-bottom: var(--s-4);
+    border-bottom: 1px solid var(--border);
   }
 
-  .inv-intro__title {
+  .inv-intro__label .t-meta {
+    margin-left: auto;
+  }
+
+  .inv-intro__grid > :global(.inv-intro__title) {
     grid-column: 1 / span 8;
-    font-size: clamp(3rem, 1.2rem + 6.6vw, 8.5rem);
+    font-size: clamp(3rem, 1rem + 7.4vw, 9rem);
   }
 
   .inv-intro__lead {
@@ -146,7 +154,7 @@ const countWord = words[count] ?? String(count);
   }
 
   @media (max-width: 63.99rem) {
-    .inv-intro__title,
+    .inv-intro__grid > :global(.inv-intro__title),
     .inv-intro__lead {
       grid-column: 1 / -1;
     }

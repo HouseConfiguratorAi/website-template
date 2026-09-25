@@ -1,7 +1,8 @@
 ---
 /** Horizontal collection. Native scroll + snap, mouse drag on desktop, buttons for keyboard users. */
 import type { Vehicle } from '@/lib/inventory';
-import { rich } from '@/lib/text';
+import Heading from '@/components/ui/Heading.astro';
+import Label from '@/components/ui/Label.astro';
 import VehicleCard from '@/components/vehicles/VehicleCard.astro';
 
 interface Props { vehicles: Vehicle[]; eyebrow: string; headline: string; tone?: 'dark' | 'light' }
@@ -13,8 +14,8 @@ const { vehicles, eyebrow, headline, tone = 'light' } = Astro.props;
     <section class="rail" data-tone={tone} data-rail>
       <div class="container container--gallery rail__head">
         <div>
-          <p class="t-eyebrow eyebrow-row" data-reveal="fade">{eyebrow}</p>
-          <h2 class="t-title" data-reveal set:html={rich(headline)} />
+          <Label text={eyebrow} rule={false} />
+          <Heading as="h2" size="headline" text={headline} />
         </div>
         <div class="rail__nav">
           <button type="button" class="rail__btn" data-rail-prev aria-label="Scroll back">

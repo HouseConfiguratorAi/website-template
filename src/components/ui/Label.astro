@@ -1,0 +1,41 @@
+---
+/**
+ * Section label: a mono index and an eyebrow, optionally on a hairline rule.
+ * The index gives every page the rhythm of a numbered specification sheet.
+ */
+interface Props {
+  text: string;
+  index?: string;
+  /** Right-aligned detail, e.g. a count or date. */
+  meta?: string;
+  rule?: boolean;
+  class?: string;
+}
+const { text, index, meta, rule = true, class: className } = Astro.props;
+---
+
+<p class:list={['label', { 'label--rule': rule }, className]} data-reveal="fade">
+  {index && <span class="t-index">({index})</span>}
+  <span class="t-eyebrow">{text}</span>
+  {meta && <span class="label__meta t-meta">{meta}</span>}
+</p>
+
+<style>
+  .label {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    color: var(--muted);
+  }
+  .label--rule {
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .label .t-eyebrow {
+    color: var(--fg);
+  }
+  .label__meta {
+    margin-left: auto;
+    color: var(--muted);
+  }
+</style>

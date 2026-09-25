@@ -1,0 +1,156 @@
+---
+/**
+ * A band of the collection's names that flows continuously across the screen.
+ * Scrolling speeds it up and reverses it with the scroll direction, then it
+ * eases back to its idle drift. Static under reduced motion.
+ */
+import type { Vehicle } from '@/lib/inventory';
+import { vehicleUrl } from '@/lib/inventory';
+
+interface Props { vehicles: Vehicle[]; tone?: 'signal' | 'dark' | 'light'; label?: string }
+const { vehicles, tone = 'signal', label = 'In the collection' } = Astro.props;
+const items = vehicles.map((v) => ({ text: `${v.brand} ${v.model}`, href: vehicleUrl(v) }));
+// Repeat so one copy is always wider than the widest screen.
+const run = Array.from({ length: Math.max(2, Math.ceil(8 / Math.max(1, items.length))) }, () => items).flat();
+---
+
+<section class="flow" data-tone={tone} aria-label={label} data-flow>
+  <div class="flow__track" data-flow-track>
+    {
+      [0, 1].map((copy) => (
+        <ul class="flow__group" role="list" aria-hidden={copy === 1 ? 'true' : undefined}>
+          {run.map((it) => (
+            <li>
+              <a href={it.href} tabindex={copy === 1 ? -1 : undefined} data-cursor="View">
+                {it.text}
+              </a>
+              <span class="flow__mark" aria-hidden="true" />
+            </li>
+          ))}
+        </ul>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .flow {
+    overflow: clip;
+    padding-block: clamp(20px, 1rem + 1.4vw, 40px);
+    border-block: 1px solid var(--border);
+  }
+
+  .flow__track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+  }
+
+  .flow__group {
+    display: flex;
+    flex: none;
+  }
+
+  .flow li {
+    display: flex;
+    align-items: center;
+    flex: none;
+  }
+
+  .flow a {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-stretch: var(--display-stretch);
+    letter-spacing: var(--display-tracking);
+    font-size: clamp(2.4rem, 1.2rem + 4.6vw, 6.5rem);
+    line-height: 1;
+    padding-inline: clamp(18px, 1rem + 1.6vw, 44px);
+    white-space: nowrap;
+    color: var(--fg);
+    transition: opacity 300ms var(--ease-standard);
+  }
+
+  /* Hovering one name quietens the others. */
+  .flow__track:hover a {
+    opacity: 0.45;
+  }
+
+  .flow__track:hover a:hover {
+    opacity: 1;
+  }
+
+  .flow__mark {
+    flex: none;
+    width: clamp(10px, 0.5rem + 0.6vw, 18px);
+    height: clamp(10px, 0.5rem + 0.6vw, 18px);
+    background: currentColor;
+    opacity: 0.9;
+  }
+
+  @keyframes flow {
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  :global(.motion) .flow__track {
+    animation: flow var(--flow-duration, 60s) linear infinite;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-flow]').forEach((root) => {
+    const track = root.querySelector<HTMLElement>('[data-flow-track]');
+    if (!track || !document.documentElement.classList.contains('motion')) return;
+    const anim = track.getAnimations()[0];
+    if (!anim) return;
+
+    // Start far along the timeline so reversing never reaches the beginning.
+    const duration = Number(anim.effect?.getTiming().duration) || 60000;
+    anim.currentTime = duration * 500;
+
+    let lastY = window.scrollY;
+    let dir = 1;
+    let boost = 0;
+    let hover = false;
+    let rate = 1;
+    let visible = false;
+    let raf = 0;
+
+    const tick = () => {
+      boost *= 0.92;
+      const want = dir * ((hover ? 0.25 : 1) + boost);
+      rate += (want - rate) * 0.1;
+      anim.playbackRate = rate;
+      raf = visible && (Math.abs(want - rate) > 0.005 || boost > 0.01) ? requestAnimationFrame(tick) : 0;
+    };
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+
+    new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible) {
+        anim.play();
+        kick();
+      } else anim.pause();
+    }).observe(root);
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        const dy = window.scrollY - lastY;
+        lastY = window.scrollY;
+        if (!visible || !dy) return;
+        // Scroll velocity pushes the band; its direction follows the scroll.
+        dir = dy > 0 ? 1 : -1;
+        boost = Math.min(5, boost + Math.abs(dy) * 0.05);
+        kick();
+      },
+      { passive: true },
+    );
+
+    root.addEventListener('pointerenter', () => { hover = true; kick(); });
+    root.addEventListener('pointerleave', () => { hover = false; kick(); });
+  });
+</script>

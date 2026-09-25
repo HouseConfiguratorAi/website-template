@@ -6,7 +6,8 @@ import FinalCTA from '@/components/sections/FinalCTA.astro';
 import Media from '@/components/ui/Media.astro';
 import { about } from '@/config/content';
 import { pad } from '@/lib/format';
-import { rich } from '@/lib/text';
+import Heading from '@/components/ui/Heading.astro';
+import Label from '@/components/ui/Label.astro';
 import { breadcrumbLd } from '@/lib/seo';
 ---
 
@@ -21,13 +22,13 @@ import { breadcrumbLd } from '@/lib/seo';
 
   <section class="principles" data-tone="light">
     <div class="container container--gallery">
-      <p class="t-eyebrow eyebrow-row" data-reveal="fade">What we believe</p>
+      <Label text="What we believe" index="01" />
       <ol class="principles__list" role="list">
         {
           about.principles.map((p, i) => (
             <li data-reveal style={`--delay:${(i % 2) * 100}ms`}>
               <span class="t-index">{pad(i + 1)}</span>
-              <h2 class="t-title" set:html={rich(p.title)} />
+              <Heading as="h2" size="title" text={p.title} />
               <p class="t-body muted">{p.body}</p>
             </li>
           ))
