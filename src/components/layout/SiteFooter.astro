@@ -1,5 +1,7 @@
 ---
 import { navigation, contact, site } from '@/config/site';
+import LiveStatus from '@/components/ui/LiveStatus.astro';
+import Arrow from '@/components/ui/Arrow.astro';
 const year = new Date().getFullYear();
 ---
 
@@ -41,8 +43,10 @@ const year = new Date().getFullYear();
 
     <div class="site-footer__bottom t-meta">
       <span>© {year} {site.legalName}</span>
+      <LiveStatus />
       <ul role="list">
         {navigation.legal.map((item) => <li><a class="link" href={item.href}>{item.label}</a></li>)}
+        <li><a class="site-footer__top-link" href="#main">Back to top <Arrow direction="up" /></a></li>
       </ul>
     </div>
   </div>
@@ -124,7 +128,22 @@ const year = new Date().getFullYear();
 
   .site-footer__bottom ul {
     display: flex;
+    align-items: center;
     gap: var(--s-5);
+  }
+
+  .site-footer__top-link:hover :global(.arrow) {
+    transform: translateX(4px);
+  }
+
+  .site-footer__top-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .site-footer__top-link :global(.arrow) {
+    color: var(--accent-ink);
   }
 
   @media (max-width: 63.99rem) {

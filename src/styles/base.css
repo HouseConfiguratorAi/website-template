@@ -554,3 +554,53 @@ a:hover > .arrow,
   background: transparent;
   box-shadow: inset 0 0 0 1px currentColor;
 }
+
+/* Viewfinder corner marks for key photographs. Add .marks to any positioned frame. */
+.marks::before {
+  --c: rgb(255 255 255 / 0.8);
+  --l: 18px;
+  --w: 1.5px;
+  content: '';
+  position: absolute;
+  inset: clamp(10px, 1.4vw, 20px);
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--c), var(--c)) 0 0 / var(--l) var(--w),
+    linear-gradient(var(--c), var(--c)) 0 0 / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 100% 0 / var(--l) var(--w),
+    linear-gradient(var(--c), var(--c)) 100% 0 / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 0 100% / var(--l) var(--w),
+    linear-gradient(var(--c), var(--c)) 0 100% / var(--w) var(--l),
+    linear-gradient(var(--c), var(--c)) 100% 100% / var(--l) var(--w),
+    linear-gradient(var(--c), var(--c)) 100% 100% / var(--w) var(--l);
+  background-repeat: no-repeat;
+  transition: inset 700ms var(--ease-emphasis);
+}
+
+a:hover .marks::before,
+.marks:hover::before {
+  inset: clamp(16px, 2vw, 28px);
+}
+
+/* A mono caption set inside a photograph, bottom left. */
+.frame-caption {
+  position: absolute;
+  left: clamp(18px, 2vw, 32px);
+  bottom: clamp(16px, 1.8vw, 28px);
+  z-index: 3;
+  color: rgb(255 255 255 / 0.85);
+  pointer-events: none;
+}
+
+/* Editorial drop cap on long-form articles. */
+.prose--article > p:first-child::first-letter {
+  float: left;
+  margin: 0.06em 0.12em 0 0;
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-stretch: var(--display-stretch);
+  font-size: 4.6em;
+  line-height: 0.8;
+  color: var(--accent-ink);
+}

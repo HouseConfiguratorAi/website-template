@@ -1,14 +1,13 @@
 ---
 import { home } from '@/config/content';
-import { contact } from '@/config/site';
 import { getVehicle, vehicleUrl } from '@/lib/inventory';
 import Media from '@/components/ui/Media.astro';
 import Arrow from '@/components/ui/Arrow.astro';
 import Heading from '@/components/ui/Heading.astro';
+import LiveStatus from '@/components/ui/LiveStatus.astro';
 
 const h = home.hero;
 const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : undefined;
-const hours = contact.hours[0];
 ---
 
 <section class="hero" data-tone="dark" data-scene="through" aria-labelledby="hero-title">
@@ -55,7 +54,7 @@ const hours = contact.hours[0];
         <span />
       )
     }
-    <span class="hero__hours"><span class="muted">Open</span> {hours.days} · {hours.time}</span>
+    <LiveStatus class="hero__hours" />
     <span class="hero__scroll muted" aria-hidden="true">Scroll <i></i></span>
   </div>
 </section>
@@ -197,7 +196,7 @@ const hours = contact.hours[0];
       grid-column: 1 / -1;
       justify-self: start;
     }
-    .hero__hours {
+    .hero__foot :global(.hero__hours) {
       display: none;
     }
     .hero__foot {

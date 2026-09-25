@@ -24,6 +24,7 @@ const pattern = [
     <SectionHead
       eyebrow={home.collection.eyebrow}
       index={index}
+      meta={`${vehicles.length} cars on the floor`}
       headline={home.collection.headline}
       body={home.collection.body}
       cta={home.collection.cta}
@@ -34,7 +35,7 @@ const pattern = [
           const p = pattern[i % pattern.length];
           return (
             <li class={`collection__item slot-${p.slot}`} data-scene="through">
-              <VehicleCard vehicle={v} ratio={p.ratio} image={p.image} size={p.size} sizes={p.sizes} />
+              <VehicleCard vehicle={v} ratio={p.ratio} image={p.image} size={p.size} sizes={p.sizes} index={i + 1} />
             </li>
           );
         })

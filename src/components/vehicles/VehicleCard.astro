@@ -18,6 +18,8 @@ interface Props {
   headingLevel?: 'h2' | 'h3';
   class?: string;
   delay?: number;
+  /** Optional position shown as (01) — for curated, fixed-order selections. */
+  index?: number;
 }
 
 const {
@@ -30,6 +32,7 @@ const {
   headingLevel: H = 'h3',
   class: className,
   delay = 0,
+  index,
 } = Astro.props;
 
 const img = (image !== 'cover' && imageOfKind(v, image)) || coverImage(v);
@@ -51,7 +54,10 @@ const flagged = v.status !== 'available';
     </div>
     <div class="vcard__body">
       <p class="vcard__top">
-        <span class="t-eyebrow">{v.brand}</span>
+        <span class="vcard__brand">
+          {index != null && <span class="t-index">({String(index).padStart(2, '0')})</span>}
+          <span class="t-eyebrow">{v.brand}</span>
+        </span>
         <span class="t-meta muted">{v.id}</span>
       </p>
       <div class="vcard__name">
@@ -134,6 +140,12 @@ const flagged = v.status !== 'available';
     gap: var(--s-4);
   }
 
+  .vcard__brand {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
   .vcard__name {
     display: flex;
     align-items: center;
@@ -179,6 +191,7 @@ const flagged = v.status !== 'available';
 
   .vcard__meta {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
     gap: 6px 18px;
     margin-top: var(--s-3);
@@ -189,6 +202,10 @@ const flagged = v.status !== 'available';
 
   .vcard__meta dd {
     margin: 0;
+  }
+
+  .vcard__meta dd {
+    white-space: nowrap;
   }
 
   .vcard__price {

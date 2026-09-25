@@ -4,6 +4,7 @@ import { contact } from '@/config/site';
 import { home } from '@/config/content';
 import Heading from '@/components/ui/Heading.astro';
 import Label from '@/components/ui/Label.astro';
+import LiveStatus from '@/components/ui/LiveStatus.astro';
 import Media from '@/components/ui/Media.astro';
 import Arrow from '@/components/ui/Arrow.astro';
 
@@ -24,7 +25,11 @@ const l = home.location;
       <p class="t-body location__body" data-reveal>{l.body}</p>
     </div>
     <div class="location__card" data-reveal style="--delay:150ms">
-      <p class="location__city">{contact.address.city}</p>
+      <div class="location__top">
+        <p class="location__city">{contact.address.city}</p>
+        <p class="t-meta muted location__coords">{contact.geo.lat.toFixed(4)}° N<br />{contact.geo.lng.toFixed(4)}° E</p>
+      </div>
+      <LiveStatus city={false} />
       <dl class="location__facts">
         <div>
           <dt class="t-eyebrow muted">Address</dt>
@@ -107,6 +112,16 @@ const l = home.location;
     backdrop-filter: blur(20px);
     border: 1px solid var(--border);
     border-radius: var(--radius-img);
+  }
+  .location__top {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--s-5);
+  }
+  .location__coords {
+    text-align: right;
   }
   .location__city {
     font-family: var(--font-sans);

@@ -11,6 +11,7 @@ import Label from '@/components/ui/Label.astro';
 interface Props {
   eyebrow?: string;
   index?: string;
+  meta?: string;
   headline: string;
   body?: string;
   cta?: { label: string; href: string };
@@ -21,11 +22,11 @@ interface Props {
   split?: boolean;
 }
 
-const { eyebrow, index, headline, body, cta, as = 'h2', size = 'headline', class: className, split = true } = Astro.props;
+const { eyebrow, index, meta, headline, body, cta, as = 'h2', size = 'headline', class: className, split = true } = Astro.props;
 ---
 
 <header class:list={['shead', { 'shead--split': split }, className]}>
-  {eyebrow && <Label text={eyebrow} index={index} />}
+  {eyebrow && <Label text={eyebrow} index={index} meta={meta} />}
   <div class="shead__grid">
     <Heading as={as} size={size} text={headline} class="shead__title" />
     {

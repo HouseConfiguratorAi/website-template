@@ -6,15 +6,18 @@
 interface Props {
   text: string;
   index?: string;
+  /** Right-aligned detail, e.g. a count or date. */
+  meta?: string;
   rule?: boolean;
   class?: string;
 }
-const { text, index, rule = true, class: className } = Astro.props;
+const { text, index, meta, rule = true, class: className } = Astro.props;
 ---
 
 <p class:list={['label', { 'label--rule': rule }, className]} data-reveal="fade">
   {index && <span class="t-index">({index})</span>}
   <span class="t-eyebrow">{text}</span>
+  {meta && <span class="label__meta t-meta">{meta}</span>}
 </p>
 
 <style>
@@ -30,5 +33,9 @@ const { text, index, rule = true, class: className } = Astro.props;
   }
   .label .t-eyebrow {
     color: var(--fg);
+  }
+  .label__meta {
+    margin-left: auto;
+    color: var(--muted);
   }
 </style>

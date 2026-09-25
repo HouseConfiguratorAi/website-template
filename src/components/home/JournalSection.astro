@@ -7,11 +7,12 @@ import JournalCard from '@/components/sections/JournalCard.astro';
 interface Props { index?: string }
 const { index } = Astro.props;
 const { feature, rest } = await getJournalLayout();
+const total = rest.length + 1;
 ---
 
 <section class="journal" data-tone="dark">
   <div class="container container--gallery">
-    <SectionHead eyebrow={home.journal.eyebrow} index={index} headline={home.journal.headline} cta={home.journal.cta} />
+    <SectionHead eyebrow={home.journal.eyebrow} index={index} meta={`${total} articles`} headline={home.journal.headline} cta={home.journal.cta} />
     <div class="journal__grid">
       <div class="journal__feature">
         <JournalCard post={feature} variant="feature" />

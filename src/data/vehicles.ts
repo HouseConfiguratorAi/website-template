@@ -49,6 +49,8 @@ export interface Vehicle {
   images: VehicleImage[];
   location: string;
   status: VehicleStatus;
+  /** Date the listing was published (ISO, YYYY-MM-DD). */
+  listed?: string;
   featured?: boolean;
 }
 
@@ -97,6 +99,7 @@ export const vehicles: Vehicle[] = [
     ],
     location: 'Antwerp',
     status: 'available',
+    listed: '2026-09-12',
   },
   {
     id: 'OB-0139',
@@ -140,6 +143,7 @@ export const vehicles: Vehicle[] = [
     ],
     location: 'Antwerp',
     status: 'available',
+    listed: '2026-09-03',
   },
   {
     id: 'OB-0145',
@@ -182,6 +186,7 @@ export const vehicles: Vehicle[] = [
     ],
     location: 'Antwerp',
     status: 'available',
+    listed: '2026-08-27',
   },
   {
     id: 'OB-0147',
@@ -224,6 +229,7 @@ export const vehicles: Vehicle[] = [
     ],
     location: 'Antwerp',
     status: 'reserved',
+    listed: '2026-08-19',
   },
   {
     id: 'OB-0144',
@@ -266,6 +272,7 @@ export const vehicles: Vehicle[] = [
     ],
     location: 'Antwerp',
     status: 'available',
+    listed: '2026-08-08',
   },
   {
     id: 'OB-0148',
@@ -294,6 +301,7 @@ export const vehicles: Vehicle[] = [
     images: [],
     location: 'In transit',
     status: 'incoming',
+    listed: '2026-09-21',
   },
   {
     id: 'OB-0131',
@@ -327,5 +335,6 @@ export const vehicles: Vehicle[] = [
     ],
     location: 'Antwerp',
     status: 'sold',
+    listed: '2026-06-14',
   },
 ];

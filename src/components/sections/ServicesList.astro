@@ -22,7 +22,7 @@ const { eyebrow, index, headline, cta, linkRows = true } = Astro.props;
 
 <section class="services" data-tone="light" data-services>
   <div class="container container--gallery services__grid">
-    {headline && <SectionHead class="services__head" eyebrow={eyebrow} index={index} headline={headline} cta={cta} />}
+    {headline && <SectionHead class="services__head" eyebrow={eyebrow} index={index} meta={`${services.length} services`} headline={headline} cta={cta} />}
 
     <div class="services__visual" aria-hidden="true">
       <div class="services__frame media">

@@ -30,7 +30,7 @@ const specs = [
   </div>
 
   <a class="featured__frame" href={vehicleUrl(v)} data-cursor="View" aria-label={`View the ${v.brand} ${v.model}`} data-scene="through">
-    <div class="featured__media media" data-reveal="image">
+    <div class="featured__media media marks" data-reveal="image">
       <div class="featured__zoom">
         <Media
           src={cover?.src}
@@ -41,6 +41,7 @@ const specs = [
           transitionName={`vehicle-${v.slug}`}
         />
       </div>
+      <span class="frame-caption t-meta">Fig. 01 — {v.brand} {v.model}, {v.exteriorColor}</span>
     </div>
   </a>
 
