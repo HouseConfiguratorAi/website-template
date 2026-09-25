@@ -1,0 +1,16 @@
+---
+import LegalPage from '@/components/sections/LegalPage.astro';
+import { site } from '@/config/site';
+---
+
+<LegalPage title="Voorwaarden" description={`Gebruiksvoorwaarden van de website van ${site.name}.`} updated="september 2026">
+  <p>Deze voorwaarden gelden voor uw gebruik van deze website. Door de website te gebruiken, gaat u ermee akkoord.</p>
+  <h2>Informatie over auto’s</h2>
+  <p>We beschrijven elke auto zo nauwkeurig als we kunnen. Specificaties, kilometerstanden en uitrusting worden te goeder trouw vermeld en dienen bij een bezichtiging te worden bevestigd. Prijzen zijn inclusief btw waar van toepassing (of onder de margeregeling) en kunnen zonder aankondiging wijzigen. Een auto is pas gereserveerd na schriftelijke bevestiging.</p>
+  <h2>Fotografie</h2>
+  <p>Alle foto’s op deze website zijn eigendom van {site.legalName} en mogen niet zonder toestemming worden hergebruikt.</p>
+  <h2>Aansprakelijkheid</h2>
+  <p>We zijn niet aansprakelijk voor beslissingen die uitsluitend op basis van informatie op deze website zijn genomen.</p>
+  <h2>Toepasselijk recht</h2>
+  <p>Op deze voorwaarden is Nederlands recht van toepassing.</p>
+</LegalPage>

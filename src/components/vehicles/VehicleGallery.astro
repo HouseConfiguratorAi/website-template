@@ -24,17 +24,17 @@ const sizes: Record<(typeof frames)[number], string> = {
 
 {
   images.length > 0 && (
-    <section class="gallery" data-tone="dark" aria-label={`${title} — photographs`} data-gallery>
+    <section class="gallery" data-tone="dark" aria-label={`${title} — foto’s`} data-gallery>
       <ul class="gallery__grid" role="list">
         {images.map((img, i) => {
           const frame = frames[i % frames.length];
           return (
             <li class={`gallery__item gallery__item--${frame}`}>
-              <button type="button" class="gallery__open media" data-open={i} data-reveal="image" data-cursor="Open" aria-label={`Open photograph ${i + 1} of ${images.length}: ${img.alt}`}>
+              <button type="button" class="gallery__open media" data-open={i} data-reveal="image" data-cursor="Open" aria-label={`Open foto ${i + 1} van ${images.length}: ${img.alt}`}>
                 <Media src={img.src} alt={img.alt} focal={img.focal} sizes={sizes[frame]} />
               </button>
               <p class="gallery__cap t-meta">
-                <span class="t-index">Fig. {String(i + 2).padStart(2, '0')}</span>
+                <span class="t-index">{String(i + 2).padStart(2, '0')}</span>
                 <span class="muted">{img.alt}</span>
               </p>
             </li>
@@ -42,7 +42,7 @@ const sizes: Record<(typeof frames)[number], string> = {
         })}
       </ul>
 
-      <dialog class="viewer" data-viewer aria-label={`${title} — photograph viewer`} data-tone="dark">
+      <dialog class="viewer" data-viewer aria-label={`${title} — fotoviewer`} data-tone="dark">
         <div class="viewer__track" data-track>
           {images.map((img, i) => (
             <figure class="viewer__slide" data-slide={i} hidden={i !== 0}>
@@ -54,13 +54,13 @@ const sizes: Record<(typeof frames)[number], string> = {
         <div class="viewer__ui">
           <p class="t-meta" aria-live="polite"><span data-current>1</span> / {images.length}</p>
           <div class="viewer__nav">
-            <button type="button" class="viewer__btn" data-prev aria-label="Previous photograph">
+            <button type="button" class="viewer__btn" data-prev aria-label="Vorige foto">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" /></svg>
             </button>
-            <button type="button" class="viewer__btn" data-next aria-label="Next photograph">
+            <button type="button" class="viewer__btn" data-next aria-label="Volgende foto">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" /></svg>
             </button>
-            <button type="button" class="viewer__btn" data-close aria-label="Close viewer">
+            <button type="button" class="viewer__btn" data-close aria-label="Viewer sluiten">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" /></svg>
             </button>
           </div>

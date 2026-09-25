@@ -11,27 +11,30 @@ import { formatDate } from '@/lib/format';
 const vehicles = await getListedVehicles();
 const count = vehicles.length;
 const updated = vehicles.map((v) => v.listed).filter(Boolean).sort().at(-1);
-const words = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve'];
+const words = ['Geen', 'Eén', 'Twee', 'Drie', 'Vier', 'Vijf', 'Zes', 'Zeven', 'Acht', 'Negen', 'Tien', 'Elf', 'Twaalf'];
 const countWord = words[count] ?? String(count);
 ---
 
 <BaseLayout
-  title="Vehicles"
-  description={`${countWord} selected sports and grand touring cars at ${site.name}. Inspected, documented and photographed.`}
+  title="Aanbod"
+  description={`${countWord} geselecteerde sport- en GT-auto’s bij ${site.name} in Amsterdam. Gekeurd, gedocumenteerd en gefotografeerd.`}
   image="journal-collection"
-  jsonLd={breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Vehicles', path: '/vehicles' }])}
+  jsonLd={breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Aanbod', path: '/aanbod' }])}
 >
   <section class="inv-intro" data-tone="dark">
-    <div class="container container--gallery inv-intro__grid">
-      <p class="inv-intro__label eyebrow-row" data-intro="fade" style="--intro:150ms"><span class="t-eyebrow">The collection</span><span class="t-meta muted">{count} listed{updated && ` · Updated ${formatDate(new Date(updated))}`}</span></p>
-      <Heading as="h1" size="display" text={`${countWord} cars. *Each* one chosen.`} reveal="load" delay={200} class="inv-intro__title" />
+    <div class="container inv-intro__inner">
+      <p class="inv-intro__label" data-intro="fade" style="--intro:150ms">
+        <span class="t-eyebrow">De collectie</span>
+        <span class="t-meta muted">{count} auto’s{updated && ` · Bijgewerkt ${formatDate(new Date(updated))}`}</span>
+      </p>
+      <Heading as="h1" size="display" text={`${countWord} auto’s. *Elk* bewust gekozen.`} reveal="load" delay={200} class="inv-intro__title" />
       <p class="t-lead inv-intro__lead" data-intro style="--intro:400ms">
-        Every car on this page is inspected, documented and in the showroom. Ask for the full file on any of them.
+        Elke auto op deze pagina is gekeurd, gedocumenteerd en staat in de showroom. Vraag van elke auto het volledige dossier op.
       </p>
     </div>
   </section>
 
-  <section class="inv" data-tone="dark" aria-label="Vehicles">
+  <section class="inv" data-tone="dark" aria-label="Auto’s">
     <VehicleFilters vehicles={vehicles} />
 
     <div class="container container--gallery">
@@ -60,11 +63,11 @@ const countWord = words[count] ?? String(count);
       </ul>
 
       <div class="inv__empty" data-empty hidden>
-        <p class="t-title">No vehicles match your search.</p>
-        <p class="t-body muted">Try fewer filters — or tell us what you are looking for and we will find it.</p>
+        <p class="t-title">Geen auto’s gevonden.</p>
+        <p class="t-body muted">Probeer minder filters — of vertel ons wat u zoekt, dan gaan wij op zoek.</p>
         <div class="inv__empty-actions">
-          <button class="btn btn--primary" type="button" data-clear>Clear filters</button>
-          <a class="link-arrow" href="/contact">Ask us to search</a>
+          <button class="btn btn--primary" type="button" data-clear>Wis filters</button>
+          <a class="link-arrow" href="/contact">Laat ons zoeken</a>
         </div>
       </div>
     </div>
@@ -77,33 +80,26 @@ const countWord = words[count] ?? String(count);
     padding-bottom: var(--section-s);
   }
 
-  .inv-intro__grid {
+  .inv-intro__inner {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--gutter);
-    row-gap: var(--s-6);
-    align-items: end;
+    justify-items: center;
+    gap: var(--s-6);
+    text-align: center;
   }
 
   .inv-intro__label {
-    grid-column: 1 / -1;
-    color: var(--fg);
-    padding-bottom: var(--s-4);
-    border-bottom: 1px solid var(--border);
+    display: grid;
+    justify-items: center;
+    gap: 10px;
   }
 
-  .inv-intro__label .t-meta {
-    margin-left: auto;
-  }
-
-  .inv-intro__grid > :global(.inv-intro__title) {
-    grid-column: 1 / span 8;
-    font-size: clamp(3rem, 1rem + 7.4vw, 9rem);
+  .inv-intro__inner > :global(.inv-intro__title) {
+    max-width: 12ch;
+    font-size: clamp(2.8rem, 1rem + 6.4vw, 8rem);
   }
 
   .inv-intro__lead {
-    grid-column: 9 / -1;
-    padding-bottom: 0.6em;
+    max-width: 30em;
     color: color-mix(in srgb, var(--fg) 80%, transparent);
   }
 
@@ -151,13 +147,6 @@ const countWord = words[count] ?? String(count);
     align-items: center;
     gap: var(--s-6);
     margin-top: var(--s-4);
-  }
-
-  @media (max-width: 63.99rem) {
-    .inv-intro__grid > :global(.inv-intro__title),
-    .inv-intro__lead {
-      grid-column: 1 / -1;
-    }
   }
 
   @media (max-width: 47.99rem) {

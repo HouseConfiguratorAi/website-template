@@ -5,14 +5,14 @@ interface Props {
   eyebrow: string;
   headline: string;
   lead?: string;
-  size?: 'display' | 'headline';
+  size?: 'display' | 'headline' | 'title';
 }
 const { eyebrow, headline, lead, size = 'display' } = Astro.props;
 ---
 
 <section class="intro" data-tone="dark">
-  <div class="container container--gallery intro__grid">
-    <p class="intro__label eyebrow-row" data-intro="fade" style="--intro:150ms"><span class="t-eyebrow">{eyebrow}</span></p>
+  <div class="container intro__inner">
+    <p class="intro__label t-eyebrow" data-intro="fade" style="--intro:150ms">{eyebrow}</p>
     <Heading as="h1" size={size} text={headline} reveal="load" delay={200} class="intro__title" />
     {lead && <p class="t-lead intro__lead" data-intro style="--intro:400ms">{lead}</p>}
     <slot />
@@ -24,34 +24,30 @@ const { eyebrow, headline, lead, size = 'display' } = Astro.props;
     padding-top: calc(var(--header-h) + var(--section-m));
     padding-bottom: var(--section-m);
   }
-  .intro__grid {
+  /* Centred opening, like a model page: label, a red rule, the title, one paragraph. */
+  .intro__inner {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--gutter);
-    row-gap: var(--s-6);
-    align-items: end;
-  }
-  .intro__grid > :global(*) {
-    grid-column: 1 / -1;
+    justify-items: center;
+    gap: var(--s-6);
+    text-align: center;
   }
   .intro__label {
-    color: var(--fg);
-    padding-bottom: var(--s-4);
-    border-bottom: 1px solid var(--border);
+    display: grid;
+    justify-items: center;
+    gap: 16px;
+    color: var(--muted);
   }
-  .intro__grid > :global(.intro__title) {
-    grid-column: 1 / span 10;
-    max-width: 10em;
+  .intro__label::after {
+    content: '';
+    width: 28px;
+    height: 2px;
+    background: var(--accent);
+  }
+  .intro__inner > :global(.intro__title) {
+    max-width: 14ch;
   }
   .intro__lead {
-    grid-column: 1 / span 6;
+    max-width: 32em;
     color: color-mix(in srgb, var(--fg) 80%, transparent);
-    max-width: 30em;
-  }
-  @media (max-width: 63.99rem) {
-    .intro__grid > :global(.intro__title),
-    .intro__lead {
-      grid-column: 1 / -1;
-    }
   }
 </style>

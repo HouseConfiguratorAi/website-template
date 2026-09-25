@@ -14,7 +14,7 @@ interface Props {
   index?: string;
   headline?: string;
   cta?: { label: string; href: string };
-  /** Link each row to its section on /services. */
+  /** Link each row to its section on /diensten. */
   linkRows?: boolean;
 }
 const { eyebrow, index, headline, cta, linkRows = true } = Astro.props;
@@ -22,7 +22,7 @@ const { eyebrow, index, headline, cta, linkRows = true } = Astro.props;
 
 <section class="services" data-tone="light" data-services>
   <div class="container container--gallery services__grid">
-    {headline && <SectionHead class="services__head" eyebrow={eyebrow} index={index} meta={`${services.length} services`} headline={headline} cta={cta} />}
+    {headline && <SectionHead class="services__head" align="split" eyebrow={eyebrow} index={index} meta={`${services.length} diensten`} headline={headline} cta={cta} />}
 
     <div class="services__visual" aria-hidden="true">
       <div class="services__frame media">
@@ -43,7 +43,7 @@ const { eyebrow, index, headline, cta, linkRows = true } = Astro.props;
           const Row = linkRows ? 'a' : 'div';
           return (
             <li class="services__item" data-index={i} data-active={i === 0 ? '' : undefined} data-alt={s.imageAlt}>
-              <Row class="services__row" href={linkRows ? `/services#${s.slug}` : undefined}>
+              <Row class="services__row" href={linkRows ? `/diensten#${s.slug}` : undefined}>
                 <span class="t-index">{pad(i + 1)}</span>
                 <span class="services__title">{s.title}</span>
                 <span class="services__summary t-small">{s.summary}</span>
@@ -127,6 +127,7 @@ const { eyebrow, index, headline, cta, linkRows = true } = Astro.props;
 
   .services__title {
     font-family: var(--font-display);
+    text-transform: var(--display-case, none);
     font-weight: var(--display-weight);
     font-stretch: var(--display-stretch);
     letter-spacing: var(--display-tracking);

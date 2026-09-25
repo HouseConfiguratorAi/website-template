@@ -40,7 +40,7 @@ export function vehicleTitle(v: Vehicle) {
 }
 
 export function vehicleUrl(v: Pick<Vehicle, 'slug'>) {
-  return `/vehicles/${v.slug}`;
+  return `/aanbod/${v.slug}`;
 }
 
 export function coverImage(v: Vehicle) {
@@ -52,8 +52,8 @@ export function imageOfKind(v: Vehicle, kind: string) {
 }
 
 export const statusLabel: Record<VehicleStatus, string> = {
-  available: 'Available',
-  reserved: 'Reserved',
-  incoming: 'Arriving soon',
-  sold: 'Sold',
+  available: 'Beschikbaar',
+  reserved: 'Gereserveerd',
+  incoming: 'Binnenkort binnen',
+  sold: 'Verkocht',
 };

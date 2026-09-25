@@ -1,8 +1,9 @@
 ---
 /**
- * Section heading used across the site, so every section shares one hierarchy:
- *   (index) EYEBROW  ─────────────────────────────  on a hairline
- *   Headline across eight columns          intro text + link, bottom-aligned
+ * Section heading used across the site, so every section shares one hierarchy.
+ *   align="center" (default): eyebrow, headline and text centred on the page,
+ *                             the way a manufacturer introduces a model.
+ *   align="split":           headline left, intro text and link right.
  */
 import Arrow from '@/components/ui/Arrow.astro';
 import Heading from '@/components/ui/Heading.astro';
@@ -18,15 +19,15 @@ interface Props {
   as?: 'h1' | 'h2';
   size?: 'headline' | 'title' | 'display';
   class?: string;
-  /** Put body/cta beside the headline on wide screens. */
-  split?: boolean;
+  align?: 'center' | 'split';
 }
 
-const { eyebrow, index, meta, headline, body, cta, as = 'h2', size = 'headline', class: className, split = true } = Astro.props;
+const { eyebrow, index, meta, headline, body, cta, as = 'h2', size = 'headline', class: className, align = 'center' } = Astro.props;
+const center = align === 'center';
 ---
 
-<header class:list={['shead', { 'shead--split': split }, className]}>
-  {eyebrow && <Label text={eyebrow} index={index} meta={meta} />}
+<header class:list={['shead', `shead--${align}`, className]}>
+  {eyebrow && <Label text={eyebrow} index={index} meta={center ? undefined : meta} align={center ? 'center' : 'start'} rule={!center} />}
   <div class="shead__grid">
     <Heading as={as} size={size} text={headline} class="shead__title" />
     {
@@ -48,7 +49,7 @@ const { eyebrow, index, meta, headline, body, cta, as = 'h2', size = 'headline',
 <style>
   .shead {
     display: grid;
-    gap: var(--s-7);
+    gap: var(--s-6);
   }
 
   .shead__grid {
@@ -60,7 +61,22 @@ const { eyebrow, index, meta, headline, body, cta, as = 'h2', size = 'headline',
     display: grid;
     gap: var(--s-5);
     justify-items: start;
-    max-width: 26rem;
+    max-width: 30rem;
+  }
+
+  .shead--center {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .shead--center .shead__grid {
+    justify-items: center;
+    max-width: 58rem;
+  }
+
+  .shead--center .shead__aside {
+    justify-items: center;
+    max-width: 38rem;
   }
 
   @media (min-width: 64rem) {

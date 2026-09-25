@@ -18,15 +18,15 @@ const { vehicles, eyebrow, headline, tone = 'light' } = Astro.props;
           <Heading as="h2" size="headline" text={headline} />
         </div>
         <div class="rail__nav">
-          <button type="button" class="rail__btn" data-rail-prev aria-label="Scroll back">
+          <button type="button" class="rail__btn" data-rail-prev aria-label="Terug scrollen">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" /></svg>
           </button>
-          <button type="button" class="rail__btn" data-rail-next aria-label="Scroll forward">
+          <button type="button" class="rail__btn" data-rail-next aria-label="Verder scrollen">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" /></svg>
           </button>
         </div>
       </div>
-      <ul class="rail__track" role="list" data-rail-track data-cursor="Drag">
+      <ul class="rail__track" role="list" data-rail-track data-cursor="Sleep">
         {vehicles.map((v, i) => (
           <li class="rail__item">
             <VehicleCard vehicle={v} ratio="4 / 5" image="portrait" size="small" sizes="(min-width: 64rem) 30vw, 80vw" transition={false} delay={i * 80} />

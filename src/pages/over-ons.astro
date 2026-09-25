@@ -11,7 +11,7 @@ import Label from '@/components/ui/Label.astro';
 import { breadcrumbLd } from '@/lib/seo';
 ---
 
-<BaseLayout title={about.seo.title} description={about.seo.description} image={about.image} jsonLd={breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'About', path: '/about' }])}>
+<BaseLayout title={about.seo.title} description={about.seo.description} image={about.image} jsonLd={breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Over ons', path: '/over-ons' }])}>
   <PageIntro eyebrow={about.eyebrow} headline={about.headline} lead={about.intro} />
 
   <section class="about-image" data-tone="dark" data-scene="through">
@@ -22,7 +22,7 @@ import { breadcrumbLd } from '@/lib/seo';
 
   <section class="principles" data-tone="light">
     <div class="container container--gallery">
-      <Label text="What we believe" index="01" />
+      <Label text="Waar wij voor staan" align="center" />
       <ol class="principles__list" role="list">
         {
           about.principles.map((p, i) => (
@@ -43,7 +43,7 @@ import { breadcrumbLd } from '@/lib/seo';
     eyebrow={about.space.eyebrow}
     headline={about.space.headline}
     body={[about.space.body]}
-    cta={{ label: 'Plan a visit', href: '/contact' }}
+    cta={{ label: 'Plan een bezoek', href: '/contact' }}
     image={about.space.image}
     imageAlt={about.space.imageAlt}
     size="narrow"

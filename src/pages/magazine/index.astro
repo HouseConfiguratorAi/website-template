@@ -9,12 +9,12 @@ const { feature, rest } = await getJournalLayout();
 ---
 
 <BaseLayout
-  title="Journal"
-  description="Essays, guides and notes from the workshop — on cars worth knowing and how to choose one."
+  title="Magazine"
+  description="Essays, gidsen en verhalen uit de werkplaats — over auto’s die het kennen waard zijn en hoe u er een kiest."
   image={feature.data.cover}
-  jsonLd={breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Journal', path: '/journal' }])}
+  jsonLd={breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Magazine', path: '/magazine' }])}
 >
-  <PageIntro eyebrow="Journal" headline="Notes on cars *worth* knowing." size="display" />
+  <PageIntro eyebrow="Magazine" headline="Over auto’s die het *kennen waard* zijn." size="display" />
 
   <section class="jfeature" data-tone="dark">
     <div class="container container--gallery">
@@ -22,7 +22,7 @@ const { feature, rest } = await getJournalLayout();
     </div>
   </section>
 
-  <section class="jlist" data-tone="light" aria-label="More articles">
+  <section class="jlist" data-tone="light" aria-label="Meer artikelen">
     <div class="container container--gallery">
       <ul class="jlist__grid" role="list">
         {rest.map((p, i) => <li><JournalCard post={p} variant="grid" headingLevel="h2" delay={(i % 3) * 90} /></li>)}

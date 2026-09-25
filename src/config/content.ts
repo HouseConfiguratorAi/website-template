@@ -3,104 +3,105 @@
  * ------------------------------------------------------------------
  * Headlines and short texts used across the homepage and about page.
  * Keep headlines short; the photography carries half the message.
- * Wrap a word in *asterisks* to set it as an emphasised (italic) accent.
+ * Wrap a word in *asterisks* to set it as an emphasised accent (a lighter weight in
+ * the default theme, italic in the serif themes).
  */
 
 export const home = {
   seo: {
-    title: 'Selected sports and grand touring cars',
+    title: 'Geselecteerde sport- en GT-auto’s in Amsterdam',
     description:
-      'A small showroom for selected sports and grand touring cars. Inspected, documented and photographed before they are offered.',
+      'Een kleine showroom voor geselecteerde sport- en GT-auto’s. Gekeurd, gedocumenteerd en gefotografeerd voordat we ze aanbieden.',
   },
   hero: {
-    eyebrow: 'Antwerp — Selected automobiles',
-    headline: 'Cars worth *stopping* for.',
-    supporting: 'A small collection of sports and grand touring cars. Each one inspected, documented and chosen for a reason.',
-    primary: { label: 'Explore collection', href: '/vehicles' },
-    secondary: { label: 'Our story', href: '/about' },
+    eyebrow: 'Amsterdam — Geselecteerde automobielen',
+    headline: 'Het wachten *waard.*',
+    supporting: 'Een kleine collectie sport- en GT-auto’s. Elke auto gekeurd, gedocumenteerd en met een reden gekozen.',
+    primary: { label: 'Ontdek het aanbod', href: '/aanbod' },
+    secondary: { label: 'Ons verhaal', href: '/over-ons' },
     image: 'hero-wide',
     imageMobile: 'hero-tall',
-    imageAlt: 'A red sports car in a dark architectural hall, lit from above',
+    imageAlt: 'Een rode sportauto in een donkere hal, van bovenaf belicht',
     /** Optional caption linking the hero photograph to the car in it. */
     captionVehicle: 'ferrari-458-spider-2012',
   },
   statement: {
-    eyebrow: 'The idea',
-    lines: ['Some cars are transportation.', 'Some become *stories.*'],
-    body: 'We only offer the second kind. Fewer cars, better cars, and everything we know about each one.',
+    eyebrow: 'Het idee',
+    lines: ['Sommige auto’s brengen je ergens.', 'Andere worden *een verhaal.*'],
+    body: 'Wij bieden alleen die tweede soort aan. Minder auto’s, betere auto’s — en alles wat we over elk ervan weten.',
   },
   featured: {
-    eyebrow: 'Featured',
+    eyebrow: 'Uitgelicht',
   },
   collection: {
-    eyebrow: 'The collection',
-    headline: 'On the floor *now.*',
-    body: 'Every car is in the showroom and ready to view. Sold cars leave the list; the good ones rarely stay long.',
-    cta: { label: 'View all vehicles', href: '/vehicles' },
+    eyebrow: 'De collectie',
+    headline: 'Nu in de *showroom.*',
+    body: 'Elke auto staat in de showroom en is klaar om te bezichtigen. Verkochte auto’s verdwijnen van de lijst — de goede blijven zelden lang.',
+    cta: { label: 'Bekijk het volledige aanbod', href: '/aanbod' },
   },
   philosophy: {
-    eyebrow: 'Philosophy',
-    headline: 'Selected *differently.*',
+    eyebrow: 'Filosofie',
+    headline: 'Anders *geselecteerd.*',
     body: [
-      'We read a car’s history before we look at the car. We measure the paint, lift it, drive it cold and warm. Most cars we see do not make it into the collection.',
-      'What remains is a small number of cars we would be happy to own ourselves — and a complete, honest account of each one.',
+      'We lezen de geschiedenis van een auto voordat we naar de auto zelf kijken. We meten de lak, zetten hem op de brug en rijden hem koud en warm. De meeste auto’s die we zien, halen de collectie niet.',
+      'Wat overblijft is een klein aantal auto’s die we zelf graag zouden bezitten — met een volledig en eerlijk verslag van elk ervan.',
     ],
-    cta: { label: 'How we work', href: '/about' },
+    cta: { label: 'Zo werken wij', href: '/over-ons' },
     image: 'story-light',
-    imageAlt: 'A single headlight glowing in the dark',
+    imageAlt: 'Eén koplamp die oplicht in het donker',
   },
   services: {
-    eyebrow: 'Services',
-    headline: 'Beyond the *showroom.*',
-    cta: { label: 'All services', href: '/services' },
+    eyebrow: 'Diensten',
+    headline: 'Meer dan een *showroom.*',
+    cta: { label: 'Alle diensten', href: '/diensten' },
   },
   journal: {
-    eyebrow: 'Journal',
-    headline: 'Notes on *cars* worth knowing.',
-    cta: { label: 'Read the journal', href: '/journal' },
+    eyebrow: 'Magazine',
+    headline: 'Over auto’s die het *kennen waard* zijn.',
+    cta: { label: 'Lees het magazine', href: '/magazine' },
   },
   location: {
-    eyebrow: 'Visit',
-    headline: 'A hall built for *looking.*',
-    body: 'Cars are presented under daylight-balanced light in a former warehouse by the docks. Come by during opening hours, or book a private viewing.',
+    eyebrow: 'Bezoek',
+    headline: 'Een hal gebouwd om te *kijken.*',
+    body: 'De auto’s staan onder daglichtgebalanceerd licht in een voormalig pakhuis aan het IJ. Kom langs tijdens de openingstijden of plan een privébezichtiging.',
     image: 'location-hall',
-    imageAlt: 'A long concrete hall with vertical slots of light',
+    imageAlt: 'Een lange betonnen hal met verticale lichtstroken',
   },
   contact: {
-    eyebrow: 'Enquiries',
-    headline: 'Looking for something *specific?*',
-    body: 'Tell us what you have in mind. We reply personally, usually the same day.',
+    eyebrow: 'Contact',
+    headline: 'Op zoek naar iets *bijzonders?*',
+    body: 'Vertel ons wat u zoekt. We antwoorden persoonlijk, meestal dezelfde dag nog.',
   },
   final: {
-    headline: 'Find something worth *driving.*',
-    cta: { label: 'Explore the collection', href: '/vehicles' },
+    headline: 'Vind een auto die het *rijden waard* is.',
+    cta: { label: 'Ontdek de collectie', href: '/aanbod' },
     image: 'final-scene',
-    imageAlt: 'A car driving towards a slot of light at the end of a dark hall, tail lights glowing',
+    imageAlt: 'Een auto rijdt naar een lichtspleet aan het einde van een donkere hal, achterlichten gloeiend',
   },
 };
 
 export const about = {
   seo: {
-    title: 'About',
-    description: 'A small showroom with a simple idea: fewer cars, better cars, and complete honesty about each one.',
+    title: 'Over ons',
+    description: 'Een kleine showroom met een eenvoudig idee: minder auto’s, betere auto’s en volledige eerlijkheid over elk ervan.',
   },
-  eyebrow: 'About Oberhall',
-  headline: 'Fewer cars. *Better* cars.',
+  eyebrow: 'Over Oberhall',
+  headline: 'Minder auto’s. *Betere* auto’s.',
   intro:
-    'Oberhall is a fictional showroom created to demonstrate this template. Replace this text with the story of your business: who you are, why you started, and what you refuse to compromise on.',
+    'Oberhall is een fictieve showroom, gemaakt om deze template te demonstreren. Vervang deze tekst door het verhaal van uw bedrijf: wie u bent, waarom u begon en waar u nooit concessies aan doet.',
   image: 'about-studio',
-  imageAlt: 'A slate grand tourer in a dark studio',
+  imageAlt: 'Een leigrijze GT in een donkere studio',
   principles: [
-    { title: 'History first', body: 'We read every document before we look at the car. A good story on paper is where a good car starts.' },
-    { title: 'Nothing hidden', body: 'Inspection notes, photographs of the underside, paint readings — you see what we see.' },
-    { title: 'Original over perfect', body: 'We prefer honest, well-maintained cars to restorations that erase their history.' },
-    { title: 'No pressure', body: 'There is no sales target. If a car is not right for you, we will say so.' },
+    { title: 'Eerst de historie', body: 'We lezen elk document voordat we naar de auto kijken. Een goed verhaal op papier is waar een goede auto begint.' },
+    { title: 'Niets verborgen', body: 'Keuringsnotities, foto’s van de onderkant, laklaagdiktes — u ziet wat wij zien.' },
+    { title: 'Origineel boven perfect', body: 'We verkiezen eerlijke, goed onderhouden auto’s boven restauraties die hun geschiedenis uitwissen.' },
+    { title: 'Geen druk', body: 'Er is geen verkooptarget. Als een auto niet bij u past, zeggen we dat eerlijk.' },
   ],
   space: {
-    eyebrow: 'The space',
-    headline: 'A former warehouse, *rebuilt* around light.',
-    body: 'Concrete, steel and tall slots of daylight. The hall is designed so you can walk around every car and see it the way it will look on the road.',
+    eyebrow: 'De ruimte',
+    headline: 'Een voormalig pakhuis, *herbouwd* rond licht.',
+    body: 'Beton, staal en hoge stroken daglicht. De hal is zo ontworpen dat u om elke auto heen kunt lopen en hem ziet zoals hij er op de weg uitziet.',
     image: 'location-hall',
-    imageAlt: 'The Oberhall hall with vertical slots of light',
+    imageAlt: 'De hal van Oberhall met verticale lichtstroken',
   },
 };

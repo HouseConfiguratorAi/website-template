@@ -1,69 +1,58 @@
 ---
+/**
+ * The featured car, presented like a model launch: centred name, the
+ * photograph edge to edge, four key figures, then price and actions.
+ */
 import type { Vehicle } from '@/lib/inventory';
 import { coverImage, imageOfKind, vehicleUrl } from '@/lib/inventory';
-import { formatMileage, formatPrice } from '@/lib/format';
+import { formatPrice } from '@/lib/format';
+import { keyFigures } from '@/lib/specs';
 import { home } from '@/config/content';
 import Media from '@/components/ui/Media.astro';
 import Arrow from '@/components/ui/Arrow.astro';
 import Label from '@/components/ui/Label.astro';
 import Heading from '@/components/ui/Heading.astro';
+import KeyFigures from '@/components/vehicles/KeyFigures.astro';
 
-interface Props { vehicle: Vehicle; index?: string }
-const { vehicle: v, index } = Astro.props;
+interface Props { vehicle: Vehicle }
+const { vehicle: v } = Astro.props;
 const cover = coverImage(v);
 const portrait = imageOfKind(v, 'portrait');
-const specs = [
-  { k: 'Year', v: String(v.year) },
-  { k: 'Mileage', v: formatMileage(v.mileage) },
-  { k: 'Power', v: `${v.power.hp} hp` },
-  { k: 'Gearbox', v: v.transmission },
-];
 ---
 
 <section class="featured" data-tone="dark" aria-labelledby="featured-title">
-  <div class="container container--gallery">
-    <Label text={`${home.featured.eyebrow} — ${v.brand}`} index={index} />
-    <div class="featured__masthead">
-      <Heading as="h2" id="featured-title" size="display" text={v.model} class="featured__title" />
-      <p class="t-meta muted featured__ref" data-reveal="fade">Ref. {v.id}<br />{v.variant} · {v.location}</p>
-    </div>
+  <div class="container featured__head">
+    <Label text={`${home.featured.eyebrow} — ${v.brand}`} align="center" />
+    <Heading as="h2" id="featured-title" size="display" text={v.model} class="featured__title" />
+    <p class="featured__variant muted" data-reveal="fade">{v.variant} · {v.year}</p>
   </div>
 
-  <a class="featured__frame" href={vehicleUrl(v)} data-cursor="View" aria-label={`View the ${v.brand} ${v.model}`} data-scene="through">
-    <div class="featured__media media marks" data-reveal="image">
+  <a class="featured__frame" href={vehicleUrl(v)} data-cursor="Bekijk" aria-label={`Bekijk de ${v.brand} ${v.model}`} data-scene="through">
+    <div class="featured__media media" data-reveal="image">
       <div class="featured__zoom">
         <Media
           src={cover?.src}
           mobileSrc={portrait?.src}
           alt={cover?.alt ?? ''}
-          sizes="(min-width: 100rem) 1600px, 100vw"
-          focal="45% 55%"
+          sizes="100vw"
+          focal="48% 58%"
           transitionName={`vehicle-${v.slug}`}
         />
       </div>
-      <span class="frame-caption t-meta">Fig. 01 — {v.brand} {v.model}, {v.exteriorColor}</span>
     </div>
   </a>
 
   <div class="container container--gallery featured__info">
+    <KeyFigures figures={keyFigures(v)} />
     <p class="t-lead featured__summary" data-reveal>{v.summary}</p>
-    <div class="featured__sheet" data-reveal style="--delay:120ms">
-      <dl class="featured__specs">
-        {
-          specs.map((s) => (
-            <div>
-              <dt class="t-meta muted">{s.k}</dt>
-              <dd class="t-spec">{s.v}</dd>
-            </div>
-          ))
-        }
-      </dl>
-      <div class="featured__offer">
-        <p>
-          <span class="t-meta muted">Price</span>
-          <span class="featured__price">{formatPrice(v.price)}</span>
-        </p>
-        <a class="btn btn--primary" href={vehicleUrl(v)}>View vehicle <Arrow /></a>
+    <div class="featured__offer" data-reveal style="--delay:120ms">
+      <p class="featured__price">
+        <span class="t-meta muted">Vraagprijs</span>
+        <span>{formatPrice(v.price)}</span>
+      </p>
+      <div class="featured__actions">
+        <a class="btn btn--primary" href={vehicleUrl(v)}>Ontdek deze auto <Arrow /></a>
+        <a class="btn btn--ghost" href={`${vehicleUrl(v)}#aanvraag`}>Plan een bezichtiging</a>
       </div>
     </div>
   </div>
@@ -71,40 +60,35 @@ const specs = [
 
 <style>
   .featured {
-    padding-top: var(--section-m);
+    padding-top: var(--section-l);
     padding-bottom: var(--section-l);
   }
 
-  .featured__masthead {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: var(--s-6);
-    margin-top: var(--s-6);
+  .featured__head {
+    display: grid;
+    justify-items: center;
+    gap: var(--s-5);
+    text-align: center;
+    padding-bottom: var(--s-8);
   }
 
-  /* The model name sits on the photograph like a magazine masthead. */
-  .featured__masthead :global(.featured__title) {
-    position: relative;
-    z-index: 2;
-    margin-bottom: -0.2em;
-    font-size: clamp(3.6rem, 0.6rem + 12vw, 14rem);
-    line-height: 0.82;
+  .featured__head :global(.featured__title) {
+    font-size: clamp(3.2rem, 0.8rem + 10vw, 12rem);
+    line-height: 0.86;
   }
 
-  .featured__ref {
-    text-align: right;
-    padding-bottom: var(--s-5);
+  .featured__variant {
+    font-size: var(--fs-small);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
   }
 
   .featured__frame {
     display: block;
-    width: min(100% - 2 * var(--gutter), var(--w-gallery));
-    margin-inline: auto;
   }
 
   .featured__media {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 21 / 9;
   }
 
   .featured__zoom {
@@ -120,72 +104,48 @@ const specs = [
 
   .featured__info {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--gutter);
-    row-gap: var(--s-7);
-    padding-top: var(--s-7);
-    align-items: start;
+    justify-items: center;
+    gap: var(--s-8);
+    padding-top: var(--s-8);
+    text-align: center;
+  }
+
+  .featured__info :global(.figures) {
+    width: 100%;
+    max-width: 72rem;
   }
 
   .featured__summary {
-    grid-column: 1 / span 4;
-  }
-
-  .featured__sheet {
-    grid-column: 6 / -1;
-    display: grid;
-    gap: var(--s-6);
-  }
-
-  .featured__specs {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    border-top: 1px solid var(--border);
-  }
-
-  .featured__specs div {
-    display: grid;
-    gap: 10px;
-    padding: var(--s-4) var(--s-4) 0 0;
-  }
-
-  .featured__specs div + div {
-    padding-left: var(--s-4);
-    border-left: 1px solid var(--border);
-  }
-
-  .featured__specs dd {
-    margin: 0;
+    max-width: 30em;
+    color: color-mix(in srgb, var(--fg) 82%, transparent);
   }
 
   .featured__offer {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: var(--s-5);
-    padding-top: var(--s-5);
-    border-top: 1px solid var(--border);
-  }
-
-  .featured__offer p {
     display: grid;
-    gap: 8px;
+    justify-items: center;
+    gap: var(--s-5);
   }
 
   .featured__price {
-    font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);
-    font-weight: 600;
-    font-stretch: 92%;
-    letter-spacing: -0.035em;
+    display: grid;
+    gap: 10px;
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+    font-weight: 400;
+    letter-spacing: -0.01em;
     line-height: 1;
     font-variant-numeric: tabular-nums lining-nums;
   }
 
+  .featured__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--s-3);
+  }
+
   @media (max-width: 63.99rem) {
-    .featured__summary,
-    .featured__sheet {
-      grid-column: 1 / -1;
+    .featured__media {
+      aspect-ratio: 16 / 9;
     }
   }
 
@@ -193,25 +153,11 @@ const specs = [
     .featured__media {
       aspect-ratio: 4 / 5;
     }
-    .featured__frame {
+    .featured__actions {
       width: 100%;
     }
-    .featured__ref {
-      display: none;
-    }
-    .featured__specs {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .featured__specs div + div:nth-child(3) {
-      padding-left: 0;
-      border-left: 0;
-    }
-    .featured__specs div:nth-child(n + 3) {
-      margin-top: var(--s-4);
-      border-top: 1px solid var(--border);
-    }
-    .featured__offer .btn {
-      width: 100%;
+    .featured__actions .btn {
+      flex: 1 1 100%;
     }
   }
 </style>

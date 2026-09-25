@@ -9,11 +9,11 @@ import { dealerLd, breadcrumbLd } from '@/lib/seo';
 
 <BaseLayout
   title="Contact"
-  description={`Visit the showroom in ${contact.address.city}, call ${contact.phone} or send us a message.`}
+  description={`Bezoek de showroom in ${contact.address.city}, bel ${contact.phone} of stuur ons een bericht.`}
   image="location-hall"
   jsonLd={[dealerLd(), breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Contact', path: '/contact' }])]}
 >
-  <PageIntro eyebrow="Contact" headline="Looking for something *specific?*" lead="Ask about a car in the collection, one that is not, or anything in between. We reply personally, usually the same day." />
-  <ContactSection eyebrow="Write to us" headline="Start with a *message.*" body="Or call us during opening hours. Viewings outside those hours are possible by appointment." />
+  <PageIntro eyebrow="Contact" headline="Op zoek naar iets *bijzonders?*" lead="Vraag naar een auto uit de collectie, een auto die er niet in staat, of alles daartussen. We antwoorden persoonlijk, meestal dezelfde dag nog." />
+  <ContactSection eyebrow="Schrijf ons" headline="Begin met een *bericht.*" body="Of bel ons tijdens openingstijden. Bezichtigingen buiten die tijden zijn mogelijk op afspraak." />
   <LocationSection />
 </BaseLayout>

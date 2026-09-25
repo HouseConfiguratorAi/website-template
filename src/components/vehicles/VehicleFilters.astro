@@ -34,34 +34,34 @@ const mileageSteps = [5000, 10000, 25000, 50000, 100000].filter((m) => m <= Math
 <div class="fbar" data-filters>
   <div class="container container--gallery fbar__inner">
     <div class="fbar__search">
-      <label class="sr-only" for="f-q">Search vehicles</label>
+      <label class="sr-only" for="f-q">Zoek in het aanbod</label>
       <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" /><path d="M13 13l5 5" stroke="currentColor" /></svg>
-      <input id="f-q" type="search" name="q" placeholder="Search make, model, colour" autocomplete="off" data-f />
+      <input id="f-q" type="search" name="q" placeholder="Zoek op merk, model, kleur" autocomplete="off" data-f />
     </div>
 
     <div class="fbar__inline">
       <label class="fsel">
-        <span class="sr-only">Make</span>
+        <span class="sr-only">Merk</span>
         <select name="make" data-f>
-          <option value="">All makes</option>
+          <option value="">Alle merken</option>
           {makes.map((m) => <option value={m}>{m}</option>)}
         </select>
       </label>
       <label class="fsel">
-        <span class="sr-only">Body type</span>
+        <span class="sr-only">Carrosserie</span>
         <select name="body" data-f>
-          <option value="">All body types</option>
+          <option value="">Alle carrosserieën</option>
           {bodies.map((b) => <option value={b}>{b}</option>)}
         </select>
       </label>
       <label class="fsel">
-        <span class="sr-only">Sort by</span>
+        <span class="sr-only">Sorteer op</span>
         <select name="sort" data-f>
-          <option value="">Recommended</option>
-          <option value="price-asc">Price, low to high</option>
-          <option value="price-desc">Price, high to low</option>
-          <option value="year-desc">Newest first</option>
-          <option value="mileage-asc">Lowest mileage</option>
+          <option value="">Aanbevolen</option>
+          <option value="price-asc">Prijs, laag naar hoog</option>
+          <option value="price-desc">Prijs, hoog naar laag</option>
+          <option value="year-desc">Nieuwste eerst</option>
+          <option value="mileage-asc">Laagste kilometerstand</option>
         </select>
       </label>
     </div>
@@ -72,73 +72,73 @@ const mileageSteps = [5000, 10000, 25000, 50000, 100000].filter((m) => m <= Math
     </button>
   </div>
   <div class="container container--gallery fbar__status">
-    <p class="t-meta muted" data-count aria-live="polite">{vehicles.length} vehicles</p>
-    <button class="t-meta link" type="button" data-clear hidden>Clear all</button>
+    <p class="t-meta muted" data-count aria-live="polite">{vehicles.length} auto’s</p>
+    <button class="t-meta link" type="button" data-clear hidden>Alles wissen</button>
   </div>
 </div>
 
 <dialog class="fpanel" id="filter-panel" data-tone="dark" aria-labelledby="fpanel-title" data-panel>
   <div class="fpanel__head">
-    <h2 id="fpanel-title" class="t-eyebrow">Refine the collection</h2>
-    <button type="button" class="fpanel__close" data-close-panel aria-label="Close filters">
+    <h2 id="fpanel-title" class="t-eyebrow">Verfijn de collectie</h2>
+    <button type="button" class="fpanel__close" data-close-panel aria-label="Filters sluiten">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" /></svg>
     </button>
   </div>
 
   <div class="fpanel__body">
     <div class="ffield">
-      <label for="p-make">Make</label>
+      <label for="p-make">Merk</label>
       <select id="p-make" name="make" data-f>
-        <option value="">All makes</option>
+        <option value="">Alle merken</option>
         {makes.map((m) => <option value={m}>{m}</option>)}
       </select>
     </div>
     <div class="ffield">
       <label for="p-model">Model</label>
       <select id="p-model" name="model" data-f>
-        <option value="">All models</option>
+        <option value="">Alle modellen</option>
         {models.map((m) => <option value={m.model} data-make={m.make}>{m.make} {m.model}</option>)}
       </select>
     </div>
     <div class="ffield">
-      <label for="p-price">Maximum price</label>
+      <label for="p-price">Maximale prijs</label>
       <select id="p-price" name="priceMax" data-f>
-        <option value="">Any price</option>
-        {priceSteps.map((p) => <option value={p}>Up to {formatPrice(p)}</option>)}
+        <option value="">Elke prijs</option>
+        {priceSteps.map((p) => <option value={p}>Tot {formatPrice(p)}</option>)}
       </select>
     </div>
     <div class="ffield">
-      <label for="p-year">Year</label>
+      <label for="p-year">Bouwjaar</label>
       <select id="p-year" name="yearMin" data-f>
-        <option value="">Any year</option>
-        {years.map((y) => <option value={y}>{y} or newer</option>)}
+        <option value="">Elk bouwjaar</option>
+        {years.map((y) => <option value={y}>{y} of nieuwer</option>)}
       </select>
     </div>
     <div class="ffield">
-      <label for="p-mileage">Mileage</label>
+      <label for="p-mileage">Kilometerstand</label>
       <select id="p-mileage" name="mileageMax" data-f>
-        <option value="">Any mileage</option>
-        {mileageSteps.map((m) => <option value={m}>Up to {formatMileage(m)}</option>)}
+        <option value="">Elke kilometerstand</option>
+        {mileageSteps.map((m) => <option value={m}>Tot {formatMileage(m)}</option>)}
       </select>
     </div>
 
     <fieldset class="ffield fchips">
-      <legend>Fuel</legend>
-      <div>{fuels.map((f) => <label class="fchip"><input type="radio" name="fuel" value={f} data-f /><span>{f}</span></label>)}<label class="fchip"><input type="radio" name="fuel" value="" data-f checked /><span>Any</span></label></div>
+      <legend>Brandstof</legend>
+      <div>{fuels.map((f) => <label class="fchip"><input type="radio" name="fuel" value={f} data-f /><span>{f}</span></label>)}<label class="fchip"><input type="radio" name="fuel" value="" data-f checked /><span>Alle</span></label></div>
     </fieldset>
     <fieldset class="ffield fchips">
-      <legend>Transmission</legend>
-      <div>{transmissions.map((t) => <label class="fchip"><input type="radio" name="transmission" value={t} data-f /><span>{t}</span></label>)}<label class="fchip"><input type="radio" name="transmission" value="" data-f checked /><span>Any</span></label></div>
+      <legend>Transmissie</legend>
+      <div>{transmissions.map((t) => <label class="fchip"><input type="radio" name="transmission" value={t} data-f /><span>{t}</span></label>)}<label class="fchip"><input type="radio" name="transmission" value="" data-f checked /><span>Alle</span></label></div>
     </fieldset>
     <fieldset class="ffield fchips">
-      <legend>Body type</legend>
-      <div>{bodies.map((b) => <label class="fchip"><input type="radio" name="body" value={b} data-f /><span>{b}</span></label>)}<label class="fchip"><input type="radio" name="body" value="" data-f checked /><span>Any</span></label></div>
+      <legend>Carrosserie</legend>
+      <div>{bodies.map((b) => <label class="fchip"><input type="radio" name="body" value={b} data-f /><span>{b}</span></label>)}<label class="fchip"><input type="radio" name="body" value="" data-f checked /><span>Alle</span></label></div>
     </fieldset>
   </div>
 
   <div class="fpanel__foot">
-    <button type="button" class="link t-meta" data-clear>Clear all</button>
-    <button type="button" class="btn btn--primary" data-close-panel data-show-count>Show {vehicles.length} vehicles</button>
+    <button type="button" class="link t-meta" data-clear>Alles wissen</button>
+    <button type="button" class="btn btn--primary" data-close-panel data-show-count>Toon {vehicles.length} auto’s</button>
   </div>
 </dialog>
 
@@ -561,8 +561,8 @@ const mileageSteps = [5000, 10000, 25000, 50000, 100000].filter((m) => m <= Math
       sorted.forEach((el) => list.appendChild(el));
 
       const active = KEYS.filter((k) => k !== 'sort' && k !== 'q' && state[k]).length + (state.q ? 1 : 0);
-      countEl.textContent = `${visible} ${visible === 1 ? 'vehicle' : 'vehicles'}${active ? ' match' : ''}`;
-      showBtn.textContent = visible ? `Show ${visible} ${visible === 1 ? 'vehicle' : 'vehicles'}` : 'No matches';
+      countEl.textContent = `${visible} ${visible === 1 ? 'auto' : 'auto’s'}${active ? ' gevonden' : ''}`;
+      showBtn.textContent = visible ? `Toon ${visible} ${visible === 1 ? 'auto' : 'auto’s'}` : 'Geen resultaten';
       badge.hidden = !active;
       badge.textContent = String(active);
       clearBtns.forEach((b) => (b.hidden = !active && !state.sort));

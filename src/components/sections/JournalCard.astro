@@ -16,7 +16,7 @@ const sizes = variant === 'feature' ? '(min-width: 64rem) 60vw, 100vw' : variant
 ---
 
 <article class:list={['jcard', `jcard--${variant}`]} data-reveal style={`--delay:${delay}ms`}>
-  <a class="jcard__link" href={postUrl(post)} data-cursor="Read">
+  <a class="jcard__link" href={postUrl(post)} data-cursor="Lees">
     <div class="jcard__media media">
       <Media src={d.cover} alt={d.coverAlt} sizes={sizes} transitionName={variant !== 'compact' ? `post-${post.id}` : undefined} />
     </div>

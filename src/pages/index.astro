@@ -16,7 +16,7 @@ import { getFeaturedVehicle, getListedVehicles } from '@/lib/inventory';
 import { dealerLd } from '@/lib/seo';
 
 const featured = await getFeaturedVehicle();
-// The homepage shows photographed cars only; incoming cars live on /vehicles.
+// The homepage shows photographed cars only; incoming cars live on /aanbod.
 const listed = await getListedVehicles();
 const collection = listed.filter((v) => v.slug !== featured.slug && v.images.length).slice(0, 4);
 // One name per model for the flowing band.
@@ -26,14 +26,14 @@ const p = home.philosophy;
 
 <BaseLayout title={home.seo.title} description={home.seo.description} jsonLd={dealerLd()}>
   <Hero />
-  <Statement index="02" />
-  <FeaturedVehicle vehicle={featured} index="03" />
-  <Collection vehicles={collection} index="04" />
+  <Statement />
+  <FeaturedVehicle vehicle={featured} />
+  <Collection vehicles={collection} total={listed.length} />
   <FlowBand vehicles={bandVehicles} />
-  <StorySection layout="scene" index="05" eyebrow={p.eyebrow} headline={p.headline} body={p.body} cta={p.cta} image={p.image} imageAlt={p.imageAlt} focal="40% 50%" />
-  <ServicesList index="06" eyebrow={home.services.eyebrow} headline={home.services.headline} cta={home.services.cta} />
-  <JournalSection index="07" />
-  <LocationSection index="08" />
-  <ContactSection tone="signal" index="09" eyebrow={home.contact.eyebrow} headline={home.contact.headline} body={home.contact.body} />
+  <StorySection layout="scene" eyebrow={p.eyebrow} headline={p.headline} body={p.body} cta={p.cta} image={p.image} imageAlt={p.imageAlt} focal="40% 50%" />
+  <ServicesList eyebrow={home.services.eyebrow} headline={home.services.headline} cta={home.services.cta} />
+  <JournalSection />
+  <LocationSection />
+  <ContactSection eyebrow={home.contact.eyebrow} headline={home.contact.headline} body={home.contact.body} />
   <FinalCTA />
 </BaseLayout>

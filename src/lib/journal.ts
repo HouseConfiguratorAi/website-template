@@ -14,4 +14,4 @@ export async function getJournalLayout() {
   return { feature, rest: posts.filter((p) => p !== feature) };
 }
 
-export const postUrl = (p: Post) => `/journal/${p.id}`;
+export const postUrl = (p: Post) => `/magazine/${p.id}`;

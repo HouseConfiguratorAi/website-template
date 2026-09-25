@@ -4,15 +4,15 @@ import Arrow from '@/components/ui/Arrow.astro';
 import Heading from '@/components/ui/Heading.astro';
 ---
 
-<BaseLayout title="Page not found" description="This page does not exist." noindex>
+<BaseLayout title="Pagina niet gevonden" description="Deze pagina bestaat niet." noindex>
   <section class="nf" data-tone="dark">
     <div class="container container--gallery nf__inner">
-      <p class="nf__label" data-intro="fade" style="--intro:150ms"><span class="t-index">(404)</span><span class="t-eyebrow">Page not found</span></p>
-      <Heading as="h1" size="display" text="This road does not go *anywhere.*" reveal="load" delay={200} class="nf__title" />
-      <p class="t-lead muted" data-intro style="--intro:400ms">The page may have moved, or the car it described has found a new home.</p>
+      <p class="nf__label" data-intro="fade" style="--intro:150ms"><span class="t-index">404</span><span class="t-eyebrow">Pagina niet gevonden</span></p>
+      <Heading as="h1" size="display" text="Deze weg loopt *dood.*" reveal="load" delay={200} class="nf__title" />
+      <p class="t-lead muted" data-intro style="--intro:400ms">De pagina is misschien verplaatst, of de auto die hier stond heeft een nieuwe eigenaar gevonden.</p>
       <div class="nf__actions" data-intro style="--intro:550ms">
-        <a class="btn btn--primary" href="/vehicles">Explore the collection <Arrow /></a>
-        <a class="btn btn--ghost" href="/">Back to the start</a>
+        <a class="btn btn--primary" href="/aanbod">Ontdek de collectie <Arrow /></a>
+        <a class="btn btn--ghost" href="/">Terug naar home</a>
       </div>
     </div>
   </section>
@@ -29,10 +29,13 @@ import Heading from '@/components/ui/Heading.astro';
   .nf__inner {
     display: grid;
     gap: var(--s-6);
-    justify-items: start;
+    justify-items: center;
+    text-align: center;
   }
   .nf__label {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 14px;
     align-items: baseline;
   }
@@ -41,6 +44,7 @@ import Heading from '@/components/ui/Heading.astro';
   }
   .nf__actions {
     display: flex;
+    justify-content: center;
     flex-wrap: wrap;
     gap: var(--s-3);
   }

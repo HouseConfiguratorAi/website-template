@@ -30,6 +30,7 @@ const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', site.url
 const activeTheme = resolveTheme();
 const theme = themeToCss(activeTheme);
 const serifDisplay = activeTheme.type.display === 'serif';
+const monoMeta = activeTheme.type.metaFont !== 'sans';
 
 let ogImage: string | undefined;
 const media = resolveMedia(image);
@@ -81,7 +82,7 @@ const graph = [
 
     {serifDisplay && <link rel="preload" href={newsreaderUrl} as="font" type="font/woff2" crossorigin />}
     <link rel="preload" href={archivoUrl} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={monoUrl} as="font" type="font/woff2" crossorigin />
+    {monoMeta && <link rel="preload" href={monoUrl} as="font" type="font/woff2" crossorigin />}
     <style is:inline set:html={theme}></style>
     <script is:inline>
       // Motion is opt-in: only when the visitor has not asked for reduced motion
@@ -96,7 +97,7 @@ const graph = [
     <slot name="head" />
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">Naar de inhoud</a>
     <SiteHeader />
     <main id="main" tabindex="-1">
       <slot />
