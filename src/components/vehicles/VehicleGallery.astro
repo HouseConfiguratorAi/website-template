@@ -195,7 +195,7 @@ const sizes: Record<(typeof frames)[number], string> = {
     text-align: center;
   }
 
-  .motion .viewer__slide:not([hidden]) {
+  :global(.motion) .viewer__slide:not([hidden]) {
     animation: fade-in 450ms var(--ease-standard);
   }
 

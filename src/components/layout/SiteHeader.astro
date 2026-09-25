@@ -153,7 +153,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     padding-block: 6px;
   }
 
-  .motion .site-header__inner {
+  :global(.motion) .site-header__inner {
     animation: fade-in 800ms var(--ease-standard) 700ms both;
   }
 

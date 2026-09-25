@@ -28,8 +28,6 @@ const tracking = len <= 10 ? 0.34 : len <= 16 ? 0.22 : 0.14;
     letter-spacing: var(--tracking, 0.34em);
     text-transform: uppercase;
     line-height: 1.2;
-    /* optical compensation for trailing letter-spacing */
-    margin-right: calc(var(--tracking, 0.34em) * -1);
     white-space: nowrap;
     max-width: 100%;
     overflow: hidden;

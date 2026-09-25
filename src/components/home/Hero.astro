@@ -141,7 +141,7 @@ const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : u
     overflow: hidden;
   }
 
-  .motion .hero__scroll i::after {
+  :global(.motion) .hero__scroll i::after {
     content: '';
     position: absolute;
     inset: 0;

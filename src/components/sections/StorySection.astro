@@ -186,35 +186,35 @@ const overlay = layout === 'scene' || layout === 'background';
   /* ---------------- The camera move ----------------
      --p is 0 → 1 while the section scrolls past. Without motion it is
      unset, so the fallbacks below render the final, static composition. */
-  .motion .story--scene {
+  :global(.motion) .story--scene {
     height: 260vh;
   }
 
-  .motion .story--scene .story__stage {
+  :global(.motion) .story--scene .story__stage {
     position: sticky;
     top: 0;
     height: 100svh;
   }
 
-  .motion .story--scene {
+  :global(.motion) .story--scene {
     --e: clamp(0, var(--p, 1) * 1.8, 1);
     --c: clamp(0, (var(--p, 1) - 0.5) * 4, 1);
   }
 
-  .motion .story--scene .story__frame {
+  :global(.motion) .story--scene .story__frame {
     clip-path: inset(calc((1 - var(--e)) * 22%) calc((1 - var(--e)) * 31%) round calc((1 - var(--e)) * 4px));
   }
 
-  .motion .story--scene .story__img {
+  :global(.motion) .story--scene .story__img {
     transform: scale(calc(1.22 - var(--e) * 0.22));
     will-change: transform;
   }
 
-  .motion .story--scene .story__veil {
+  :global(.motion) .story--scene .story__veil {
     opacity: var(--c);
   }
 
-  .motion .story--scene .story__copy {
+  :global(.motion) .story--scene .story__copy {
     opacity: var(--c);
     transform: translate3d(0, calc((1 - var(--c)) * 40px), 0);
   }
@@ -233,10 +233,10 @@ const overlay = layout === 'scene' || layout === 'background';
   }
 
   @media (max-width: 47.99rem) {
-    .motion .story--scene {
+    :global(.motion) .story--scene {
       height: 190vh;
     }
-    .motion .story--scene .story__frame {
+    :global(.motion) .story--scene .story__frame {
       clip-path: inset(calc((1 - var(--e)) * 18%) calc((1 - var(--e)) * 12%));
     }
   }
