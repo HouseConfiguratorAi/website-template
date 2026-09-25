@@ -1,35 +1,20 @@
 ---
 import { home } from '@/config/content';
-import { plain } from '@/lib/text';
+import { plain, splitWords } from '@/lib/text';
+import Label from '@/components/ui/Label.astro';
 
+interface Props { index?: string }
+const { index } = Astro.props;
 const s = home.statement;
-// Split into words server-side so each can be revealed in sequence.
-let i = 0;
-const lines = s.lines.map((line) =>
-  line.split(' ').map((word) => {
-    const em = /^\*.*\*[.,]?$/.test(word) || /^\*/.test(word);
-    return { text: word.replace(/\*/g, ''), em, i: i++ };
-  }),
-);
 ---
 
 <section class="statement" data-tone="light">
   <div class="container container--gallery statement__grid">
-    <p class="t-eyebrow eyebrow-row statement__eyebrow" data-reveal="fade">{s.eyebrow}</p>
-    <h2 class="t-display statement__text" data-words>
+    <Label text={s.eyebrow} index={index} class="statement__label" />
+    <h2 class="t-display statement__text" data-split>
       <span class="sr-only">{plain(s.lines.join(' '))}</span>
       <span aria-hidden="true">
-      {
-        lines.map((words) => (
-          <span class="statement__line">
-            {words.map((w) => (
-              <>
-                <span class="w" style={`--i:${w.i}`}>{w.em ? <em>{w.text}</em> : w.text}</span>{' '}
-              </>
-            ))}
-          </span>
-        ))
-      }
+        {s.lines.map((line, n) => <span class="statement__line" style={`--delay:${n * 180}ms`} set:html={splitWords(line)} />)}
       </span>
     </h2>
     <p class="t-lead statement__body" data-reveal style="--delay:300ms">{s.body}</p>
@@ -38,24 +23,24 @@ const lines = s.lines.map((line) =>
 
 <style>
   .statement {
-    padding-block: var(--section-xl);
+    padding-block: var(--section-l) var(--section-xl);
   }
 
   .statement__grid {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     column-gap: var(--gutter);
-    row-gap: var(--s-8);
+    row-gap: var(--section-s);
   }
 
-  .statement__eyebrow {
+  :global(.statement__label) {
     grid-column: 1 / -1;
   }
 
   .statement__text {
     grid-column: 1 / -1;
-    font-size: clamp(2.75rem, 1.2rem + 6.6vw, 8.75rem);
-    line-height: 0.98;
+    font-size: clamp(2.9rem, 0.9rem + 7.6vw, 9.5rem);
+    line-height: 0.9;
   }
 
   .statement__line {
@@ -64,12 +49,14 @@ const lines = s.lines.map((line) =>
 
   /* The second line steps in — an editorial indent rather than a centred block. */
   .statement__line:nth-child(2) {
-    padding-left: 1.6em;
+    padding-left: 16.66%;
   }
 
   .statement__body {
     grid-column: 7 / span 5;
-    max-width: 26em;
+    max-width: 28em;
+    padding-top: var(--s-5);
+    border-top: 2px solid var(--accent-ink);
   }
 
   @media (max-width: 63.99rem) {
@@ -80,7 +67,7 @@ const lines = s.lines.map((line) =>
 
   @media (max-width: 47.99rem) {
     .statement__line:nth-child(2) {
-      padding-left: 0.6em;
+      padding-left: 0;
     }
     .statement__body {
       grid-column: 1 / -1;

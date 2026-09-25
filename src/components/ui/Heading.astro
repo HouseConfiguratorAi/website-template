@@ -1,0 +1,32 @@
+---
+/**
+ * Display heading with a word-by-word mask reveal.
+ * - reveal="scroll" (default): words rise when the heading enters the viewport
+ * - reveal="load": words rise on page load (opening scenes), after `delay` ms
+ * - reveal="none": static
+ * Screen readers get the sentence once; the animated words are aria-hidden.
+ */
+import { plain, splitWords } from '@/lib/text';
+
+interface Props {
+  text: string;
+  as?: 'h1' | 'h2' | 'h3' | 'p';
+  size?: 'display' | 'headline' | 'title';
+  reveal?: 'scroll' | 'load' | 'none';
+  delay?: number;
+  id?: string;
+  class?: string;
+}
+const { text, as: Tag = 'h2', size = 'headline', reveal = 'scroll', delay = 0, id, class: className } = Astro.props;
+---
+
+<Tag
+  id={id}
+  class:list={[`t-${size}`, 'heading', className]}
+  data-split={reveal === 'scroll' ? '' : undefined}
+  data-split-load={reveal === 'load' ? '' : undefined}
+  style={delay ? `--delay:${delay}ms` : undefined}
+>
+  <span class="sr-only">{plain(text)}</span>
+  <span aria-hidden="true" set:html={splitWords(text)} />
+</Tag>

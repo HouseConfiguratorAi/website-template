@@ -2,10 +2,13 @@
 /** The physical place as part of the brand: architecture first, details overlaid. */
 import { contact } from '@/config/site';
 import { home } from '@/config/content';
-import { rich } from '@/lib/text';
+import Heading from '@/components/ui/Heading.astro';
+import Label from '@/components/ui/Label.astro';
 import Media from '@/components/ui/Media.astro';
 import Arrow from '@/components/ui/Arrow.astro';
 
+interface Props { index?: string }
+const { index } = Astro.props;
 const l = home.location;
 ---
 
@@ -16,8 +19,8 @@ const l = home.location;
   <div class="location__veil" aria-hidden="true"></div>
   <div class="container container--gallery location__inner">
     <div class="location__intro">
-      <p class="t-eyebrow eyebrow-row" data-reveal="fade">{l.eyebrow}</p>
-      <h2 class="t-headline" data-reveal set:html={rich(l.headline)} />
+      <Label text={l.eyebrow} index={index} rule={false} />
+      <Heading as="h2" size="headline" text={l.headline} />
       <p class="t-body location__body" data-reveal>{l.body}</p>
     </div>
     <div class="location__card" data-reveal style="--delay:150ms">

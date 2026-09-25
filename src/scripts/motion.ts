@@ -16,7 +16,7 @@ const root = document.documentElement;
 const motion = root.classList.contains('motion');
 
 // ---- 1. Reveals -----------------------------------------------------------
-const revealTargets = document.querySelectorAll<HTMLElement>('[data-reveal], [data-words]');
+const revealTargets = document.querySelectorAll<HTMLElement>('[data-reveal], [data-words], [data-split]');
 if (motion && 'IntersectionObserver' in window) {
   const io = new IntersectionObserver(
     (entries) => {
@@ -80,4 +80,68 @@ if (motion && scenes.length) {
   window.addEventListener('scroll', request, { passive: true });
   window.addEventListener('resize', request, { passive: true });
   measure();
+}
+
+// ---- 3. Pointer interactions (desktop pointers only) --------------------------
+const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+// Rolling labels: button and nav text rolls up to a duplicate on hover.
+// The text is wrapped here, so markup stays plain and the effect is removable.
+if (motion && finePointer) {
+  document.querySelectorAll<HTMLElement>('.btn, .site-header__nav a, .link-arrow').forEach((el) => {
+    const textNode = [...el.childNodes].find((n) => n.nodeType === Node.TEXT_NODE && n.textContent!.trim());
+    if (!textNode) return;
+    const text = textNode.textContent!.trim();
+    const roll = document.createElement('span');
+    roll.className = 'roll';
+    roll.dataset.text = text;
+    const inner = document.createElement('span');
+    inner.textContent = text;
+    roll.append(inner);
+    textNode.replaceWith(roll);
+  });
+}
+
+// Magnetic actions: primary buttons lean a few pixels towards the cursor.
+if (motion && finePointer) {
+  document.querySelectorAll<HTMLElement>('.btn--primary, [data-magnetic]').forEach((el) => {
+    let frame = 0;
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      const x = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+      const y = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        el.style.transform = `translate3d(${x * 6}px, ${y * 5}px, 0)`;
+      });
+    });
+    el.addEventListener('pointerleave', () => {
+      cancelAnimationFrame(frame);
+      el.style.transform = '';
+    });
+  });
+}
+
+// Photographs in cards drift gently with the pointer, like looking through a window.
+if (motion && finePointer) {
+  document.querySelectorAll<HTMLElement>('.card-link, .jcard__link, .gallery__open').forEach((link) => {
+    const media = link.classList.contains('media') ? link : link.querySelector<HTMLElement>('.media');
+    if (!media) return;
+    let frame = 0;
+    link.addEventListener('pointermove', (e) => {
+      const r = media.getBoundingClientRect();
+      const x = ((e.clientX - r.left) / r.width - 0.5) * 2;
+      const y = ((e.clientY - r.top) / r.height - 0.5) * 2;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        media.style.setProperty('--mx', x.toFixed(3));
+        media.style.setProperty('--my', y.toFixed(3));
+      });
+    });
+    link.addEventListener('pointerleave', () => {
+      cancelAnimationFrame(frame);
+      media.style.setProperty('--mx', '0');
+      media.style.setProperty('--my', '0');
+    });
+  });
 }

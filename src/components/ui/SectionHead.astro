@@ -1,9 +1,16 @@
 ---
-import { rich } from '@/lib/text';
+/**
+ * Section heading used across the site, so every section shares one hierarchy:
+ *   (index) EYEBROW  ─────────────────────────────  on a hairline
+ *   Headline across eight columns          intro text + link, bottom-aligned
+ */
 import Arrow from '@/components/ui/Arrow.astro';
+import Heading from '@/components/ui/Heading.astro';
+import Label from '@/components/ui/Label.astro';
 
 interface Props {
   eyebrow?: string;
+  index?: string;
   headline: string;
   body?: string;
   cta?: { label: string; href: string };
@@ -14,52 +21,59 @@ interface Props {
   split?: boolean;
 }
 
-const { eyebrow, headline, body, cta, as: Tag = 'h2', size = 'headline', class: className, split = false } = Astro.props;
+const { eyebrow, index, headline, body, cta, as = 'h2', size = 'headline', class: className, split = true } = Astro.props;
 ---
 
 <header class:list={['shead', { 'shead--split': split }, className]}>
-  <div class="shead__main">
-    {eyebrow && <p class="t-eyebrow eyebrow-row" data-reveal="fade">{eyebrow}</p>}
-    <Tag class={`t-${size}`} data-reveal set:html={rich(headline)} />
+  {eyebrow && <Label text={eyebrow} index={index} />}
+  <div class="shead__grid">
+    <Heading as={as} size={size} text={headline} class="shead__title" />
+    {
+      (body || cta) && (
+        <div class="shead__aside" data-reveal style="--delay:150ms">
+          {body && <p class="t-body muted">{body}</p>}
+          {cta && (
+            <a class="link-arrow" href={cta.href}>
+              {cta.label}
+              <Arrow />
+            </a>
+          )}
+        </div>
+      )
+    }
   </div>
-  {
-    (body || cta) && (
-      <div class="shead__aside" data-reveal style="--delay:120ms">
-        {body && <p class="t-body muted">{body}</p>}
-        {cta && (
-          <a class="link-arrow" href={cta.href}>
-            {cta.label}
-            <Arrow />
-          </a>
-        )}
-      </div>
-    )
-  }
 </header>
 
 <style>
   .shead {
     display: grid;
+    gap: var(--s-7);
+  }
+
+  .shead__grid {
+    display: grid;
     gap: var(--s-6);
   }
-  .shead__main {
-    display: grid;
-    gap: var(--s-5);
-  }
+
   .shead__aside {
     display: grid;
     gap: var(--s-5);
     justify-items: start;
-    max-width: 30rem;
+    max-width: 26rem;
   }
+
   @media (min-width: 64rem) {
-    .shead--split {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
-      align-items: end;
+    .shead--split .shead__grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
       column-gap: var(--gutter);
+      align-items: end;
+    }
+    .shead--split :global(.shead__title) {
+      grid-column: 1 / span 8;
     }
     .shead--split .shead__aside {
-      padding-bottom: 0.6em;
+      grid-column: 9 / -1;
+      padding-bottom: 0.35em;
     }
   }
 </style>

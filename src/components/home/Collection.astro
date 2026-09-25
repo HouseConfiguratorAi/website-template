@@ -4,8 +4,8 @@ import { home } from '@/config/content';
 import SectionHead from '@/components/ui/SectionHead.astro';
 import VehicleCard from '@/components/vehicles/VehicleCard.astro';
 
-interface Props { vehicles: Vehicle[] }
-const { vehicles } = Astro.props;
+interface Props { vehicles: Vehicle[]; index?: string }
+const { vehicles, index } = Astro.props;
 
 /**
  * An editorial rhythm instead of identical cards: a wide frame, a tall
@@ -23,17 +23,17 @@ const pattern = [
   <div class="container container--gallery">
     <SectionHead
       eyebrow={home.collection.eyebrow}
+      index={index}
       headline={home.collection.headline}
       body={home.collection.body}
       cta={home.collection.cta}
-      split
     />
     <ul class="collection__grid" role="list">
       {
         vehicles.map((v, i) => {
           const p = pattern[i % pattern.length];
           return (
-            <li class={`collection__item slot-${p.slot}`}>
+            <li class={`collection__item slot-${p.slot}`} data-scene="through">
               <VehicleCard vehicle={v} ratio={p.ratio} image={p.image} size={p.size} sizes={p.sizes} />
             </li>
           );
@@ -58,19 +58,31 @@ const pattern = [
     row-gap: var(--section-s);
   }
 
+  /* Layered scroll: each frame travels at its own speed. */
+  :global(.motion) .collection__item {
+    transform: translate3d(0, calc((var(--p, 0.5) - 0.5) * var(--depth, 0px)), 0);
+    will-change: transform;
+  }
+
   .slot-a {
     grid-column: 1 / span 7;
+    --depth: 40px;
   }
   .slot-b {
     grid-column: 9 / span 4;
     margin-top: 32%;
+    --depth: -140px;
   }
   .slot-c {
     grid-column: 2 / span 4;
   }
+  .slot-c {
+    --depth: -60px;
+  }
   .slot-d {
     grid-column: 6 / -1;
     margin-top: 18%;
+    --depth: 90px;
   }
 
   @media (max-width: 47.99rem) {
@@ -79,6 +91,7 @@ const pattern = [
     }
     .collection__item {
       margin-top: 0 !important;
+      --depth: 0px !important;
     }
     .slot-a,
     .slot-d {

@@ -11,8 +11,9 @@
  *   'full'       — full-bleed image, copy below in a narrow column
  * size: 'narrow' | 'large' — the scale of the headline.
  */
-import { rich } from '@/lib/text';
 import Media from '@/components/ui/Media.astro';
+import Heading from '@/components/ui/Heading.astro';
+import Label from '@/components/ui/Label.astro';
 import Arrow from '@/components/ui/Arrow.astro';
 
 interface Props {
@@ -20,6 +21,7 @@ interface Props {
   size?: 'narrow' | 'large';
   tone?: 'dark' | 'light';
   eyebrow?: string;
+  index?: string;
   headline: string;
   body?: string[];
   cta?: { label: string; href: string };
@@ -34,6 +36,7 @@ const {
   size = 'large',
   tone = 'dark',
   eyebrow,
+  index,
   headline,
   body = [],
   cta,
@@ -59,8 +62,8 @@ const overlay = layout === 'scene' || layout === 'background';
     </div>
     {overlay && <div class="story__veil" aria-hidden="true" />}
     <div class="story__copy">
-      {eyebrow && <p class="t-eyebrow eyebrow-row" data-reveal={overlay ? undefined : 'fade'}>{eyebrow}</p>}
-      <H class:list={[size === 'large' ? 't-headline' : 't-title']} data-reveal={overlay ? undefined : ''} set:html={rich(headline)} />
+      {eyebrow && <Label text={eyebrow} index={index} rule={!overlay} />}
+      <Heading as={H} size={size === 'large' ? 'headline' : 'title'} text={headline} reveal={layout === 'scene' ? 'none' : 'scroll'} />
       {
         body.length > 0 && (
           <div class="story__body" data-reveal={overlay ? undefined : ''} style="--delay:120ms">
@@ -173,13 +176,13 @@ const overlay = layout === 'scene' || layout === 'background';
     max-width: none;
   }
 
-  .story--scene .story__copy > *,
-  .story--background .story__copy > * {
+  .story--scene .story__copy > :global(*),
+  .story--background .story__copy > :global(*) {
     max-width: 38rem;
   }
 
-  .story--scene.story--large .story__copy h2,
-  .story--background.story--large .story__copy h2 {
+  .story--scene.story--large .story__copy :global(.heading),
+  .story--background.story--large .story__copy :global(.heading) {
     max-width: 12ch;
   }
 

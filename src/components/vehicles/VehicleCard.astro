@@ -47,20 +47,23 @@ const flagged = v.status !== 'available';
         sizes={sizes}
         transitionName={transition ? `vehicle-${v.slug}` : undefined}
       />
-      {flagged && <span class="vcard__flag t-eyebrow status-dot" data-status={v.status}>{statusLabel[v.status]}</span>}
+      {flagged && <span class="vcard__flag t-meta status-dot" data-status={v.status}>{statusLabel[v.status]}</span>}
     </div>
     <div class="vcard__body">
-      <p class="t-eyebrow muted">{v.brand}</p>
-      <H class="vcard__title">
-        {v.model}
-        {v.variant && <span class="vcard__variant">{v.variant}</span>}
-      </H>
-      <dl class="vcard__meta t-meta">
-        <div><dt class="sr-only">Year</dt><dd>{v.year}</dd></div>
-        <div><dt class="sr-only">Mileage</dt><dd>{formatMileage(v.mileage)}</dd></div>
+      <p class="vcard__top">
+        <span class="t-eyebrow">{v.brand}</span>
+        <span class="t-meta muted">{v.id}</span>
+      </p>
+      <div class="vcard__name">
+        <H class="vcard__title">{v.model}</H>
+        <Arrow class="vcard__arrow" />
+      </div>
+      {v.variant && <p class="vcard__variant">{v.variant}</p>}
+      <dl class="vcard__meta">
+        <div><dt class="sr-only">Year</dt><dd class="t-meta">{v.year}</dd></div>
+        <div><dt class="sr-only">Mileage</dt><dd class="t-meta">{formatMileage(v.mileage)}</dd></div>
         <div class="vcard__price"><dt class="sr-only">Price</dt><dd>{v.status === 'sold' ? 'Sold' : formatPrice(v.price)}</dd></div>
       </dl>
-      <span class="vcard__cta t-eyebrow">View vehicle <Arrow /></span>
     </div>
   </a>
 </article>
@@ -80,21 +83,40 @@ const flagged = v.status !== 'available';
     isolation: isolate;
   }
 
+  /* A line of brand colour draws along the base of the image on hover. */
+  .vcard__media::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    height: 3px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 700ms var(--ease-emphasis);
+  }
+
+  .card-link:hover .vcard__media::after {
+    transform: scaleX(1);
+  }
+
   .vcard__media :global(img) {
     transition: transform 1400ms var(--ease-emphasis);
   }
 
   .card-link:hover .vcard__media :global(img) {
-    transform: scale(1.035);
+    transform: scale(1.04);
   }
 
   .vcard__flag {
     position: absolute;
-    top: 16px;
-    left: 16px;
+    top: 14px;
+    left: 14px;
     z-index: 1;
-    padding: 8px 12px;
-    background: color-mix(in srgb, var(--dark-bg) 72%, transparent);
+    padding: 7px 10px;
+    background: color-mix(in srgb, var(--dark-bg) 78%, transparent);
     color: var(--dark-fg);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
@@ -102,13 +124,22 @@ const flagged = v.status !== 'available';
 
   .vcard__body {
     display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: end;
-    gap: 6px var(--s-5);
+    gap: 6px;
   }
 
-  .vcard__body > .t-eyebrow {
-    grid-column: 1 / -1;
+  .vcard__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--s-4);
+  }
+
+  .vcard__name {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    margin-top: 4px;
   }
 
   .vcard__title {
@@ -116,35 +147,43 @@ const flagged = v.status !== 'available';
     font-weight: var(--display-weight);
     font-stretch: var(--display-stretch);
     letter-spacing: var(--display-tracking);
-    font-size: clamp(1.6rem, 1.3rem + 1.1vw, 2.25rem);
-    line-height: 1.05;
-    grid-column: 1 / -1;
+    font-size: clamp(1.7rem, 1.35rem + 1.2vw, 2.4rem);
+    line-height: 1;
   }
 
   .vcard--large .vcard__title {
-    font-size: clamp(1.9rem, 1.4rem + 2vw, 3.25rem);
+    font-size: clamp(2rem, 1.4rem + 2.2vw, 3.4rem);
   }
 
   .vcard--small .vcard__title {
-    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.9rem);
+    font-size: clamp(1.45rem, 1.25rem + 0.8vw, 1.9rem);
+  }
+
+  .vcard__name :global(.vcard__arrow) {
+    width: 22px;
+    height: 12px;
+    color: var(--muted);
+    transition:
+      transform 450ms var(--ease-emphasis),
+      color var(--dur-micro) var(--ease-standard);
+  }
+
+  .card-link:hover .vcard__name :global(.vcard__arrow) {
+    color: var(--accent-ink);
   }
 
   .vcard__variant {
-    display: block;
-    margin-top: 4px;
-    font-family: var(--font-sans);
     font-size: var(--fs-small);
-    font-stretch: 100%;
-    letter-spacing: 0;
-    font-weight: 400;
     color: var(--muted);
   }
 
   .vcard__meta {
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px 18px;
-    margin-top: var(--s-2);
+    align-items: baseline;
+    gap: 6px 18px;
+    margin-top: var(--s-3);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--border);
     color: var(--muted);
   }
 
@@ -153,23 +192,11 @@ const flagged = v.status !== 'available';
   }
 
   .vcard__price {
+    margin-left: auto;
     color: var(--fg);
-  }
-
-  .vcard__cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    padding-block: 6px;
-    white-space: nowrap;
-  }
-
-  @media (max-width: 29.99rem) {
-    .vcard__body {
-      grid-template-columns: 1fr;
-    }
-    .vcard__cta {
-      display: none;
-    }
+    font-weight: 600;
+    font-size: var(--fs-small);
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
   }
 </style>

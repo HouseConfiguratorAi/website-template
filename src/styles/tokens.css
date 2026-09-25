@@ -8,22 +8,24 @@
   /* ---- Type families ---- */
   --font-serif: 'Newsreader Variable', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
   --font-sans: 'Archivo Variable', 'Helvetica Neue', Arial, system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
   /* ---- Type scale (fluid, 375px → 1600px) ----
      Contrast is the point: a 160px statement next to 12px metadata. */
-  --fs-display: clamp(3.4rem, 1.5rem + 8.4vw, 10.5rem);   /* ~54 → 168 */
-  --fs-headline: clamp(2.6rem, 1.45rem + 4.9vw, 6rem);    /* ~42 → 96 */
-  --fs-title: clamp(2rem, 1.35rem + 2.75vw, 4rem);        /* ~32 → 64 */
+  --fs-display: clamp(3.5rem, 1.2rem + 9.6vw, 11.5rem);   /* ~56 → 184 */
+  --fs-headline: clamp(2.5rem, 1.3rem + 5vw, 6rem);       /* ~40 → 96 */
+  --fs-title: clamp(1.9rem, 1.3rem + 2.5vw, 3.75rem);     /* ~30 → 60 */
   --fs-subhead: clamp(1.3rem, 1.1rem + 0.85vw, 1.875rem); /* ~21 → 30 */
   --fs-lead: clamp(1.2rem, 1.08rem + 0.55vw, 1.6rem);     /* ~19 → 26 */
   --fs-body: clamp(1rem, 0.97rem + 0.14vw, 1.125rem);     /* 16 → 18 */
   --fs-small: 0.9375rem;                                  /* 15 */
   --fs-caption: 0.8125rem;                                /* 13 */
   --fs-eyebrow: 0.75rem;                                  /* 12 */
+  --fs-mono: 0.75rem;                                     /* 12 */
   --fs-nav: 0.875rem;                                     /* 14 */
   --fs-price: clamp(1.125rem, 1.02rem + 0.4vw, 1.5rem);
 
-  --lh-tight: 0.94;
+  --lh-tight: 0.9;
   --lh-snug: 1.12;
   --lh-body: 1.62;
 
@@ -52,6 +54,8 @@
   --w-standard: 86rem;    /* ~1376px */
   --w-gallery: 100rem;    /* 1600px */
   --header-h: 76px;
+  /* Offset for sticky elements: follows the header when it hides. */
+  --sticky-top: var(--header-h);
 
   /* ---- Motion ---- */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -73,6 +77,10 @@
   }
 }
 
+:root[data-header-hidden] {
+  --sticky-top: 0px;
+}
+
 /* ---- Tones ----
    A section declares data-tone="dark" or "light"; every component inside
    reads the semantic tokens below. */
@@ -84,7 +92,9 @@
   --muted: var(--dark-muted);
   --accent: var(--dark-accent);
   --accent-contrast: var(--dark-accent-contrast);
+  --accent-ink: var(--dark-accent-ink);
   --border: var(--dark-border);
+  --error: #ff7b7b;
   color-scheme: dark;
 }
 
@@ -95,8 +105,23 @@
   --muted: var(--light-muted);
   --accent: var(--light-accent);
   --accent-contrast: var(--light-accent-contrast);
+  --accent-ink: var(--light-accent-ink);
   --border: var(--light-border);
+  --error: #b3261e;
   color-scheme: light;
+}
+
+[data-tone='signal'] {
+  --bg: var(--signal-bg);
+  --surface: var(--signal-surface);
+  --fg: var(--signal-fg);
+  --muted: var(--signal-muted);
+  --accent: var(--signal-accent);
+  --accent-contrast: var(--signal-accent-contrast);
+  --accent-ink: var(--signal-accent-ink);
+  --border: var(--signal-border);
+  --error: #ffffff;
+  color-scheme: dark;
 }
 
 [data-tone] {

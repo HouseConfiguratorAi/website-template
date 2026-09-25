@@ -1,7 +1,7 @@
 ---
 /** The closing scene: one image, one line, one way forward. */
 import { home } from '@/config/content';
-import { rich } from '@/lib/text';
+import Heading from '@/components/ui/Heading.astro';
 import Media from '@/components/ui/Media.astro';
 import Arrow from '@/components/ui/Arrow.astro';
 
@@ -21,7 +21,7 @@ const { headline = f.headline, cta = f.cta, image = f.image, imageAlt = f.imageA
   </div>
   <div class="final__veil" aria-hidden="true"></div>
   <div class="final__content container container--gallery">
-    <h2 class="t-headline final__title" data-reveal set:html={rich(headline)} />
+    <Heading as="h2" size="display" text={headline} class="final__title" />
     <a class="btn btn--primary" href={cta.href} data-reveal style="--delay:150ms">{cta.label}<Arrow /></a>
   </div>
 </section>
@@ -57,7 +57,8 @@ const { headline = f.headline, cta = f.cta, image = f.image, imageAlt = f.imageA
     justify-items: start;
     gap: var(--s-7);
   }
-  .final__title {
-    max-width: 7.5em;
+  .final__content :global(.final__title) {
+    max-width: 7em;
+    font-size: clamp(3rem, 1rem + 7.5vw, 9rem);
   }
 </style>

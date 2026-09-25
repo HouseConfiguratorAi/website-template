@@ -20,9 +20,9 @@ export const home = {
     secondary: { label: 'Our story', href: '/about' },
     image: 'hero-wide',
     imageMobile: 'hero-tall',
-    imageAlt: 'A champagne-coloured sports car in a dark architectural hall, lit from above',
+    imageAlt: 'A red sports car in a dark architectural hall, lit from above',
     /** Optional caption linking the hero photograph to the car in it. */
-    captionVehicle: 'ferrari-458-spider-2013',
+    captionVehicle: 'ferrari-458-spider-2012',
   },
   statement: {
     eyebrow: 'The idea',

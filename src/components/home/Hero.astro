@@ -1,16 +1,18 @@
 ---
 import { home } from '@/config/content';
-import { rich } from '@/lib/text';
+import { contact } from '@/config/site';
 import { getVehicle, vehicleUrl } from '@/lib/inventory';
 import Media from '@/components/ui/Media.astro';
 import Arrow from '@/components/ui/Arrow.astro';
+import Heading from '@/components/ui/Heading.astro';
 
 const h = home.hero;
 const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : undefined;
+const hours = contact.hours[0];
 ---
 
 <section class="hero" data-tone="dark" data-scene="through" aria-labelledby="hero-title">
-  <div class="hero__media" aria-hidden="false">
+  <div class="hero__media">
     <div class="hero__drift">
       <div class="hero__settle" data-intro="settle">
         <Media
@@ -28,23 +30,32 @@ const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : u
   <div class="hero__veil" aria-hidden="true"></div>
 
   <div class="hero__content">
-    <p class="t-eyebrow eyebrow-row" data-intro style="--intro:250ms">{h.eyebrow}</p>
-    <h1 id="hero-title" class="t-display hero__title" data-intro style="--intro:250ms" set:html={rich(h.headline)} />
-    <p class="hero__support t-subhead" data-intro style="--intro:400ms">{h.supporting}</p>
-    <div class="hero__actions" data-intro style="--intro:550ms">
-      <a class="btn btn--primary" href={h.primary.href}>{h.primary.label}<Arrow /></a>
-      <a class="btn btn--ghost" href={h.secondary.href}>{h.secondary.label}</a>
+    <p class="hero__label" data-intro="fade" style="--intro:150ms">
+      <span class="t-index">(01)</span>
+      <span class="t-eyebrow">{h.eyebrow}</span>
+    </p>
+    <Heading as="h1" id="hero-title" size="display" text={h.headline} reveal="load" delay={250} class="hero__title" />
+    <div class="hero__row">
+      <p class="hero__support" data-intro style="--intro:450ms">{h.supporting}</p>
+      <div class="hero__actions" data-intro style="--intro:600ms">
+        <a class="btn btn--primary" href={h.primary.href}>{h.primary.label}<Arrow /></a>
+        <a class="btn btn--ghost" href={h.secondary.href}>{h.secondary.label}</a>
+      </div>
     </div>
   </div>
 
   <div class="hero__foot t-meta" data-intro="fade" style="--intro:900ms">
     {
-      captionVehicle && (
+      captionVehicle ? (
         <a class="hero__caption link" href={vehicleUrl(captionVehicle)}>
-          <span class="muted">In the hall</span> {captionVehicle.brand} {captionVehicle.model} · {captionVehicle.variant}
+          <span class="muted">In the hall</span>
+          <span>{captionVehicle.brand} {captionVehicle.model} — {captionVehicle.variant}</span>
         </a>
+      ) : (
+        <span />
       )
     }
+    <span class="hero__hours"><span class="muted">Open</span> {hours.days} · {hours.time}</span>
     <span class="hero__scroll muted" aria-hidden="true">Scroll <i></i></span>
   </div>
 </section>
@@ -81,8 +92,8 @@ const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : u
     inset: 0;
     z-index: -1;
     background:
-      linear-gradient(to right, rgb(10 9 8 / 0.62) 0%, rgb(10 9 8 / 0.2) 42%, transparent 62%),
-      linear-gradient(to top, rgb(10 9 8 / 0.7) 0%, transparent 38%);
+      linear-gradient(to right, rgb(0 0 0 / 0.72) 0%, rgb(0 0 0 / 0.28) 45%, transparent 65%),
+      linear-gradient(to top, rgb(0 0 0 / 0.75) 0%, transparent 42%);
   }
 
   .hero__content {
@@ -92,45 +103,69 @@ const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : u
     padding-top: calc(var(--header-h) + var(--s-8));
     padding-bottom: var(--s-8);
     display: grid;
-    justify-items: start;
-    gap: var(--s-5);
+    gap: var(--s-6);
   }
 
-  .hero__title {
-    max-width: 8.6em;
-    margin-top: var(--s-2);
+  .hero__label {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+
+  .hero__content :global(.hero__title) {
+    max-width: 6.4em;
+    font-size: clamp(3.5rem, 1rem + 9.6vw, 10rem);
+  }
+
+  .hero__row {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--s-6);
+    align-items: end;
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--border);
+    max-width: 62rem;
   }
 
   .hero__support {
+    grid-column: 1 / span 6;
     max-width: 30rem;
-    color: color-mix(in srgb, var(--fg) 82%, transparent);
+    font-size: var(--fs-body);
+    line-height: 1.55;
+    color: color-mix(in srgb, var(--fg) 80%, transparent);
   }
 
   .hero__actions {
+    grid-column: 7 / -1;
+    justify-self: end;
     display: flex;
     flex-wrap: wrap;
     gap: var(--s-3);
-    margin-top: var(--s-4);
   }
 
   .hero__foot {
     width: min(100% - 2 * var(--gutter), var(--w-gallery));
     margin-inline: auto;
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: var(--s-5);
     padding-block: var(--s-5);
     border-top: 1px solid var(--border);
   }
 
+  .hero__caption {
+    justify-self: start;
+    display: inline-flex;
+    gap: 12px;
+  }
+
   .hero__scroll {
+    justify-self: end;
     display: inline-flex;
     align-items: center;
     gap: 12px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    font-size: 0.6875rem;
   }
 
   .hero__scroll i {
@@ -145,7 +180,7 @@ const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : u
     content: '';
     position: absolute;
     inset: 0;
-    background: var(--fg);
+    background: var(--accent-ink);
     animation: scroll-cue 2.4s var(--ease-smooth) 1.6s infinite;
   }
 
@@ -154,30 +189,52 @@ const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : u
     60%, 100% { transform: translateY(100%); }
   }
 
-  /* Mobile has its own composition: the tall crop puts the car low,
-     so the words sit at the top and the car anchors the bottom. */
-  @media (max-width: 47.99rem) {
-    .hero {
-      min-height: 100svh;
+  @media (max-width: 63.99rem) {
+    .hero__support {
+      grid-column: 1 / -1;
     }
+    .hero__actions {
+      grid-column: 1 / -1;
+      justify-self: start;
+    }
+    .hero__hours {
+      display: none;
+    }
+    .hero__foot {
+      grid-template-columns: 1fr auto;
+    }
+  }
+
+  /* Phones: the tall crop puts the car low, so words sit at the top
+     and the car anchors the bottom of the screen. */
+  @media (max-width: 47.99rem) {
     .hero__content {
       align-self: start;
       padding-top: calc(var(--header-h) + var(--s-7));
-      gap: var(--s-4);
+      gap: var(--s-5);
     }
     .hero__veil {
       background:
-        linear-gradient(to bottom, rgb(10 9 8 / 0.78) 0%, rgb(10 9 8 / 0.35) 45%, transparent 62%),
-        linear-gradient(to top, rgb(10 9 8 / 0.55) 0%, transparent 25%);
+        linear-gradient(to bottom, rgb(0 0 0 / 0.82) 0%, rgb(0 0 0 / 0.4) 48%, transparent 64%),
+        linear-gradient(to top, rgb(0 0 0 / 0.6) 0%, transparent 24%);
+    }
+    .hero__row {
+      border-top: 0;
+      padding-top: 0;
     }
     .hero__actions .btn {
       flex: 1 1 auto;
     }
-    /* One clear action on phones keeps the car visible below. */
     .hero__actions .btn--ghost {
       display: none;
     }
     .hero__scroll {
+      display: none;
+    }
+    .hero__foot {
+      grid-template-columns: 1fr;
+    }
+    .hero__caption .muted {
       display: none;
     }
   }

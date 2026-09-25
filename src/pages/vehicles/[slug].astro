@@ -4,6 +4,8 @@ import { getImage } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Media from '@/components/ui/Media.astro';
 import Arrow from '@/components/ui/Arrow.astro';
+import Heading from '@/components/ui/Heading.astro';
+import Label from '@/components/ui/Label.astro';
 import VehicleGallery from '@/components/vehicles/VehicleGallery.astro';
 import VehicleRail from '@/components/vehicles/VehicleRail.astro';
 import ContactSection from '@/components/sections/ContactSection.astro';
@@ -99,7 +101,7 @@ for (const img of v.images.slice(0, 4)) {
       </nav>
       <div class="vd-head__title">
         <p class="t-eyebrow" data-intro style="--intro:150ms">{v.brand}</p>
-        <h1 class="t-display vd-head__model" data-intro style="--intro:220ms">{v.model}</h1>
+        <Heading as="h1" size="display" text={v.model} reveal="load" delay={200} class="vd-head__model" />
         {v.variant && <p class="t-subhead muted" data-intro style="--intro:320ms">{v.variant} · {v.year}</p>}
       </div>
       <div class="vd-head__offer" data-intro style="--intro:420ms">
@@ -121,8 +123,8 @@ for (const img of v.images.slice(0, 4)) {
         {
           specs.map((s, i) => (
             <div data-reveal style={`--delay:${i * 60}ms`}>
-              <dt class="t-eyebrow muted">{s.k}</dt>
-              <dd class="t-price">{s.v}</dd>
+              <dt class="t-meta muted">{s.k}</dt>
+              <dd class="t-spec">{s.v}</dd>
             </div>
           ))
         }
@@ -149,7 +151,7 @@ for (const img of v.images.slice(0, 4)) {
   <section class="vd-story" data-tone="light">
     <div class="container container--gallery vd-story__grid">
       <div class="vd-story__text">
-        <p class="t-eyebrow eyebrow-row" data-reveal="fade">The car</p>
+        <Label text="The car" index="01" />
         <p class="t-lead vd-story__summary" data-reveal>{v.summary}</p>
         <div class="vd-story__body" data-reveal>
           {v.description.map((p) => <p class="t-body">{p}</p>)}
@@ -278,8 +280,8 @@ for (const img of v.images.slice(0, 4)) {
     gap: var(--s-4);
   }
 
-  .vd-head__model {
-    font-size: clamp(3rem, 1.2rem + 6.5vw, 9rem);
+  .vd-head__title :global(.vd-head__model) {
+    font-size: clamp(3.2rem, 1rem + 8vw, 10rem);
   }
 
   .vd-head__offer {

@@ -165,8 +165,8 @@ const id = (s: string) => `${idPrefix}-${s}`;
   }
 
   .field [aria-invalid='true'] {
-    border-bottom-color: #c2410c;
-    box-shadow: 0 1px 0 0 #c2410c;
+    border-bottom-color: var(--error);
+    box-shadow: 0 1px 0 0 var(--error);
   }
 
   .field__error {
@@ -177,7 +177,7 @@ const id = (s: string) => `${idPrefix}-${s}`;
 
   .field__error:not(:empty)::before {
     content: '— ';
-    color: #c2410c;
+    color: var(--error);
   }
 
   .cform__hp {
@@ -206,7 +206,7 @@ const id = (s: string) => `${idPrefix}-${s}`;
 
   .cform__status {
     padding: var(--s-4) var(--s-5);
-    border-left: 2px solid var(--accent);
+    border-left: 3px solid var(--accent-ink);
     background: var(--surface);
   }
 

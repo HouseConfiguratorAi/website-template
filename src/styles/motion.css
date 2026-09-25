@@ -52,6 +52,42 @@
   transform: scale(1.12);
 }
 
+/* ---- Headline mask reveal ----
+   Each word sits in its own mask and rises into place. The padding keeps
+   ascenders and descenders from being clipped by tight line-heights. */
+.wm {
+  display: inline-block;
+  overflow: clip;
+  vertical-align: top;
+  padding: 0.1em 0.04em 0.14em;
+  margin: -0.1em -0.04em -0.14em;
+}
+
+.wi {
+  display: inline-block;
+}
+
+.motion [data-split] .wi {
+  transform: translate3d(0, 108%, 0);
+  transition: transform 1000ms var(--ease-emphasis);
+  transition-delay: calc(var(--i, 0) * 45ms + var(--delay, 0ms));
+}
+
+.motion [data-split].is-in .wi {
+  transform: none;
+}
+
+@keyframes mask-up {
+  from {
+    transform: translate3d(0, 108%, 0);
+  }
+}
+
+.motion [data-split-load] .wi {
+  animation: mask-up 1100ms var(--ease-emphasis) both;
+  animation-delay: calc(var(--i, 0) * 70ms + var(--delay, 0ms));
+}
+
 /* ---- Word-by-word (used sparingly: the statement only) ---- */
 .motion [data-words] .w {
   display: inline-block;
@@ -147,4 +183,51 @@
   ::view-transition-new(*) {
     animation: none !important;
   }
+}
+
+/* ---- Rolling labels ---- */
+.roll {
+  position: relative;
+  display: inline-block;
+  overflow: clip;
+  vertical-align: top;
+  line-height: 1.15;
+}
+
+.roll > span,
+.roll::after {
+  display: block;
+  transition: transform 550ms var(--ease-emphasis);
+}
+
+.roll::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 100%;
+}
+
+a:hover > .roll > span,
+a:hover > .roll::after,
+button:hover > .roll > span,
+button:hover > .roll::after {
+  transform: translate3d(0, -100%, 0);
+}
+
+/* ---- Magnetic actions ---- */
+.motion .btn--primary {
+  transition:
+    color 450ms var(--ease-emphasis),
+    border-color var(--dur-micro) var(--ease-standard),
+    transform 600ms var(--ease-emphasis);
+}
+
+/* ---- Pointer drift inside card photographs ---- */
+.motion .card-link .media img,
+.motion .jcard__link .media img,
+.motion .gallery__open img {
+  translate: calc(var(--mx, 0) * -10px) calc(var(--my, 0) * -8px);
+  transition:
+    transform 1400ms var(--ease-emphasis),
+    translate 900ms var(--ease-emphasis);
 }

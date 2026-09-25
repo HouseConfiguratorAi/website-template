@@ -97,7 +97,6 @@ export const vehicles: Vehicle[] = [
     ],
     location: 'Antwerp',
     status: 'available',
-    featured: true,
   },
   {
     id: 'OB-0139',
@@ -119,6 +118,7 @@ export const vehicles: Vehicle[] = [
     firstRegistration: '09/2012',
     owners: 3,
     summary: 'The classic specification, driven as intended and maintained without compromise.',
+    featured: true,
     description: [
       'Rosso Corsa over black is the specification most people picture, and there is a reason it endures. This is a car that has been used — 31,200 km across three owners — and looked after properly throughout.',
       'We prefer cars like this to garage queens. Regular use keeps seals supple and systems exercised, and the history shows every service carried out on time at a specialist.',

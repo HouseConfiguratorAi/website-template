@@ -21,7 +21,7 @@ const sizes = variant === 'feature' ? '(min-width: 64rem) 60vw, 100vw' : variant
       <Media src={d.cover} alt={d.coverAlt} sizes={sizes} transitionName={variant !== 'compact' ? `post-${post.id}` : undefined} />
     </div>
     <div class="jcard__body">
-      <p class="jcard__meta t-eyebrow muted">
+      <p class="jcard__meta t-meta muted">
         <span>{d.category}</span>
         <time datetime={d.date.toISOString()}>{formatDate(d.date)}</time>
       </p>
@@ -37,6 +37,32 @@ const sizes = variant === 'feature' ? '(min-width: 64rem) 60vw, 100vw' : variant
     gap: var(--s-5);
   }
 
+  .jcard__media {
+    isolation: isolate;
+  }
+
+  .jcard__media::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    height: 3px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 700ms var(--ease-emphasis);
+  }
+
+  .jcard__link:hover .jcard__media::after {
+    transform: scaleX(1);
+  }
+
+  .jcard__meta span {
+    color: var(--accent-ink);
+  }
+
   .jcard__media :global(img) {
     transition: transform 1400ms var(--ease-emphasis);
   }
@@ -45,10 +71,8 @@ const sizes = variant === 'feature' ? '(min-width: 64rem) 60vw, 100vw' : variant
     transform: scale(1.04);
   }
 
-  .jcard__link:hover .jcard__title {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.16em;
+  .jcard__title {
+    transition: color var(--dur-micro) var(--ease-standard);
   }
 
   .jcard__body {
@@ -68,7 +92,7 @@ const sizes = variant === 'feature' ? '(min-width: 64rem) 60vw, 100vw' : variant
     font-weight: var(--display-weight);
     font-stretch: var(--display-stretch);
     letter-spacing: var(--display-tracking);
-    line-height: 1.06;
+    line-height: 1.02;
     text-wrap: balance;
   }
 

@@ -1,6 +1,5 @@
 ---
 import { navigation, contact, site } from '@/config/site';
-import Logo from '@/components/ui/Logo.astro';
 const year = new Date().getFullYear();
 ---
 
@@ -8,19 +7,18 @@ const year = new Date().getFullYear();
   <div class="container container--gallery">
     <div class="site-footer__top">
       <div class="site-footer__brand">
-        <a href="/" aria-label={`${site.name} — home`}><Logo size="large" /></a>
-        <p class="t-small muted">Selected sports and grand touring cars, {contact.address.city}.</p>
+        <p class="t-lead site-footer__line">Selected sports and grand touring cars, {contact.address.city}.</p>
       </div>
 
       <nav class="site-footer__col" aria-label="Footer">
-        <h2 class="t-eyebrow muted">Navigate</h2>
+        <h2 class="t-meta muted">Navigate</h2>
         <ul role="list">
           {navigation.primary.map((item) => <li><a class="link" href={item.href}>{item.label}</a></li>)}
         </ul>
       </nav>
 
       <div class="site-footer__col">
-        <h2 class="t-eyebrow muted">Visit</h2>
+        <h2 class="t-meta muted">Visit</h2>
         <address>
           {contact.address.street}<br />
           {contact.address.postalCode} {contact.address.city}<br />
@@ -30,7 +28,7 @@ const year = new Date().getFullYear();
       </div>
 
       <div class="site-footer__col">
-        <h2 class="t-eyebrow muted">Contact</h2>
+        <h2 class="t-meta muted">Contact</h2>
         <ul role="list">
           <li><a class="link" href={`mailto:${contact.email}`}>{contact.email}</a></li>
           <li><a class="link" href={`tel:${contact.phoneHref}`}>{contact.phone}</a></li>
@@ -39,7 +37,9 @@ const year = new Date().getFullYear();
       </div>
     </div>
 
-    <div class="site-footer__bottom t-caption">
+    {site.logo.type !== 'image' && <p class="site-footer__mark" aria-hidden="true" data-fit><span>{site.logo.text}</span></p>}
+
+    <div class="site-footer__bottom t-meta">
       <span>© {year} {site.legalName}</span>
       <ul role="list">
         {navigation.legal.map((item) => <li><a class="link" href={item.href}>{item.label}</a></li>)}
@@ -68,8 +68,8 @@ const year = new Date().getFullYear();
     gap: var(--s-5);
   }
 
-  .site-footer__brand p {
-    max-width: 28ch;
+  .site-footer__line {
+    max-width: 18ch;
   }
 
   .site-footer__col {
@@ -93,6 +93,24 @@ const year = new Date().getFullYear();
 
   .site-footer__col > a {
     justify-self: start;
+  }
+
+  /* Closing signature: the wordmark at full width. */
+  .site-footer__mark {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-stretch: var(--display-stretch);
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+    font-size: clamp(3.5rem, -0.5rem + 17vw, 20rem);
+    line-height: 0.78;
+    white-space: nowrap;
+    margin: 0 0 var(--s-6);
+    overflow: hidden;
+  }
+
+  .site-footer__mark span {
+    display: inline-block;
   }
 
   .site-footer__bottom {
@@ -124,3 +142,24 @@ const year = new Date().getFullYear();
     }
   }
 </style>
+
+<script>
+  // Fit the wordmark to the exact width of its container, whatever the brand name.
+  document.querySelectorAll<HTMLElement>('[data-fit]').forEach((el) => {
+    const span = el.firstElementChild as HTMLElement;
+    let lastWidth = 0;
+    const fit = () => {
+      if (el.clientWidth === lastWidth && el.style.fontSize) return;
+      lastWidth = el.clientWidth;
+      el.style.fontSize = '100px';
+      const ratio = el.clientWidth / span.getBoundingClientRect().width;
+      el.style.fontSize = `${Math.floor(100 * ratio * 0.995)}px`;
+    };
+    document.fonts?.ready.then(() => {
+      lastWidth = 0;
+      fit();
+    });
+    fit();
+    new ResizeObserver(fit).observe(el);
+  });
+</script>
