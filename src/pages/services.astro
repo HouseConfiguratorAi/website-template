@@ -1,0 +1,128 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageIntro from '@/components/sections/PageIntro.astro';
+import ContactSection from '@/components/sections/ContactSection.astro';
+import Media from '@/components/ui/Media.astro';
+import { services } from '@/data/services';
+import { pad } from '@/lib/format';
+import { breadcrumbLd } from '@/lib/seo';
+---
+
+<BaseLayout
+  title="Services"
+  description="Vehicle sourcing, trade-in, financing, import and consignment — handled personally."
+  image="svc-sourcing"
+  jsonLd={breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Services', path: '/services' }])}
+>
+  <PageIntro eyebrow="Services" headline="Beyond the *showroom.*" lead="Five things we do besides selling the cars in the collection. Each one is handled personally, from the first conversation to the handover.">
+    <nav class="svc-index" aria-label="Services on this page">
+      <ol role="list">
+        {services.map((s, i) => <li><a class="link t-small" href={`#${s.slug}`}><span class="t-index">{pad(i + 1)}</span> {s.title}</a></li>)}
+      </ol>
+    </nav>
+  </PageIntro>
+
+  {
+    services.map((s, i) => (
+      <section class:list={['svc', { 'svc--flip': i % 2 === 1 }]} id={s.slug} data-tone={i % 2 === 0 ? 'light' : 'dark'} aria-labelledby={`${s.slug}-title`}>
+        <div class="container container--gallery svc__grid">
+          <div class="svc__media media" data-reveal="image">
+            <Media src={s.image} alt={s.imageAlt} sizes="(min-width: 64rem) 50vw, 100vw" />
+          </div>
+          <div class="svc__copy">
+            <span class="t-index" data-reveal="fade">{pad(i + 1)}</span>
+            <h2 id={`${s.slug}-title`} class="t-headline" data-reveal>{s.title}</h2>
+            <div class="svc__body" data-reveal>
+              {s.body.map((p) => <p class="t-body">{p}</p>)}
+            </div>
+            <ol class="svc__steps" role="list" data-reveal>
+              {s.steps.map((step, n) => (
+                <li>
+                  <span class="t-index">{String.fromCharCode(97 + n)}</span>
+                  <span class="t-small">{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  <ContactSection eyebrow="Start a conversation" headline="Tell us what you *need.*" body="Whatever the service, it starts with a short, unhurried conversation." />
+</BaseLayout>
+
+<style>
+  .svc-index ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3) var(--s-6);
+    margin-top: var(--s-6);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--border);
+  }
+  .svc-index a {
+    display: inline-flex;
+    gap: 10px;
+    align-items: baseline;
+  }
+  .svc {
+    padding-block: var(--section-l);
+    scroll-margin-top: var(--header-h);
+  }
+  .svc__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--s-8);
+    align-items: center;
+  }
+  .svc__media {
+    grid-column: 1 / span 6;
+    aspect-ratio: 4 / 5;
+  }
+  .svc__copy {
+    grid-column: 8 / -1;
+    display: grid;
+    gap: var(--s-5);
+    align-content: start;
+  }
+  .svc--flip .svc__media {
+    grid-column: 7 / -1;
+    grid-row: 1;
+    aspect-ratio: 3 / 2;
+  }
+  .svc--flip .svc__copy {
+    grid-column: 1 / span 5;
+    grid-row: 1;
+  }
+  .svc__body {
+    display: grid;
+    gap: 1em;
+    max-width: 32rem;
+  }
+  .svc__steps {
+    margin-top: var(--s-4);
+    border-top: 1px solid var(--border);
+  }
+  .svc__steps li {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: var(--s-3);
+    padding-block: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  @media (max-width: 63.99rem) {
+    .svc__media,
+    .svc__copy,
+    .svc--flip .svc__media,
+    .svc--flip .svc__copy {
+      grid-column: 1 / -1;
+      grid-row: auto;
+    }
+    .svc__media,
+    .svc--flip .svc__media {
+      aspect-ratio: 3 / 2;
+    }
+  }
+</style>

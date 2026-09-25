@@ -1,0 +1,165 @@
+---
+/** Horizontal collection. Native scroll + snap, mouse drag on desktop, buttons for keyboard users. */
+import type { Vehicle } from '@/lib/inventory';
+import { rich } from '@/lib/text';
+import VehicleCard from '@/components/vehicles/VehicleCard.astro';
+
+interface Props { vehicles: Vehicle[]; eyebrow: string; headline: string; tone?: 'dark' | 'light' }
+const { vehicles, eyebrow, headline, tone = 'light' } = Astro.props;
+---
+
+{
+  vehicles.length > 0 && (
+    <section class="rail" data-tone={tone} data-rail>
+      <div class="container container--gallery rail__head">
+        <div>
+          <p class="t-eyebrow eyebrow-row" data-reveal="fade">{eyebrow}</p>
+          <h2 class="t-title" data-reveal set:html={rich(headline)} />
+        </div>
+        <div class="rail__nav">
+          <button type="button" class="rail__btn" data-rail-prev aria-label="Scroll back">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" /></svg>
+          </button>
+          <button type="button" class="rail__btn" data-rail-next aria-label="Scroll forward">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" /></svg>
+          </button>
+        </div>
+      </div>
+      <ul class="rail__track" role="list" data-rail-track data-cursor="Drag">
+        {vehicles.map((v, i) => (
+          <li class="rail__item">
+            <VehicleCard vehicle={v} ratio="4 / 5" image="portrait" size="small" sizes="(min-width: 64rem) 30vw, 80vw" transition={false} delay={i * 80} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .rail {
+    padding-block: var(--section-l);
+    overflow: clip;
+  }
+
+  .rail__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: var(--s-6);
+  }
+
+  .rail__head > div:first-child {
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  .rail__nav {
+    display: flex;
+    gap: 6px;
+  }
+
+  .rail__btn {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    transition: border-color var(--dur-micro), opacity var(--dur-micro);
+  }
+
+  .rail__btn:hover {
+    border-color: var(--fg);
+  }
+
+  .rail__btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .rail__btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .rail__track {
+    --inset: max(var(--gutter), (100vw - var(--w-gallery)) / 2);
+    position: relative;
+    list-style: none;
+    margin: var(--s-8) 0 0;
+    padding: 0 var(--inset);
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: clamp(260px, 28vw, 440px);
+    gap: var(--gutter);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--inset);
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+
+  .rail__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rail__item {
+    scroll-snap-align: start;
+  }
+
+  .rail__track.is-dragging {
+    scroll-snap-type: none;
+    cursor: grabbing;
+  }
+
+  .rail__track.is-dragging a {
+    pointer-events: none;
+  }
+
+  @media (max-width: 47.99rem) {
+    .rail__nav {
+      display: none;
+    }
+    .rail__track {
+      grid-auto-columns: 78vw;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-rail]').forEach((rail) => {
+    const track = rail.querySelector<HTMLElement>('[data-rail-track]')!;
+    const prev = rail.querySelector<HTMLButtonElement>('[data-rail-prev]')!;
+    const next = rail.querySelector<HTMLButtonElement>('[data-rail-next]')!;
+    const step = () => (track.querySelector('li')?.getBoundingClientRect().width ?? 300) + 24;
+    const update = () => {
+      prev.disabled = track.scrollLeft < 4;
+      next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+    };
+    prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+    next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+    track.addEventListener('scroll', update, { passive: true });
+    update();
+
+    // Mouse drag (touch already scrolls natively).
+    let down = false, moved = false, startX = 0, startLeft = 0;
+    track.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      down = true; moved = false; startX = e.clientX; startLeft = track.scrollLeft;
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!down) return;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 5) { moved = true; track.classList.add('is-dragging'); }
+      track.scrollLeft = startLeft - dx;
+    });
+    window.addEventListener('pointerup', () => {
+      if (!down) return;
+      down = false;
+      requestAnimationFrame(() => track.classList.remove('is-dragging'));
+    });
+    track.addEventListener('click', (e) => { if (moved) { e.preventDefault(); moved = false; } }, true);
+    track.addEventListener('dragstart', (e) => e.preventDefault());
+  });
+</script>

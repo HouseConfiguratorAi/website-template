@@ -1,0 +1,29 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageIntro from '@/components/sections/PageIntro.astro';
+interface Props { title: string; description: string; updated: string }
+const { title, description, updated } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <PageIntro eyebrow="Legal" headline={title} size="headline" />
+  <section class="legal" data-tone="light">
+    <div class="container container--editorial">
+      <p class="t-caption legal__updated">Last updated {updated}. This is template placeholder text — have it reviewed for your business and jurisdiction before publishing.</p>
+      <div class="prose">
+        <slot />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal {
+    padding-block: var(--section-m);
+  }
+  .legal__updated {
+    margin-bottom: var(--s-7);
+    padding-bottom: var(--s-5);
+    border-bottom: 1px solid var(--border);
+  }
+</style>

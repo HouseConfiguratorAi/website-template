@@ -1,0 +1,508 @@
+/* =====================================================================
+   BASE — reset, typography, layout primitives, shared UI
+   ===================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 16px);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+  font-stretch: 100%;
+  background: var(--dark-bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+img,
+picture,
+video,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd,
+ul,
+ol {
+  margin: 0;
+}
+
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* On accent-filled controls the ring must contrast with the fill. */
+.btn--primary:focus-visible {
+  outline-color: var(--fg);
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  padding: 12px 18px;
+  background: var(--dark-accent);
+  color: var(--dark-accent-contrast);
+  font-size: var(--fs-caption);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: translateY(-160%);
+  transition: transform var(--dur-micro) var(--ease-standard);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------------------------------------------------------------------
+   Typography roles
+   --------------------------------------------------------------------- */
+
+.t-display,
+.t-headline,
+.t-title {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  letter-spacing: var(--display-tracking);
+  font-stretch: var(--display-stretch);
+  font-optical-sizing: auto;
+  text-wrap: balance;
+}
+
+.t-display {
+  font-size: var(--fs-display);
+  line-height: var(--lh-tight);
+}
+
+.t-headline {
+  font-size: var(--fs-headline);
+  line-height: 0.98;
+}
+
+.t-title {
+  font-size: var(--fs-title);
+  line-height: 1.04;
+}
+
+.t-display em,
+.t-headline em,
+.t-title em {
+  font-style: var(--display-italic);
+  color: color-mix(in srgb, var(--accent) calc(var(--em-accent) * 100%), currentColor);
+}
+
+.t-subhead {
+  font-family: var(--font-sans);
+  font-size: var(--fs-subhead);
+  line-height: 1.3;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.t-lead {
+  font-family: var(--font-serif);
+  font-size: var(--fs-lead);
+  line-height: 1.42;
+  font-weight: 360;
+  letter-spacing: -0.005em;
+  text-wrap: pretty;
+}
+
+.t-body {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  text-wrap: pretty;
+}
+
+.t-small {
+  font-size: var(--fs-small);
+  line-height: 1.55;
+}
+
+.t-caption {
+  font-size: var(--fs-caption);
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.t-eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--fs-eyebrow);
+  line-height: 1.3;
+  font-weight: 500;
+  font-stretch: 118%;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.t-meta {
+  font-size: var(--fs-caption);
+  line-height: 1.4;
+  font-stretch: 108%;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.t-price {
+  font-size: var(--fs-price);
+  line-height: 1.1;
+  font-weight: 420;
+  font-stretch: 106%;
+  letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.t-index {
+  font-size: var(--fs-caption);
+  font-stretch: 112%;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* Long-form prose (journal articles, legal pages). */
+.prose {
+  font-size: var(--fs-body);
+  line-height: 1.72;
+}
+
+.prose > * + * {
+  margin-top: 1.1em;
+}
+
+.prose h2 {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  font-stretch: var(--display-stretch);
+  letter-spacing: var(--display-tracking);
+  font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.25rem);
+  line-height: 1.12;
+  margin-top: 2em;
+}
+
+.prose h3 {
+  font-size: var(--fs-subhead);
+  font-weight: 500;
+  margin-top: 1.6em;
+}
+
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.2em;
+}
+
+.prose li + li {
+  margin-top: 0.4em;
+}
+
+/* ---------------------------------------------------------------------
+   Layout primitives — deliberately several widths, not one.
+   --------------------------------------------------------------------- */
+
+.container {
+  width: min(100% - 2 * var(--gutter), var(--w-standard));
+  margin-inline: auto;
+}
+
+.container--editorial {
+  width: min(100% - 2 * var(--gutter), var(--w-editorial));
+}
+
+.container--gallery {
+  width: min(100% - 2 * var(--gutter), var(--w-gallery));
+}
+
+.container--bleed {
+  width: 100%;
+}
+
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+}
+
+.rule {
+  height: 1px;
+  border: 0;
+  margin: 0;
+  background: var(--border);
+}
+
+/* ---------------------------------------------------------------------
+   Buttons & links
+   --------------------------------------------------------------------- */
+
+.btn {
+  --btn-pad-y: 17px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 52px;
+  padding: var(--btn-pad-y) 24px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-s);
+  font-size: var(--fs-caption);
+  line-height: 1;
+  font-weight: 500;
+  font-stretch: 116%;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-micro) var(--ease-standard),
+    color var(--dur-micro) var(--ease-standard),
+    border-color var(--dur-micro) var(--ease-standard);
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.btn--primary:hover {
+  background: color-mix(in srgb, var(--accent) 86%, var(--fg));
+}
+
+.btn--ghost {
+  border-color: color-mix(in srgb, var(--fg) 34%, transparent);
+  color: var(--fg);
+}
+
+.btn--ghost:hover {
+  border-color: var(--fg);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.arrow {
+  width: 18px;
+  height: 10px;
+  flex: none;
+  transition: transform var(--dur-micro) var(--ease-emphasis);
+}
+
+.btn:hover .arrow,
+.link-arrow:hover .arrow,
+a:hover > .arrow,
+.card-link:hover .arrow {
+  transform: translateX(5px);
+}
+
+/* Text link with an underline that draws in from the left. */
+.link {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  padding-bottom: 2px;
+  transition: background-size var(--dur-standard) var(--ease-emphasis);
+}
+
+.link:hover,
+.link:focus-visible,
+.link[aria-current='page'] {
+  background-size: 100% 1px;
+}
+
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  font-stretch: 116%;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding-block: 8px;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  transition: background-size var(--dur-standard) var(--ease-emphasis);
+}
+
+.link-arrow:hover {
+  background-size: 0% 1px;
+  background-position: 100% 100%;
+}
+
+/* ---------------------------------------------------------------------
+   Media
+   --------------------------------------------------------------------- */
+
+.media {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border-radius: var(--radius-img);
+}
+
+.media img,
+.media picture {
+  width: 100%;
+  height: 100%;
+}
+
+.media img {
+  object-fit: cover;
+}
+
+.media-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(to top, color-mix(in srgb, var(--fg) 6%, transparent), transparent 60%),
+    var(--surface);
+  color: var(--muted);
+}
+
+.media-placeholder__inner {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 24px;
+  text-align: center;
+}
+
+.media-placeholder svg {
+  width: min(58%, 220px);
+  height: auto;
+  opacity: 0.55;
+}
+
+/* Section headings: eyebrow + title with an index. */
+.section-head {
+  display: grid;
+  gap: var(--s-5);
+}
+
+.eyebrow-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--muted);
+}
+
+.eyebrow-row::before {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.8;
+}
+
+.status-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-dot[data-status='available']::before {
+  background: var(--accent);
+}
+
+.status-dot[data-status='reserved']::before,
+.status-dot[data-status='incoming']::before {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px currentColor;
+}

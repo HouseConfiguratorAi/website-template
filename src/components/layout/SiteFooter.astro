@@ -1,0 +1,126 @@
+---
+import { navigation, contact, site } from '@/config/site';
+import Logo from '@/components/ui/Logo.astro';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer" data-tone="dark">
+  <div class="container container--gallery">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <a href="/" aria-label={`${site.name} — home`}><Logo size="large" /></a>
+        <p class="t-small muted">Selected sports and grand touring cars, {contact.address.city}.</p>
+      </div>
+
+      <nav class="site-footer__col" aria-label="Footer">
+        <h2 class="t-eyebrow muted">Navigate</h2>
+        <ul role="list">
+          {navigation.primary.map((item) => <li><a class="link" href={item.href}>{item.label}</a></li>)}
+        </ul>
+      </nav>
+
+      <div class="site-footer__col">
+        <h2 class="t-eyebrow muted">Visit</h2>
+        <address>
+          {contact.address.street}<br />
+          {contact.address.postalCode} {contact.address.city}<br />
+          {contact.address.country}
+        </address>
+        <a class="link" href={contact.directionsUrl} rel="noopener" target="_blank">Directions<span class="sr-only"> (opens in a new tab)</span></a>
+      </div>
+
+      <div class="site-footer__col">
+        <h2 class="t-eyebrow muted">Contact</h2>
+        <ul role="list">
+          <li><a class="link" href={`mailto:${contact.email}`}>{contact.email}</a></li>
+          <li><a class="link" href={`tel:${contact.phoneHref}`}>{contact.phone}</a></li>
+          {site.social.map((s) => <li><a class="link" href={s.href} rel="noopener" target="_blank">{s.label}<span class="sr-only"> (opens in a new tab)</span></a></li>)}
+        </ul>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom t-caption">
+      <span>© {year} {site.legalName}</span>
+      <ul role="list">
+        {navigation.legal.map((item) => <li><a class="link" href={item.href}>{item.label}</a></li>)}
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-top: var(--section-m);
+    padding-bottom: var(--s-6);
+    border-top: 1px solid var(--border);
+  }
+
+  .site-footer__top {
+    display: grid;
+    grid-template-columns: 2fr repeat(3, 1fr);
+    gap: var(--s-7) var(--gutter);
+    padding-bottom: var(--section-s);
+  }
+
+  .site-footer__brand {
+    display: grid;
+    align-content: start;
+    gap: var(--s-5);
+  }
+
+  .site-footer__brand p {
+    max-width: 28ch;
+  }
+
+  .site-footer__col {
+    display: grid;
+    align-content: start;
+    gap: var(--s-4);
+    font-size: var(--fs-small);
+    font-style: normal;
+  }
+
+  .site-footer__col ul {
+    display: grid;
+    gap: 8px;
+    justify-items: start;
+  }
+
+  address {
+    font-style: normal;
+    line-height: 1.6;
+  }
+
+  .site-footer__col > a {
+    justify-self: start;
+  }
+
+  .site-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-4);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--border);
+  }
+
+  .site-footer__bottom ul {
+    display: flex;
+    gap: var(--s-5);
+  }
+
+  @media (max-width: 63.99rem) {
+    .site-footer__top {
+      grid-template-columns: 1fr 1fr;
+    }
+    .site-footer__brand {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 29.99rem) {
+    .site-footer__top {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

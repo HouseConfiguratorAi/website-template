@@ -1,0 +1,297 @@
+---
+/**
+ * Enquiry form. Posts multipart/form-data to contact.formEndpoint
+ * (src/config/site.ts). With no endpoint configured it runs in demo mode:
+ * it validates, then says clearly that nothing was sent.
+ * Server-side validation is still required on whatever receives the form.
+ */
+import { contact } from '@/config/site';
+import { getListedVehicles, vehicleTitle } from '@/lib/inventory';
+import Arrow from '@/components/ui/Arrow.astro';
+
+interface Props {
+  /** Pre-select a vehicle (slug). ?vehicle=slug in the URL also works. */
+  vehicle?: string;
+  idPrefix?: string;
+}
+const { vehicle, idPrefix = 'cf' } = Astro.props;
+const vehicles = await getListedVehicles();
+const id = (s: string) => `${idPrefix}-${s}`;
+---
+
+<form class="cform" data-contact-form action={contact.formEndpoint || undefined} method="post" novalidate data-endpoint={contact.formEndpoint}>
+  <div class="cform__grid">
+    <div class="field">
+      <label for={id('name')}>Name</label>
+      <input id={id('name')} name="name" type="text" autocomplete="name" required maxlength="120" aria-describedby={id('name-error')} />
+      <p class="field__error" id={id('name-error')} aria-live="polite"></p>
+    </div>
+    <div class="field">
+      <label for={id('email')}>Email</label>
+      <input id={id('email')} name="email" type="email" autocomplete="email" required maxlength="200" aria-describedby={id('email-error')} />
+      <p class="field__error" id={id('email-error')} aria-live="polite"></p>
+    </div>
+    <div class="field">
+      <label for={id('phone')}>Phone <span class="field__opt">optional</span></label>
+      <input id={id('phone')} name="phone" type="tel" autocomplete="tel" maxlength="40" pattern="[0-9+()\\s.\\-]{6,40}" aria-describedby={id('phone-error')} />
+      <p class="field__error" id={id('phone-error')} aria-live="polite"></p>
+    </div>
+    <div class="field">
+      <label for={id('vehicle')}>Vehicle of interest <span class="field__opt">optional</span></label>
+      <div class="field__select">
+        <select id={id('vehicle')} name="vehicle" data-vehicle-select>
+          <option value="">Something else</option>
+          {vehicles.map((v) => <option value={v.slug} selected={v.slug === vehicle}>{vehicleTitle(v)} · {v.year}{v.variant ? ` · ${v.variant}` : ''}</option>)}
+        </select>
+      </div>
+    </div>
+    <div class="field field--full">
+      <label for={id('message')}>Message</label>
+      <textarea id={id('message')} name="message" rows="5" required minlength="10" maxlength="4000" aria-describedby={id('message-error')}></textarea>
+      <p class="field__error" id={id('message-error')} aria-live="polite"></p>
+    </div>
+    <!-- Honeypot: invisible to people, tempting to bots. -->
+    <div class="cform__hp" aria-hidden="true">
+      <label for={id('company')}>Company</label>
+      <input id={id('company')} name="company" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+  </div>
+
+  <div class="cform__foot">
+    <p class="t-caption">We use your details only to reply. See our <a class="link" href="/privacy">privacy notice</a>.</p>
+    <button class="btn btn--primary" type="submit">Send enquiry <Arrow /></button>
+  </div>
+  <p class="cform__status t-small" role="status" aria-live="polite" data-status></p>
+</form>
+
+<style>
+  .cform {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .cform__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-5) var(--s-6);
+  }
+
+  .field {
+    display: grid;
+    gap: 10px;
+    align-content: start;
+  }
+
+  .field--full {
+    grid-column: 1 / -1;
+  }
+
+  .field label {
+    font-size: var(--fs-caption);
+    font-weight: 500;
+    font-stretch: 112%;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .field__opt {
+    color: var(--muted);
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: none;
+    font-stretch: 100%;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    min-height: 52px;
+    padding: 14px 0;
+    border: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
+    border-radius: 0;
+    background: transparent;
+    font-size: var(--fs-body);
+    transition: border-color var(--dur-micro) var(--ease-standard);
+    appearance: none;
+  }
+
+  .field select {
+    padding-right: 32px;
+    text-overflow: ellipsis;
+  }
+
+  .field textarea {
+    resize: vertical;
+    min-height: 140px;
+    line-height: 1.5;
+  }
+
+  .field input:hover,
+  .field select:hover,
+  .field textarea:hover {
+    border-bottom-color: var(--fg);
+  }
+
+  .field input:focus-visible,
+  .field select:focus-visible,
+  .field textarea:focus-visible {
+    outline: none;
+    border-bottom-color: var(--fg);
+    box-shadow: 0 1px 0 0 var(--fg);
+  }
+
+  .field__select {
+    position: relative;
+  }
+
+  .field__select::after {
+    content: '';
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-right: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+
+  .field select option {
+    background: var(--bg);
+    color: var(--fg);
+  }
+
+  .field [aria-invalid='true'] {
+    border-bottom-color: #c2410c;
+    box-shadow: 0 1px 0 0 #c2410c;
+  }
+
+  .field__error {
+    min-height: 0;
+    font-size: var(--fs-caption);
+    color: var(--fg);
+  }
+
+  .field__error:not(:empty)::before {
+    content: '— ';
+    color: #c2410c;
+  }
+
+  .cform__hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .cform__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-5);
+  }
+
+  .cform__foot p {
+    max-width: 26rem;
+  }
+
+  .cform__status:empty {
+    display: none;
+  }
+
+  .cform__status {
+    padding: var(--s-4) var(--s-5);
+    border-left: 2px solid var(--accent);
+    background: var(--surface);
+  }
+
+  @media (max-width: 47.99rem) {
+    .cform__grid {
+      grid-template-columns: 1fr;
+    }
+    .cform__foot .btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  const messages: Record<string, (el: HTMLInputElement | HTMLTextAreaElement) => string> = {
+    valueMissing: () => 'Please fill in this field.',
+    typeMismatch: () => 'Please enter a valid email address.',
+    patternMismatch: () => 'Please use digits, spaces and + ( ) - only.',
+    tooShort: (el) => `Please write at least ${el.getAttribute('minlength')} characters.`,
+    tooLong: (el) => `Please keep this under ${el.getAttribute('maxlength')} characters.`,
+  };
+
+  function validate(el: HTMLInputElement | HTMLTextAreaElement): boolean {
+    const error = el.id ? document.getElementById(`${el.id}-error`) : null;
+    let msg = '';
+    if (!el.validity.valid) {
+      const key = Object.keys(messages).find((k) => el.validity[k as keyof ValidityState]);
+      msg = key ? messages[key](el) : 'Please check this field.';
+    }
+    el.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    if (error) error.textContent = msg;
+    return !msg;
+  }
+
+  document.querySelectorAll<HTMLFormElement>('[data-contact-form]').forEach((form) => {
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const submit = form.querySelector<HTMLButtonElement>('[type="submit"]')!;
+    const fields = [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input:not([name="company"]), textarea')];
+
+    // Pre-select a vehicle from ?vehicle=slug
+    const wanted = new URLSearchParams(location.search).get('vehicle');
+    const select = form.querySelector<HTMLSelectElement>('[data-vehicle-select]');
+    if (wanted && select && [...select.options].some((o) => o.value === wanted)) select.value = wanted;
+
+    fields.forEach((el) => {
+      el.addEventListener('blur', () => el.value && validate(el));
+      el.addEventListener('input', () => el.getAttribute('aria-invalid') === 'true' && validate(el));
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      status.textContent = '';
+      const invalid = fields.filter((el) => !validate(el));
+      if (invalid.length) {
+        invalid[0].focus();
+        return;
+      }
+      const data = new FormData(form);
+      // Bots fill the honeypot; pretend success and drop the submission.
+      if (String(data.get('company') || '').trim()) {
+        form.reset();
+        status.textContent = 'Thank you. We will be in touch shortly.';
+        return;
+      }
+      // Normalise whitespace; the receiving endpoint must still validate and escape.
+      for (const [k, v] of data.entries()) if (typeof v === 'string') data.set(k, v.trim());
+
+      const endpoint = form.dataset.endpoint;
+      if (!endpoint) {
+        status.textContent = 'Demo mode — the form works, but nothing was sent. Set contact.formEndpoint in src/config/site.ts to receive enquiries.';
+        return;
+      }
+      submit.disabled = true;
+      submit.setAttribute('aria-busy', 'true');
+      try {
+        const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        status.textContent = 'Thank you. Your message has arrived and we will reply personally, usually the same day.';
+      } catch {
+        status.textContent = 'Something went wrong while sending. Please try again, or email us directly.';
+      } finally {
+        submit.disabled = false;
+        submit.removeAttribute('aria-busy');
+      }
+    });
+  });
+</script>

@@ -1,0 +1,175 @@
+---
+import type { Vehicle } from '@/lib/inventory';
+import { coverImage, imageOfKind, statusLabel, vehicleUrl } from '@/lib/inventory';
+import { formatMileage, formatPrice } from '@/lib/format';
+import Media from '@/components/ui/Media.astro';
+import Arrow from '@/components/ui/Arrow.astro';
+
+interface Props {
+  vehicle: Vehicle;
+  /** CSS aspect-ratio of the image, e.g. '3 / 2', '4 / 5'. */
+  ratio?: string;
+  /** Which photograph to use. Portrait frames work best with the 'portrait' shot. */
+  image?: 'cover' | 'portrait' | 'profile';
+  sizes?: string;
+  size?: 'large' | 'medium' | 'small';
+  /** Shared-element transition into the detail page. Only one per page per vehicle. */
+  transition?: boolean;
+  headingLevel?: 'h2' | 'h3';
+  class?: string;
+  delay?: number;
+}
+
+const {
+  vehicle: v,
+  ratio = '3 / 2',
+  image = 'cover',
+  sizes = '(min-width: 64rem) 50vw, 100vw',
+  size = 'medium',
+  transition = true,
+  headingLevel: H = 'h3',
+  class: className,
+  delay = 0,
+} = Astro.props;
+
+const img = (image !== 'cover' && imageOfKind(v, image)) || coverImage(v);
+const url = vehicleUrl(v);
+const flagged = v.status !== 'available';
+---
+
+<article class:list={['vcard', `vcard--${size}`, className]} data-reveal style={`--delay:${delay}ms`}>
+  <a class="card-link" href={url} data-cursor="View">
+    <div class="vcard__media media" style={`aspect-ratio:${ratio}`}>
+      <Media
+        src={img?.src}
+        alt={img?.alt ?? ''}
+        focal={img?.focal}
+        sizes={sizes}
+        transitionName={transition ? `vehicle-${v.slug}` : undefined}
+      />
+      {flagged && <span class="vcard__flag t-eyebrow status-dot" data-status={v.status}>{statusLabel[v.status]}</span>}
+    </div>
+    <div class="vcard__body">
+      <p class="t-eyebrow muted">{v.brand}</p>
+      <H class="vcard__title">
+        {v.model}
+        {v.variant && <span class="vcard__variant">{v.variant}</span>}
+      </H>
+      <dl class="vcard__meta t-meta">
+        <div><dt class="sr-only">Year</dt><dd>{v.year}</dd></div>
+        <div><dt class="sr-only">Mileage</dt><dd>{formatMileage(v.mileage)}</dd></div>
+        <div class="vcard__price"><dt class="sr-only">Price</dt><dd>{v.status === 'sold' ? 'Sold' : formatPrice(v.price)}</dd></div>
+      </dl>
+      <span class="vcard__cta t-eyebrow">View vehicle <Arrow /></span>
+    </div>
+  </a>
+</article>
+
+<style>
+  .vcard {
+    position: relative;
+    min-width: 0;
+  }
+
+  .card-link {
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  .vcard__media {
+    isolation: isolate;
+  }
+
+  .vcard__media :global(img) {
+    transition: transform 1400ms var(--ease-emphasis);
+  }
+
+  .card-link:hover .vcard__media :global(img) {
+    transform: scale(1.035);
+  }
+
+  .vcard__flag {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 1;
+    padding: 8px 12px;
+    background: color-mix(in srgb, var(--dark-bg) 72%, transparent);
+    color: var(--dark-fg);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  .vcard__body {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 6px var(--s-5);
+  }
+
+  .vcard__body > .t-eyebrow {
+    grid-column: 1 / -1;
+  }
+
+  .vcard__title {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-stretch: var(--display-stretch);
+    letter-spacing: var(--display-tracking);
+    font-size: clamp(1.6rem, 1.3rem + 1.1vw, 2.25rem);
+    line-height: 1.05;
+    grid-column: 1 / -1;
+  }
+
+  .vcard--large .vcard__title {
+    font-size: clamp(1.9rem, 1.4rem + 2vw, 3.25rem);
+  }
+
+  .vcard--small .vcard__title {
+    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.9rem);
+  }
+
+  .vcard__variant {
+    display: block;
+    margin-top: 4px;
+    font-family: var(--font-sans);
+    font-size: var(--fs-small);
+    font-stretch: 100%;
+    letter-spacing: 0;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .vcard__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    margin-top: var(--s-2);
+    color: var(--muted);
+  }
+
+  .vcard__meta dd {
+    margin: 0;
+  }
+
+  .vcard__price {
+    color: var(--fg);
+  }
+
+  .vcard__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding-block: 6px;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 29.99rem) {
+    .vcard__body {
+      grid-template-columns: 1fr;
+    }
+    .vcard__cta {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,243 @@
+---
+/**
+ * One strong image + one strong statement + short copy.
+ *
+ * layout:
+ *   'scene'      — sticky scroll scene: the image grows from an inset frame to
+ *                  full-bleed, then the copy appears over it (camera push-in)
+ *   'background' — image fills the section, copy overlaid
+ *   'left'       — image left, copy right
+ *   'right'      — copy left, image right
+ *   'full'       — full-bleed image, copy below in a narrow column
+ * size: 'narrow' | 'large' — the scale of the headline.
+ */
+import { rich } from '@/lib/text';
+import Media from '@/components/ui/Media.astro';
+import Arrow from '@/components/ui/Arrow.astro';
+
+interface Props {
+  layout?: 'scene' | 'background' | 'left' | 'right' | 'full';
+  size?: 'narrow' | 'large';
+  tone?: 'dark' | 'light';
+  eyebrow?: string;
+  headline: string;
+  body?: string[];
+  cta?: { label: string; href: string };
+  image: string;
+  imageAlt: string;
+  focal?: string;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const {
+  layout = 'right',
+  size = 'large',
+  tone = 'dark',
+  eyebrow,
+  headline,
+  body = [],
+  cta,
+  image,
+  imageAlt,
+  focal,
+  headingLevel: H = 'h2',
+} = Astro.props;
+
+const overlay = layout === 'scene' || layout === 'background';
+---
+
+<section
+  class:list={['story', `story--${layout}`, `story--${size}`]}
+  data-tone={overlay ? 'dark' : tone}
+  data-scene={layout === 'scene' ? 'sticky' : undefined}
+>
+  <div class="story__stage">
+    <div class="story__frame media" data-reveal={overlay ? undefined : 'image'}>
+      <div class="story__img">
+        <Media src={image} alt={imageAlt} focal={focal} sizes={overlay || layout === 'full' ? '100vw' : '(min-width: 64rem) 58vw, 100vw'} />
+      </div>
+    </div>
+    {overlay && <div class="story__veil" aria-hidden="true" />}
+    <div class="story__copy">
+      {eyebrow && <p class="t-eyebrow eyebrow-row" data-reveal={overlay ? undefined : 'fade'}>{eyebrow}</p>}
+      <H class:list={[size === 'large' ? 't-headline' : 't-title']} data-reveal={overlay ? undefined : ''} set:html={rich(headline)} />
+      {
+        body.length > 0 && (
+          <div class="story__body" data-reveal={overlay ? undefined : ''} style="--delay:120ms">
+            {body.map((p) => <p class="t-body">{p}</p>)}
+          </div>
+        )
+      }
+      {cta && <a class="link-arrow" href={cta.href}>{cta.label}<Arrow /></a>}
+    </div>
+  </div>
+</section>
+
+<style>
+  .story {
+    position: relative;
+  }
+
+  .story__body {
+    display: grid;
+    gap: 1em;
+    max-width: 32rem;
+  }
+
+  .story__copy {
+    display: grid;
+    gap: var(--s-5);
+    justify-items: start;
+  }
+
+  /* ---------------- Side-by-side layouts ---------------- */
+  .story--left .story__stage,
+  .story--right .story__stage {
+    width: min(100% - 2 * var(--gutter), var(--w-gallery));
+    margin-inline: auto;
+    padding-block: var(--section-l);
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--s-7);
+    align-items: center;
+  }
+
+  .story--left .story__frame {
+    grid-column: 1 / span 7;
+    aspect-ratio: 4 / 5;
+  }
+  .story--left .story__copy {
+    grid-column: 9 / -1;
+  }
+  .story--right .story__frame {
+    grid-column: 6 / -1;
+    grid-row: 1;
+    aspect-ratio: 4 / 5;
+  }
+  .story--right .story__copy {
+    grid-column: 1 / span 4;
+    grid-row: 1;
+  }
+
+  /* ---------------- Full-bleed image, copy below ---------------- */
+  .story--full .story__stage {
+    padding-bottom: var(--section-l);
+  }
+  .story--full .story__frame {
+    aspect-ratio: 21 / 9;
+    border-radius: 0;
+  }
+  .story--full .story__copy {
+    width: min(100% - 2 * var(--gutter), var(--w-editorial));
+    margin: var(--section-s) auto 0;
+  }
+
+  /* ---------------- Overlay layouts ---------------- */
+  .story--background .story__stage,
+  .story--scene .story__stage {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    align-items: end;
+    overflow: clip;
+    isolation: isolate;
+  }
+
+  .story--background .story__frame,
+  .story--scene .story__frame {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    border-radius: 0;
+  }
+
+  .story__img {
+    height: 100%;
+  }
+
+  .story__veil {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(to top, rgb(8 8 8 / 0.82) 0%, rgb(8 8 8 / 0.25) 45%, transparent 70%),
+      linear-gradient(to right, rgb(8 8 8 / 0.55), transparent 55%);
+  }
+
+  .story--background .story__copy,
+  .story--scene .story__copy {
+    width: min(100% - 2 * var(--gutter), var(--w-gallery));
+    margin-inline: auto;
+    padding-block: var(--section-m);
+    max-width: none;
+  }
+
+  .story--scene .story__copy > *,
+  .story--background .story__copy > * {
+    max-width: 38rem;
+  }
+
+  .story--scene.story--large .story__copy h2,
+  .story--background.story--large .story__copy h2 {
+    max-width: 12ch;
+  }
+
+  /* ---------------- The camera move ----------------
+     --p is 0 → 1 while the section scrolls past. Without motion it is
+     unset, so the fallbacks below render the final, static composition. */
+  .motion .story--scene {
+    height: 260vh;
+  }
+
+  .motion .story--scene .story__stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+  }
+
+  .motion .story--scene {
+    --e: clamp(0, var(--p, 1) * 1.8, 1);
+    --c: clamp(0, (var(--p, 1) - 0.5) * 4, 1);
+  }
+
+  .motion .story--scene .story__frame {
+    clip-path: inset(calc((1 - var(--e)) * 22%) calc((1 - var(--e)) * 31%) round calc((1 - var(--e)) * 4px));
+  }
+
+  .motion .story--scene .story__img {
+    transform: scale(calc(1.22 - var(--e) * 0.22));
+    will-change: transform;
+  }
+
+  .motion .story--scene .story__veil {
+    opacity: var(--c);
+  }
+
+  .motion .story--scene .story__copy {
+    opacity: var(--c);
+    transform: translate3d(0, calc((1 - var(--c)) * 40px), 0);
+  }
+
+  @media (max-width: 63.99rem) {
+    .story--left .story__frame,
+    .story--right .story__frame,
+    .story--left .story__copy,
+    .story--right .story__copy {
+      grid-column: 1 / -1;
+      grid-row: auto;
+    }
+    .story--full .story__frame {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .motion .story--scene {
+      height: 190vh;
+    }
+    .motion .story--scene .story__frame {
+      clip-path: inset(calc((1 - var(--e)) * 18%) calc((1 - var(--e)) * 12%));
+    }
+  }
+</style>

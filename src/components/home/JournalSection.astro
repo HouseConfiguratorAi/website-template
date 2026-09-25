@@ -1,0 +1,54 @@
+---
+import { home } from '@/config/content';
+import { getJournalLayout } from '@/lib/journal';
+import SectionHead from '@/components/ui/SectionHead.astro';
+import JournalCard from '@/components/sections/JournalCard.astro';
+
+const { feature, rest } = await getJournalLayout();
+---
+
+<section class="journal" data-tone="dark">
+  <div class="container container--gallery">
+    <SectionHead eyebrow={home.journal.eyebrow} headline={home.journal.headline} cta={home.journal.cta} split />
+    <div class="journal__grid">
+      <div class="journal__feature">
+        <JournalCard post={feature} variant="feature" />
+      </div>
+      <ul class="journal__rest" role="list">
+        {rest.slice(0, 3).map((p, i) => <li><JournalCard post={p} variant="compact" delay={i * 90} /></li>)}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .journal {
+    padding-block: var(--section-l);
+  }
+  .journal__grid {
+    margin-top: var(--section-s);
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--s-8);
+  }
+  .journal__feature {
+    grid-column: 1 / span 7;
+  }
+  .journal__rest {
+    grid-column: 9 / -1;
+    align-self: end;
+    display: grid;
+    gap: var(--s-6);
+  }
+  .journal__rest li + li {
+    padding-top: var(--s-6);
+    border-top: 1px solid var(--border);
+  }
+  @media (max-width: 63.99rem) {
+    .journal__feature,
+    .journal__rest {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

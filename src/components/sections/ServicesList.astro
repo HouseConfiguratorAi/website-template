@@ -1,0 +1,226 @@
+---
+/**
+ * Vertical editorial list. Hovering (or focusing) a service swaps the image.
+ * On touch screens the image follows the service in the middle of the viewport.
+ */
+import { services } from '@/data/services';
+import { pad } from '@/lib/format';
+import { rich } from '@/lib/text';
+import Media from '@/components/ui/Media.astro';
+import Arrow from '@/components/ui/Arrow.astro';
+
+interface Props {
+  eyebrow?: string;
+  headline?: string;
+  cta?: { label: string; href: string };
+  /** Link each row to its section on /services. */
+  linkRows?: boolean;
+}
+const { eyebrow, headline, cta, linkRows = true } = Astro.props;
+---
+
+<section class="services" data-tone="light" data-services>
+  <div class="container container--gallery services__grid">
+    <div class="services__head">
+      {eyebrow && <p class="t-eyebrow eyebrow-row" data-reveal="fade">{eyebrow}</p>}
+      {headline && <h2 class="t-headline" data-reveal set:html={rich(headline)} />}
+    </div>
+
+    <div class="services__visual" aria-hidden="true">
+      <div class="services__frame media">
+        {
+          services.map((s, i) => (
+            <div class="services__img" data-index={i} data-active={i === 0 ? '' : undefined}>
+              <Media src={s.image} alt="" sizes="(min-width: 64rem) 40vw, 100vw" />
+            </div>
+          ))
+        }
+      </div>
+      <p class="services__caption t-caption" data-caption>{services[0].imageAlt}</p>
+    </div>
+
+    <ol class="services__list" role="list">
+      {
+        services.map((s, i) => {
+          const Row = linkRows ? 'a' : 'div';
+          return (
+            <li class="services__item" data-index={i} data-active={i === 0 ? '' : undefined} data-alt={s.imageAlt}>
+              <Row class="services__row" href={linkRows ? `/services#${s.slug}` : undefined}>
+                <span class="t-index">{pad(i + 1)}</span>
+                <span class="services__title">{s.title}</span>
+                <span class="services__summary t-small">{s.summary}</span>
+                {linkRows && <Arrow class="services__arrow" />}
+              </Row>
+            </li>
+          );
+        })
+      }
+    </ol>
+
+    {cta && <a class="link-arrow services__cta" href={cta.href}>{cta.label}<Arrow /></a>}
+  </div>
+</section>
+
+<style>
+  .services {
+    padding-block: var(--section-l);
+  }
+
+  .services__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--s-8);
+  }
+
+  .services__head {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  .services__visual {
+    grid-column: 1 / span 5;
+    grid-row: 2 / span 2;
+    align-self: start;
+    position: sticky;
+    top: calc(var(--header-h) + var(--s-6));
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .services__frame {
+    aspect-ratio: 4 / 5;
+  }
+
+  .services__img {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transform: scale(1.06);
+    transition:
+      opacity 700ms var(--ease-standard),
+      transform 1400ms var(--ease-emphasis);
+  }
+
+  .services__img[data-active] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .services__list {
+    grid-column: 7 / -1;
+    grid-row: 2;
+    border-top: 1px solid var(--border);
+  }
+
+  .services__item {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .services__row {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr auto;
+    align-items: baseline;
+    column-gap: var(--s-4);
+    row-gap: var(--s-2);
+    padding-block: clamp(22px, 1rem + 1.4vw, 40px);
+  }
+
+  .services__title {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-stretch: var(--display-stretch);
+    letter-spacing: var(--display-tracking);
+    font-size: clamp(1.75rem, 1.2rem + 2.2vw, 3.25rem);
+    line-height: 1.02;
+    transition:
+      transform var(--dur-standard) var(--ease-emphasis),
+      color var(--dur-micro) var(--ease-standard);
+  }
+
+  .services__summary {
+    grid-column: 2;
+    color: var(--muted);
+    max-width: 34rem;
+  }
+
+  .services__row :global(.services__arrow) {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: center;
+    opacity: 0.4;
+  }
+
+  /* Non-active rows recede so the active one reads as selected. */
+  .services__list:has([data-active]) .services__item:not([data-active]) .services__title {
+    color: color-mix(in srgb, var(--fg) 62%, var(--bg));
+  }
+
+  .services__item[data-active] .services__title {
+    transform: translateX(8px);
+  }
+
+  .services__item[data-active] :global(.services__arrow) {
+    opacity: 1;
+  }
+
+  .services__cta {
+    grid-column: 7 / -1;
+    justify-self: start;
+  }
+
+  @media (max-width: 63.99rem) {
+    .services__visual {
+      grid-column: 1 / -1;
+      grid-row: auto;
+      position: sticky;
+      top: calc(var(--header-h) + 8px);
+      z-index: 1;
+    }
+    .services__frame {
+      aspect-ratio: 16 / 10;
+    }
+    .services__caption {
+      display: none;
+    }
+    .services__list,
+    .services__cta {
+      grid-column: 1 / -1;
+      grid-row: auto;
+    }
+    .services__row {
+      grid-template-columns: 2.5rem 1fr;
+    }
+    .services__row :global(.services__arrow) {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-services]').forEach((root) => {
+    const items = [...root.querySelectorAll<HTMLElement>('.services__item')];
+    const imgs = [...root.querySelectorAll<HTMLElement>('.services__img')];
+    const caption = root.querySelector<HTMLElement>('[data-caption]');
+    const activate = (index: number) => {
+      items.forEach((el, i) => el.toggleAttribute('data-active', i === index));
+      imgs.forEach((el, i) => el.toggleAttribute('data-active', i === index));
+      if (caption) caption.textContent = items[index]?.dataset.alt ?? '';
+    };
+    items.forEach((item, i) => {
+      item.addEventListener('pointerenter', () => activate(i));
+      item.addEventListener('focusin', () => activate(i));
+    });
+    // Touch / narrow screens: the row crossing the middle of the viewport wins.
+    if (!matchMedia('(hover: hover) and (pointer: fine)').matches && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) if (e.isIntersecting) activate(items.indexOf(e.target as HTMLElement));
+        },
+        { rootMargin: '-45% 0px -45% 0px' },
+      );
+      items.forEach((el) => io.observe(el));
+    }
+  });
+</script>

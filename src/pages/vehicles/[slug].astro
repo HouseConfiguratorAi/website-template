@@ -1,0 +1,520 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getImage } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Media from '@/components/ui/Media.astro';
+import Arrow from '@/components/ui/Arrow.astro';
+import VehicleGallery from '@/components/vehicles/VehicleGallery.astro';
+import VehicleRail from '@/components/vehicles/VehicleRail.astro';
+import ContactSection from '@/components/sections/ContactSection.astro';
+import { getAllVehicles, getRelatedVehicles, coverImage, imageOfKind, statusLabel, vehicleTitle, type Vehicle } from '@/lib/inventory';
+import { formatMileage, formatPrice } from '@/lib/format';
+import { resolveMedia } from '@/lib/media';
+import { vehicleLd, breadcrumbLd } from '@/lib/seo';
+import { site, contact } from '@/config/site';
+
+export const getStaticPaths = (async () => {
+  const vehicles = await getAllVehicles();
+  return vehicles.map((vehicle) => ({ params: { slug: vehicle.slug }, props: { vehicle } }));
+}) satisfies GetStaticPaths;
+
+interface Props { vehicle: Vehicle }
+const { vehicle: v } = Astro.props;
+
+const title = vehicleTitle(v);
+const cover = coverImage(v);
+const portrait = imageOfKind(v, 'portrait');
+// The cover opens the page; the gallery shows the rest.
+const gallery = v.images.filter((i) => i !== cover);
+const related = await getRelatedVehicles(v, 4);
+const isSold = v.status === 'sold';
+
+const specs = [
+  { k: 'Year', v: String(v.year) },
+  { k: 'Mileage', v: formatMileage(v.mileage) },
+  { k: 'Power', v: `${v.power.hp} hp` },
+  { k: 'Transmission', v: v.transmission },
+  { k: 'Fuel', v: v.fuel },
+  { k: 'Body', v: v.bodyType },
+];
+const details = [
+  { k: 'Engine', v: v.engine },
+  { k: 'Drivetrain', v: v.drivetrain },
+  { k: 'Exterior', v: v.exteriorColor },
+  { k: 'Interior', v: v.interiorColor },
+  { k: 'First registration', v: v.firstRegistration },
+  { k: 'Previous owners', v: v.owners != null ? String(v.owners) : undefined },
+  { k: 'Reference', v: v.id },
+  { k: 'Location', v: v.location },
+].filter((d) => d.v);
+
+// Absolute image URLs for structured data.
+const ldImages: string[] = [];
+for (const img of v.images.slice(0, 4)) {
+  const m = resolveMedia(img.src);
+  if (m?.type === 'local') ldImages.push(new URL((await getImage({ src: m.meta, width: 1600, format: 'jpg' })).src, site.url).href);
+  else if (m?.type === 'remote') ldImages.push(m.src);
+}
+---
+
+<BaseLayout
+  title={`${title}${v.variant ? ` ${v.variant}` : ''} (${v.year})`}
+  description={`${v.summary} ${formatMileage(v.mileage)}, ${v.transmission.toLowerCase()}, ${v.power.hp} hp. ${formatPrice(v.price)}.`}
+  image={cover?.src}
+  type="product"
+  noindex={isSold}
+  jsonLd={[
+    vehicleLd(v, ldImages),
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'Vehicles', path: '/vehicles' },
+      { name: title, path: `/vehicles/${v.slug}` },
+    ]),
+  ]}
+>
+  <!-- Opening: the car, as large as the screen allows. -->
+  <section class="vd-hero" data-tone="dark" data-scene="through">
+    <div class="vd-hero__media media">
+      <div class="vd-hero__drift">
+        <Media
+          src={cover?.src}
+          mobileSrc={portrait?.src}
+          alt={cover?.alt ?? `${title}`}
+          focal={cover?.focal ?? '50% 58%'}
+          sizes="100vw"
+          priority
+          transitionName={`vehicle-${v.slug}`}
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="vd-head" data-tone="dark">
+    <div class="container container--gallery vd-head__grid">
+      <nav class="vd-crumbs t-meta" aria-label="Breadcrumb">
+        <ol role="list">
+          <li><a class="link" href="/vehicles">Vehicles</a></li>
+          <li aria-current="page">{v.brand} {v.model}</li>
+        </ol>
+      </nav>
+      <div class="vd-head__title">
+        <p class="t-eyebrow" data-intro style="--intro:150ms">{v.brand}</p>
+        <h1 class="t-display vd-head__model" data-intro style="--intro:220ms">{v.model}</h1>
+        {v.variant && <p class="t-subhead muted" data-intro style="--intro:320ms">{v.variant} · {v.year}</p>}
+      </div>
+      <div class="vd-head__offer" data-intro style="--intro:420ms">
+        <p class="t-eyebrow status-dot muted" data-status={v.status}>{statusLabel[v.status]}</p>
+        <p class="vd-head__price">{isSold ? 'Sold' : formatPrice(v.price)}</p>
+        {
+          !isSold && (
+            <div class="vd-head__actions">
+              <a class="btn btn--primary" href="#enquire">{v.status === 'incoming' ? 'Register interest' : 'Enquire'}<Arrow /></a>
+              <a class="btn btn--ghost" href={`tel:${contact.phoneHref}`}>Call</a>
+            </div>
+          )
+        }
+      </div>
+    </div>
+
+    <div class="container container--gallery">
+      <dl class="vd-specs">
+        {
+          specs.map((s, i) => (
+            <div data-reveal style={`--delay:${i * 60}ms`}>
+              <dt class="t-eyebrow muted">{s.k}</dt>
+              <dd class="t-price">{s.v}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  {
+    isSold && (
+      <div class="vd-notice" data-tone="light">
+        <div class="container container--gallery">
+          <p class="t-body">
+            This car has been sold and remains here as part of our archive. <a class="link" href="/vehicles">See what is available now</a> or{' '}
+            <a class="link" href="/services#sourcing">ask us to find one like it</a>.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  <VehicleGallery images={gallery} title={title} />
+
+  <!-- Description + details -->
+  <section class="vd-story" data-tone="light">
+    <div class="container container--gallery vd-story__grid">
+      <div class="vd-story__text">
+        <p class="t-eyebrow eyebrow-row" data-reveal="fade">The car</p>
+        <p class="t-lead vd-story__summary" data-reveal>{v.summary}</p>
+        <div class="vd-story__body" data-reveal>
+          {v.description.map((p) => <p class="t-body">{p}</p>)}
+        </div>
+        {
+          v.highlights && v.highlights.length > 0 && (
+            <ul class="vd-highlights" role="list" data-reveal>
+              {v.highlights.map((h) => <li class="t-small">{h}</li>)}
+            </ul>
+          )
+        }
+      </div>
+      <aside class="vd-details" aria-label="Specification" data-reveal style="--delay:120ms">
+        <h2 class="t-eyebrow muted">Specification</h2>
+        <dl>
+          {
+            details.map((d) => (
+              <div>
+                <dt class="muted">{d.k}</dt>
+                <dd>{d.v}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </aside>
+    </div>
+
+    {
+      v.features.length > 0 && (
+        <div class="container container--gallery vd-equipment">
+          <h2 class="t-title" data-reveal>Equipment</h2>
+          <div class="vd-equipment__groups">
+            {v.features.map((g, i) => (
+              <div class="vd-equipment__group" data-reveal style={`--delay:${i * 80}ms`}>
+                <h3 class="t-eyebrow muted">{g.group}</h3>
+                <ul role="list">
+                  {g.items.map((item) => <li>{item}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+  </section>
+
+  {
+    !isSold && (
+      <ContactSection
+        eyebrow="Enquire"
+        headline={`Interested in this *${v.model}?*`}
+        body="Ask for the full file, arrange a viewing, or simply ask a question. We reply personally."
+        vehicle={v.slug}
+      />
+    )
+  }
+
+  <VehicleRail vehicles={related} eyebrow="Also in the collection" headline="Similar *vehicles*" tone="dark" />
+
+  <!-- Compact offer bar on small screens once the header has scrolled away. -->
+  {
+    !isSold && (
+      <div class="vd-bar" data-tone="dark" data-offer-bar aria-hidden="true">
+        <div>
+          <p class="t-meta muted">{v.brand} {v.model}</p>
+          <p class="t-price">{formatPrice(v.price)}</p>
+        </div>
+        <a class="btn btn--primary" href="#enquire" tabindex="-1">Enquire</a>
+      </div>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .vd-hero {
+    position: relative;
+    height: min(92svh, 62vw);
+    min-height: 420px;
+    overflow: clip;
+  }
+
+  .vd-hero__media {
+    position: absolute;
+    inset: 0;
+    border-radius: 0;
+  }
+
+  .vd-hero__drift {
+    height: 100%;
+    transform: translate3d(0, calc(var(--p, 0) * 12%), 0) scale(1.02);
+  }
+
+  .vd-head {
+    padding-top: var(--s-6);
+    padding-bottom: var(--section-s);
+  }
+
+  .vd-head__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--s-6);
+    align-items: end;
+  }
+
+  .vd-crumbs {
+    grid-column: 1 / -1;
+  }
+
+  .vd-crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    color: var(--muted);
+  }
+
+  .vd-crumbs li + li::before {
+    content: '/';
+    margin-right: 10px;
+    opacity: 0.6;
+  }
+
+  .vd-head__title {
+    grid-column: 1 / span 8;
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .vd-head__model {
+    font-size: clamp(3rem, 1.2rem + 6.5vw, 9rem);
+  }
+
+  .vd-head__offer {
+    grid-column: 9 / -1;
+    display: grid;
+    gap: var(--s-4);
+    justify-items: start;
+    padding-bottom: 0.4em;
+  }
+
+  .vd-head__price {
+    font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);
+    font-weight: 400;
+    font-stretch: 104%;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .vd-head__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-3);
+  }
+
+  .vd-specs {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    margin-top: var(--section-s);
+    border-top: 1px solid var(--border);
+  }
+
+  .vd-specs > div {
+    display: grid;
+    gap: 12px;
+    padding: var(--s-5) var(--s-4) 0 0;
+  }
+
+  .vd-specs > div + div {
+    padding-left: var(--s-4);
+    border-left: 1px solid var(--border);
+  }
+
+  .vd-specs dd {
+    margin: 0;
+  }
+
+  .vd-notice {
+    padding-block: var(--s-6);
+  }
+
+  .vd-story {
+    padding-block: var(--section-l);
+  }
+
+  .vd-story__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--s-8);
+  }
+
+  .vd-story__text {
+    grid-column: 1 / span 7;
+    display: grid;
+    gap: var(--s-6);
+    align-content: start;
+  }
+
+  .vd-story__summary {
+    font-size: clamp(1.5rem, 1.2rem + 1.3vw, 2.4rem);
+    line-height: 1.25;
+    max-width: 22em;
+  }
+
+  .vd-story__body {
+    display: grid;
+    gap: 1.1em;
+    max-width: 36rem;
+  }
+
+  .vd-highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .vd-highlights li {
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+  }
+
+  .vd-details {
+    grid-column: 9 / -1;
+    display: grid;
+    gap: var(--s-5);
+    align-content: start;
+  }
+
+  .vd-details dl > div {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    gap: var(--s-4);
+    padding-block: 14px;
+    border-top: 1px solid var(--border);
+    font-size: var(--fs-small);
+  }
+
+  .vd-details dd {
+    margin: 0;
+  }
+
+  .vd-equipment {
+    margin-top: var(--section-m);
+    padding-top: var(--section-s);
+    border-top: 1px solid var(--border);
+    display: grid;
+    gap: var(--s-8);
+  }
+
+  .vd-equipment__groups {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s-7) var(--gutter);
+  }
+
+  .vd-equipment__group {
+    display: grid;
+    gap: var(--s-4);
+    align-content: start;
+  }
+
+  .vd-equipment__group ul {
+    display: grid;
+    gap: 10px;
+    font-size: var(--fs-small);
+  }
+
+  .vd-bar {
+    display: none;
+  }
+
+  @media (max-width: 63.99rem) {
+    .vd-head__title,
+    .vd-head__offer,
+    .vd-story__text,
+    .vd-details {
+      grid-column: 1 / -1;
+    }
+    .vd-specs {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .vd-specs > div:nth-child(3n + 1) {
+      padding-left: 0;
+      border-left: 0;
+    }
+    .vd-specs > div:nth-child(n + 4) {
+      border-top: 1px solid var(--border);
+      margin-top: var(--s-5);
+    }
+    .vd-equipment__groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .vd-hero {
+      height: auto;
+      aspect-ratio: 4 / 5;
+      min-height: 0;
+    }
+    .vd-specs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .vd-specs > div:nth-child(n) {
+      padding-left: 0;
+      border-left: 0;
+    }
+    .vd-specs > div:nth-child(n + 3) {
+      border-top: 1px solid var(--border);
+      margin-top: var(--s-5);
+    }
+    .vd-specs > div:nth-child(2n) {
+      padding-left: var(--s-4);
+      border-left: 1px solid var(--border);
+    }
+    .vd-details dl > div {
+      grid-template-columns: 1fr 1fr;
+    }
+    .vd-equipment__groups {
+      grid-template-columns: 1fr;
+    }
+
+    .vd-bar {
+      position: fixed;
+      inset: auto 0 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s-4);
+      padding: 12px var(--gutter) max(12px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--border);
+      background: color-mix(in srgb, var(--bg) 90%, transparent);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      transform: translateY(110%);
+      transition: transform 500ms var(--ease-emphasis);
+    }
+    .vd-bar.is-visible {
+      transform: none;
+    }
+    .vd-bar .btn {
+      min-height: 44px;
+      padding-block: 12px;
+    }
+  }
+</style>
+
+<script>
+  // Offer bar: visible after the title block, hidden again near the enquiry form.
+  const bar = document.querySelector<HTMLElement>('[data-offer-bar]');
+  const head = document.querySelector('.vd-head');
+  const form = document.getElementById('enquire');
+  if (bar && head && 'IntersectionObserver' in window) {
+    let pastHead = false, atForm = false;
+    const sync = () => {
+      const show = pastHead && !atForm;
+      bar.classList.toggle('is-visible', show);
+      bar.setAttribute('aria-hidden', String(!show));
+      bar.querySelector('a')?.setAttribute('tabindex', show ? '0' : '-1');
+    };
+    new IntersectionObserver(([e]) => { pastHead = !e.isIntersecting && e.boundingClientRect.top < 0; sync(); }).observe(head);
+    if (form) new IntersectionObserver(([e]) => { atForm = e.isIntersecting; sync(); }).observe(form);
+  }
+</script>

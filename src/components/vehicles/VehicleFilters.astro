@@ -1,0 +1,604 @@
+---
+/**
+ * Inventory filters. Progressive enhancement: without JavaScript the bar is
+ * hidden and every vehicle is listed. With JavaScript, the cards rendered on
+ * the server are filtered and sorted in place, and the state is kept in the URL
+ * (?make=Ferrari&body=Spider) so a filtered view can be shared.
+ */
+import type { Vehicle } from '@/lib/inventory';
+import { formatMileage, formatPrice } from '@/lib/format';
+
+interface Props { vehicles: Vehicle[] }
+const { vehicles } = Astro.props;
+
+const uniq = <T,>(arr: T[]) => [...new Set(arr)].sort();
+const makes = uniq(vehicles.map((v) => v.brand));
+const models = uniq(vehicles.map((v) => `${v.brand}|${v.model}`)).map((s) => {
+  const [make, model] = s.split('|');
+  return { make, model };
+});
+const bodies = uniq(vehicles.map((v) => v.bodyType));
+const fuels = uniq(vehicles.map((v) => v.fuel));
+const transmissions = uniq(vehicles.map((v) => v.transmission));
+
+const prices = vehicles.map((v) => v.price).filter((p): p is number => p != null);
+const step = 25000;
+const priceSteps: number[] = [];
+if (prices.length) {
+  for (let p = Math.ceil(Math.min(...prices) / step) * step; p < Math.max(...prices) + step; p += step) priceSteps.push(p);
+}
+const years = uniq(vehicles.map((v) => v.year)).reverse();
+const mileageSteps = [5000, 10000, 25000, 50000, 100000].filter((m) => m <= Math.max(...vehicles.map((v) => v.mileage)) * 1.5);
+---
+
+<div class="fbar" data-filters>
+  <div class="container container--gallery fbar__inner">
+    <div class="fbar__search">
+      <label class="sr-only" for="f-q">Search vehicles</label>
+      <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" /><path d="M13 13l5 5" stroke="currentColor" /></svg>
+      <input id="f-q" type="search" name="q" placeholder="Search make, model, colour" autocomplete="off" data-f />
+    </div>
+
+    <div class="fbar__inline">
+      <label class="fsel">
+        <span class="sr-only">Make</span>
+        <select name="make" data-f>
+          <option value="">All makes</option>
+          {makes.map((m) => <option value={m}>{m}</option>)}
+        </select>
+      </label>
+      <label class="fsel">
+        <span class="sr-only">Body type</span>
+        <select name="body" data-f>
+          <option value="">All body types</option>
+          {bodies.map((b) => <option value={b}>{b}</option>)}
+        </select>
+      </label>
+      <label class="fsel">
+        <span class="sr-only">Sort by</span>
+        <select name="sort" data-f>
+          <option value="">Recommended</option>
+          <option value="price-asc">Price, low to high</option>
+          <option value="price-desc">Price, high to low</option>
+          <option value="year-desc">Newest first</option>
+          <option value="mileage-asc">Lowest mileage</option>
+        </select>
+      </label>
+    </div>
+
+    <button class="fbar__more" type="button" data-open-panel aria-haspopup="dialog" aria-controls="filter-panel">
+      <svg viewBox="0 0 20 14" aria-hidden="true"><path d="M0 3h20M0 11h20" stroke="currentColor" /><circle cx="6" cy="3" r="2.2" fill="var(--bg)" stroke="currentColor" /><circle cx="14" cy="11" r="2.2" fill="var(--bg)" stroke="currentColor" /></svg>
+      Filters <span class="fbar__badge" data-active-count hidden></span>
+    </button>
+  </div>
+  <div class="container container--gallery fbar__status">
+    <p class="t-meta muted" data-count aria-live="polite">{vehicles.length} vehicles</p>
+    <button class="t-meta link" type="button" data-clear hidden>Clear all</button>
+  </div>
+</div>
+
+<dialog class="fpanel" id="filter-panel" data-tone="dark" aria-labelledby="fpanel-title" data-panel>
+  <div class="fpanel__head">
+    <h2 id="fpanel-title" class="t-eyebrow">Refine the collection</h2>
+    <button type="button" class="fpanel__close" data-close-panel aria-label="Close filters">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" /></svg>
+    </button>
+  </div>
+
+  <div class="fpanel__body">
+    <div class="ffield">
+      <label for="p-make">Make</label>
+      <select id="p-make" name="make" data-f>
+        <option value="">All makes</option>
+        {makes.map((m) => <option value={m}>{m}</option>)}
+      </select>
+    </div>
+    <div class="ffield">
+      <label for="p-model">Model</label>
+      <select id="p-model" name="model" data-f>
+        <option value="">All models</option>
+        {models.map((m) => <option value={m.model} data-make={m.make}>{m.make} {m.model}</option>)}
+      </select>
+    </div>
+    <div class="ffield">
+      <label for="p-price">Maximum price</label>
+      <select id="p-price" name="priceMax" data-f>
+        <option value="">Any price</option>
+        {priceSteps.map((p) => <option value={p}>Up to {formatPrice(p)}</option>)}
+      </select>
+    </div>
+    <div class="ffield">
+      <label for="p-year">Year</label>
+      <select id="p-year" name="yearMin" data-f>
+        <option value="">Any year</option>
+        {years.map((y) => <option value={y}>{y} or newer</option>)}
+      </select>
+    </div>
+    <div class="ffield">
+      <label for="p-mileage">Mileage</label>
+      <select id="p-mileage" name="mileageMax" data-f>
+        <option value="">Any mileage</option>
+        {mileageSteps.map((m) => <option value={m}>Up to {formatMileage(m)}</option>)}
+      </select>
+    </div>
+
+    <fieldset class="ffield fchips">
+      <legend>Fuel</legend>
+      <div>{fuels.map((f) => <label class="fchip"><input type="radio" name="fuel" value={f} data-f /><span>{f}</span></label>)}<label class="fchip"><input type="radio" name="fuel" value="" data-f checked /><span>Any</span></label></div>
+    </fieldset>
+    <fieldset class="ffield fchips">
+      <legend>Transmission</legend>
+      <div>{transmissions.map((t) => <label class="fchip"><input type="radio" name="transmission" value={t} data-f /><span>{t}</span></label>)}<label class="fchip"><input type="radio" name="transmission" value="" data-f checked /><span>Any</span></label></div>
+    </fieldset>
+    <fieldset class="ffield fchips">
+      <legend>Body type</legend>
+      <div>{bodies.map((b) => <label class="fchip"><input type="radio" name="body" value={b} data-f /><span>{b}</span></label>)}<label class="fchip"><input type="radio" name="body" value="" data-f checked /><span>Any</span></label></div>
+    </fieldset>
+  </div>
+
+  <div class="fpanel__foot">
+    <button type="button" class="link t-meta" data-clear>Clear all</button>
+    <button type="button" class="btn btn--primary" data-close-panel data-show-count>Show {vehicles.length} vehicles</button>
+  </div>
+</dialog>
+
+<style>
+  .fbar {
+    display: none;
+    position: sticky;
+    top: var(--header-h);
+    z-index: 20;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border-block: 1px solid var(--border);
+  }
+
+  :global(.js) .fbar {
+    display: block;
+  }
+
+  .fbar__inner {
+    display: flex;
+    align-items: stretch;
+    gap: var(--s-5);
+    min-height: 64px;
+  }
+
+  .fbar__search {
+    flex: 1 1 18rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .fbar__search svg {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    opacity: 0.7;
+  }
+
+  .fbar__search input {
+    width: 100%;
+    min-height: 44px;
+    border: 0;
+    background: transparent;
+    font-size: var(--fs-body);
+  }
+
+  .fbar__search input::placeholder {
+    color: var(--muted);
+  }
+
+  .fbar__search input:focus-visible {
+    outline: none;
+  }
+
+  .fbar__search:focus-within {
+    box-shadow: inset 0 -1px 0 var(--fg);
+  }
+
+  .fbar__inline {
+    display: flex;
+    border-left: 1px solid var(--border);
+  }
+
+  .fsel {
+    position: relative;
+    display: flex;
+    border-right: 1px solid var(--border);
+  }
+
+  .fsel::after {
+    content: '';
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-right: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+
+  .fsel select {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 0 44px 0 20px;
+    min-height: 44px;
+    font-size: var(--fs-small);
+    cursor: pointer;
+  }
+
+  .fsel select option,
+  .ffield select option {
+    background: var(--bg);
+    color: var(--fg);
+  }
+
+  .fbar__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding-inline: 4px;
+    min-height: 44px;
+    font-size: var(--fs-caption);
+    font-weight: 500;
+    font-stretch: 114%;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .fbar__more svg {
+    width: 18px;
+    height: 14px;
+  }
+
+  .fbar__badge {
+    display: inline-grid;
+    place-items: center;
+    min-width: 20px;
+    height: 20px;
+    padding-inline: 5px;
+    border-radius: 10px;
+    background: var(--accent);
+    color: var(--accent-contrast);
+    font-size: 0.6875rem;
+    letter-spacing: 0;
+  }
+
+  .fbar__badge[hidden] {
+    display: none;
+  }
+
+  .fbar__status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 40px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 63.99rem) {
+    .fbar__inline {
+      display: none;
+    }
+  }
+
+  /* ---- Panel: side sheet on desktop, bottom sheet on mobile ---- */
+  .fpanel {
+    margin: 0 0 0 auto;
+    width: min(460px, 100%);
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    padding: 0;
+    border: 0;
+    border-left: 1px solid var(--border);
+    display: none;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition:
+      transform 520ms var(--ease-emphasis),
+      display 520ms allow-discrete,
+      overlay 520ms allow-discrete;
+  }
+
+  .fpanel[open] {
+    display: flex;
+    transform: none;
+  }
+
+  @starting-style {
+    .fpanel[open] {
+      transform: translateX(100%);
+    }
+  }
+
+  .fpanel::backdrop {
+    background: rgb(0 0 0 / 0.5);
+    transition: background-color 400ms, display 400ms allow-discrete, overlay 400ms allow-discrete;
+  }
+
+  @starting-style {
+    .fpanel[open]::backdrop {
+      background: rgb(0 0 0 / 0);
+    }
+  }
+
+  .fpanel__head,
+  .fpanel__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-5);
+    padding: var(--s-5) var(--s-6);
+  }
+
+  .fpanel__head {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .fpanel__foot {
+    border-top: 1px solid var(--border);
+    padding-bottom: max(var(--s-5), env(safe-area-inset-bottom));
+  }
+
+  .fpanel__close {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-right: -12px;
+  }
+
+  .fpanel__close svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .fpanel__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--s-6);
+    display: grid;
+    align-content: start;
+    gap: var(--s-6);
+  }
+
+  .ffield {
+    display: grid;
+    gap: 10px;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+
+  .ffield label,
+  .ffield legend {
+    padding: 0;
+    font-size: var(--fs-eyebrow);
+    font-weight: 500;
+    font-stretch: 116%;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .ffield legend {
+    margin-bottom: 10px;
+  }
+
+  .ffield select {
+    appearance: none;
+    width: 100%;
+    min-height: 48px;
+    padding: 0 36px 0 0;
+    border: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
+    border-radius: 0;
+    background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23999' stroke-width='1.2'/%3E%3C/svg%3E") no-repeat right 4px center / 12px 8px;
+    font-size: var(--fs-body);
+  }
+
+  .fchips > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .fchip {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .fchip input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+  }
+
+  .fchip span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-s);
+    font-size: var(--fs-small);
+    letter-spacing: 0;
+    text-transform: none;
+    font-stretch: 100%;
+    color: var(--fg);
+    transition: background-color var(--dur-micro), border-color var(--dur-micro), color var(--dur-micro);
+  }
+
+  .fchip:hover span {
+    border-color: var(--fg);
+  }
+
+  .fchip input:checked + span {
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
+  }
+
+  .fchip input:focus-visible + span {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 47.99rem) {
+    .fpanel {
+      margin: auto 0 0;
+      width: 100%;
+      height: auto;
+      max-height: 88dvh;
+      border-left: 0;
+      border-top: 1px solid var(--border);
+      border-radius: 10px 10px 0 0;
+      transform: translateY(100%);
+    }
+    @starting-style {
+      .fpanel[open] {
+        transform: translateY(100%);
+      }
+    }
+    .fpanel__head,
+    .fpanel__foot,
+    .fpanel__body {
+      padding-inline: var(--gutter);
+    }
+  }
+
+  :global(html:has(.fpanel[open])) {
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  type State = Record<string, string>;
+  const KEYS = ['q', 'make', 'model', 'body', 'fuel', 'transmission', 'priceMax', 'yearMin', 'mileageMax', 'sort'];
+
+  const root = document.querySelector<HTMLElement>('[data-filters]');
+  const panel = document.querySelector<HTMLDialogElement>('[data-panel]');
+  const list = document.querySelector<HTMLElement>('[data-results]');
+  const empty = document.querySelector<HTMLElement>('[data-empty]');
+
+  if (root && panel && list) {
+    const items = [...list.querySelectorAll<HTMLElement>('[data-vehicle]')];
+    const controls = [...document.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-f]')];
+    const countEl = root.querySelector<HTMLElement>('[data-count]')!;
+    const badge = root.querySelector<HTMLElement>('[data-active-count]')!;
+    const showBtn = panel.querySelector<HTMLElement>('[data-show-count]')!;
+    const clearBtns = document.querySelectorAll<HTMLElement>('[data-clear]');
+    const modelOptions = [...panel.querySelectorAll<HTMLOptionElement>('select[name="model"] option[data-make]')];
+
+    const readUrl = (): State => {
+      const params = new URLSearchParams(location.search);
+      return Object.fromEntries(KEYS.map((k) => [k, params.get(k) ?? '']));
+    };
+
+    let state: State = readUrl();
+
+    // Keep every control with the same name in sync (inline bar ↔ panel).
+    const render = () => {
+      for (const c of controls) {
+        const v = state[c.name] ?? '';
+        if (c instanceof HTMLInputElement && c.type === 'radio') c.checked = c.value === v;
+        else if (c.value !== v && document.activeElement !== c) c.value = v;
+      }
+      // Models follow the chosen make.
+      modelOptions.forEach((o) => (o.hidden = !!state.make && o.dataset.make !== state.make));
+    };
+
+    const apply = () => {
+      const q = state.q.trim().toLowerCase();
+      const terms = q ? q.split(/\s+/) : [];
+      let visible = 0;
+      for (const el of items) {
+        const d = el.dataset;
+        const price = d.price ? Number(d.price) : null;
+        const ok =
+          terms.every((t) => d.search!.includes(t)) &&
+          (!state.make || d.make === state.make) &&
+          (!state.model || d.model === state.model) &&
+          (!state.body || d.body === state.body) &&
+          (!state.fuel || d.fuel === state.fuel) &&
+          (!state.transmission || d.transmission === state.transmission) &&
+          (!state.priceMax || (price != null && price <= Number(state.priceMax))) &&
+          (!state.yearMin || Number(d.year) >= Number(state.yearMin)) &&
+          (!state.mileageMax || Number(d.mileage) <= Number(state.mileageMax));
+        el.hidden = !ok;
+        if (ok) visible++;
+      }
+
+      // Sort in place. "Price on request" sorts last in either direction.
+      const num = (el: HTMLElement, k: string) => (el.dataset[k] ? Number(el.dataset[k]) : NaN);
+      const sorted = [...items].sort((a, b) => {
+        switch (state.sort) {
+          case 'price-asc':
+          case 'price-desc': {
+            const pa = num(a, 'price'), pb = num(b, 'price');
+            if (isNaN(pa) || isNaN(pb)) return isNaN(pa) ? (isNaN(pb) ? 0 : 1) : -1;
+            return state.sort === 'price-asc' ? pa - pb : pb - pa;
+          }
+          case 'year-desc':
+            return num(b, 'year') - num(a, 'year');
+          case 'mileage-asc':
+            return num(a, 'mileage') - num(b, 'mileage');
+          default:
+            return num(a, 'order') - num(b, 'order');
+        }
+      });
+      sorted.forEach((el) => list.appendChild(el));
+
+      const active = KEYS.filter((k) => k !== 'sort' && k !== 'q' && state[k]).length + (state.q ? 1 : 0);
+      countEl.textContent = `${visible} ${visible === 1 ? 'vehicle' : 'vehicles'}${active ? ' match' : ''}`;
+      showBtn.textContent = visible ? `Show ${visible} ${visible === 1 ? 'vehicle' : 'vehicles'}` : 'No matches';
+      badge.hidden = !active;
+      badge.textContent = String(active);
+      clearBtns.forEach((b) => (b.hidden = !active && !state.sort));
+      if (empty) empty.hidden = visible > 0;
+
+      const params = new URLSearchParams();
+      KEYS.forEach((k) => state[k] && params.set(k, state[k]));
+      const qs = params.toString();
+      history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+    };
+
+    const onChange = (e: Event) => {
+      const c = e.target as HTMLInputElement | HTMLSelectElement;
+      if (!c.name) return;
+      state = { ...state, [c.name]: c.value };
+      if (c.name === 'make' && state.model) {
+        const stillValid = modelOptions.some((o) => o.value === state.model && (!state.make || o.dataset.make === state.make));
+        if (!stillValid) state.model = '';
+      }
+      render();
+      apply();
+    };
+
+    controls.forEach((c) => c.addEventListener(c.type === 'search' ? 'input' : 'change', onChange));
+    clearBtns.forEach((b) =>
+      b.addEventListener('click', () => {
+        state = Object.fromEntries(KEYS.map((k) => [k, '']));
+        render();
+        apply();
+      }),
+    );
+
+    root.querySelector('[data-open-panel]')?.addEventListener('click', () => panel.showModal());
+    panel.querySelectorAll('[data-close-panel]').forEach((b) => b.addEventListener('click', () => panel.close()));
+    panel.addEventListener('click', (e) => e.target === panel && panel.close());
+
+    render();
+    apply();
+  }
+</script>

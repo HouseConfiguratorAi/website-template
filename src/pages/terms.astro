@@ -1,0 +1,16 @@
+---
+import LegalPage from '@/components/sections/LegalPage.astro';
+import { site } from '@/config/site';
+---
+
+<LegalPage title="Terms" description={`Terms of use for the ${site.name} website.`} updated="September 2026">
+  <p>These terms apply to your use of this website. By using it, you accept them.</p>
+  <h2>Vehicle information</h2>
+  <p>We describe every vehicle as accurately as we can. Specifications, mileage and equipment are provided in good faith and should be confirmed at a viewing. Prices include VAT where applicable and may change without notice. A vehicle is only reserved once confirmed in writing.</p>
+  <h2>Photography</h2>
+  <p>All photographs on this website are the property of {site.legalName} and may not be reused without permission.</p>
+  <h2>Liability</h2>
+  <p>We are not liable for decisions made solely on the basis of information on this website.</p>
+  <h2>Governing law</h2>
+  <p>These terms are governed by the law of the country in which {site.legalName} is registered.</p>
+</LegalPage>

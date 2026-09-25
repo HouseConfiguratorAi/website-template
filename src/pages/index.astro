@@ -1,0 +1,34 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/home/Hero.astro';
+import Statement from '@/components/home/Statement.astro';
+import FeaturedVehicle from '@/components/home/FeaturedVehicle.astro';
+import Collection from '@/components/home/Collection.astro';
+import JournalSection from '@/components/home/JournalSection.astro';
+import StorySection from '@/components/sections/StorySection.astro';
+import ServicesList from '@/components/sections/ServicesList.astro';
+import LocationSection from '@/components/sections/LocationSection.astro';
+import ContactSection from '@/components/sections/ContactSection.astro';
+import FinalCTA from '@/components/sections/FinalCTA.astro';
+import { home } from '@/config/content';
+import { getFeaturedVehicle, getListedVehicles } from '@/lib/inventory';
+import { dealerLd } from '@/lib/seo';
+
+const featured = await getFeaturedVehicle();
+// The homepage shows photographed cars only; incoming cars live on /vehicles.
+const collection = (await getListedVehicles()).filter((v) => v.slug !== featured.slug && v.images.length).slice(0, 4);
+const p = home.philosophy;
+---
+
+<BaseLayout title={home.seo.title} description={home.seo.description} jsonLd={dealerLd()}>
+  <Hero />
+  <Statement />
+  <FeaturedVehicle vehicle={featured} />
+  <Collection vehicles={collection} />
+  <StorySection layout="scene" eyebrow={p.eyebrow} headline={p.headline} body={p.body} cta={p.cta} image={p.image} imageAlt={p.imageAlt} focal="40% 50%" />
+  <ServicesList eyebrow={home.services.eyebrow} headline={home.services.headline} cta={home.services.cta} />
+  <JournalSection />
+  <LocationSection />
+  <ContactSection eyebrow={home.contact.eyebrow} headline={home.contact.headline} body={home.contact.body} />
+  <FinalCTA />
+</BaseLayout>

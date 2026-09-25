@@ -1,0 +1,103 @@
+---
+import type { Post } from '@/lib/journal';
+import { postUrl } from '@/lib/journal';
+import { formatDate } from '@/lib/format';
+import Media from '@/components/ui/Media.astro';
+
+interface Props {
+  post: Post;
+  variant?: 'feature' | 'compact' | 'grid';
+  headingLevel?: 'h2' | 'h3';
+  delay?: number;
+}
+const { post, variant = 'compact', headingLevel: H = 'h3', delay = 0 } = Astro.props;
+const d = post.data;
+const sizes = variant === 'feature' ? '(min-width: 64rem) 60vw, 100vw' : variant === 'grid' ? '(min-width: 64rem) 33vw, 100vw' : '(min-width: 64rem) 12vw, 30vw';
+---
+
+<article class:list={['jcard', `jcard--${variant}`]} data-reveal style={`--delay:${delay}ms`}>
+  <a class="jcard__link" href={postUrl(post)} data-cursor="Read">
+    <div class="jcard__media media">
+      <Media src={d.cover} alt={d.coverAlt} sizes={sizes} transitionName={variant !== 'compact' ? `post-${post.id}` : undefined} />
+    </div>
+    <div class="jcard__body">
+      <p class="jcard__meta t-eyebrow muted">
+        <span>{d.category}</span>
+        <time datetime={d.date.toISOString()}>{formatDate(d.date)}</time>
+      </p>
+      <H class="jcard__title">{d.title}</H>
+      {variant !== 'compact' && <p class="jcard__excerpt t-body muted">{d.excerpt}</p>}
+    </div>
+  </a>
+</article>
+
+<style>
+  .jcard__link {
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  .jcard__media :global(img) {
+    transition: transform 1400ms var(--ease-emphasis);
+  }
+
+  .jcard__link:hover .jcard__media :global(img) {
+    transform: scale(1.04);
+  }
+
+  .jcard__link:hover .jcard__title {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.16em;
+  }
+
+  .jcard__body {
+    display: grid;
+    gap: var(--s-3);
+    align-content: start;
+  }
+
+  .jcard__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+  }
+
+  .jcard__title {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-stretch: var(--display-stretch);
+    letter-spacing: var(--display-tracking);
+    line-height: 1.06;
+    text-wrap: balance;
+  }
+
+  .jcard--feature .jcard__media {
+    aspect-ratio: 16 / 10;
+  }
+  .jcard--feature .jcard__title {
+    font-size: clamp(2rem, 1.3rem + 2.8vw, 4rem);
+  }
+  .jcard--feature .jcard__excerpt {
+    max-width: 34rem;
+  }
+
+  .jcard--grid .jcard__media {
+    aspect-ratio: 4 / 5;
+  }
+  .jcard--grid .jcard__title {
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  }
+
+  .jcard--compact .jcard__link {
+    grid-template-columns: minmax(96px, 30%) 1fr;
+    align-items: center;
+    gap: var(--s-5);
+  }
+  .jcard--compact .jcard__media {
+    aspect-ratio: 1;
+  }
+  .jcard--compact .jcard__title {
+    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
+  }
+</style>

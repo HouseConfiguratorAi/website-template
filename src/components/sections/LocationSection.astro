@@ -1,0 +1,159 @@
+---
+/** The physical place as part of the brand: architecture first, details overlaid. */
+import { contact } from '@/config/site';
+import { home } from '@/config/content';
+import { rich } from '@/lib/text';
+import Media from '@/components/ui/Media.astro';
+import Arrow from '@/components/ui/Arrow.astro';
+
+const l = home.location;
+---
+
+<section class="location" data-tone="dark" data-scene="through">
+  <div class="location__media" aria-hidden="false">
+    <div class="location__drift"><Media src={l.image} alt={l.imageAlt} sizes="100vw" focal="40% 50%" /></div>
+  </div>
+  <div class="location__veil" aria-hidden="true"></div>
+  <div class="container container--gallery location__inner">
+    <div class="location__intro">
+      <p class="t-eyebrow eyebrow-row" data-reveal="fade">{l.eyebrow}</p>
+      <h2 class="t-headline" data-reveal set:html={rich(l.headline)} />
+      <p class="t-body location__body" data-reveal>{l.body}</p>
+    </div>
+    <div class="location__card" data-reveal style="--delay:150ms">
+      <p class="location__city">{contact.address.city}</p>
+      <dl class="location__facts">
+        <div>
+          <dt class="t-eyebrow muted">Address</dt>
+          <dd>
+            <address>{contact.address.street}<br />{contact.address.postalCode} {contact.address.city}</address>
+          </dd>
+        </div>
+        <div>
+          <dt class="t-eyebrow muted">Opening hours</dt>
+          <dd>
+            <ul role="list">{contact.hours.map((h) => <li><span>{h.days}</span><span class="muted">{h.time}</span></li>)}</ul>
+          </dd>
+        </div>
+        <div>
+          <dt class="t-eyebrow muted">Contact</dt>
+          <dd class="location__links">
+            <a class="link" href={`tel:${contact.phoneHref}`}>{contact.phone}</a>
+            <a class="link" href={`mailto:${contact.email}`}>{contact.email}</a>
+          </dd>
+        </div>
+      </dl>
+      <a class="link-arrow" href={contact.directionsUrl} target="_blank" rel="noopener">Directions<span class="sr-only"> (opens in a new tab)</span> <Arrow direction="up-right" /></a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .location {
+    position: relative;
+    overflow: clip;
+    isolation: isolate;
+    padding-block: var(--section-l);
+    min-height: 100svh;
+    display: grid;
+    align-items: end;
+  }
+  .location__media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .location__drift {
+    height: 116%;
+    margin-top: -8%;
+    transform: translate3d(0, calc((var(--p, 0.5) - 0.5) * -12%), 0);
+    will-change: transform;
+  }
+  .location__veil {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(to top, rgb(8 8 8 / 0.85), rgb(8 8 8 / 0.2) 60%, rgb(8 8 8 / 0.35)),
+      linear-gradient(to right, rgb(8 8 8 / 0.5), transparent 50%);
+  }
+  .location__inner {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--s-8);
+    align-items: end;
+  }
+  .location__intro {
+    grid-column: 1 / span 6;
+    display: grid;
+    gap: var(--s-5);
+  }
+  .location__body {
+    max-width: 30rem;
+    color: color-mix(in srgb, var(--fg) 85%, transparent);
+  }
+  .location__card {
+    grid-column: 8 / -1;
+    display: grid;
+    gap: var(--s-6);
+    justify-items: start;
+    padding: clamp(24px, 1rem + 2vw, 48px);
+    background: color-mix(in srgb, var(--bg) 70%, transparent);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-img);
+  }
+  .location__city {
+    font-family: var(--font-sans);
+    font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.5rem);
+    font-weight: 500;
+    font-stretch: 125%;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .location__facts {
+    width: 100%;
+    display: grid;
+    gap: var(--s-5);
+    font-size: var(--fs-small);
+  }
+  .location__facts > div {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: var(--s-4);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--border);
+  }
+  .location__facts dd {
+    margin: 0;
+  }
+  .location__facts address {
+    font-style: normal;
+  }
+  .location__facts li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 var(--s-4);
+  }
+  .location__links {
+    display: grid;
+    justify-items: start;
+    gap: 4px;
+  }
+  @media (max-width: 63.99rem) {
+    .location__intro,
+    .location__card {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 29.99rem) {
+    .location__facts > div {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+</style>
