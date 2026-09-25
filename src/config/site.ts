@@ -96,13 +96,13 @@ export type NavItem = { label: string; href: string };
 
 export const navigation = {
   primary: [
-    { label: 'Aanbod', href: '/aanbod' },
+    { label: 'Voorraad', href: '/voorraad' },
     { label: 'Diensten', href: '/diensten' },
     { label: 'Over ons', href: '/over-ons' },
     { label: 'Magazine', href: '/magazine' },
     { label: 'Contact', href: '/contact' },
   ] satisfies NavItem[],
-  cta: { label: 'Bekijk aanbod', href: '/aanbod' },
+  cta: { label: 'Bekijk voorraad', href: '/voorraad' },
   legal: [
     { label: 'Privacy', href: '/privacy' },
     { label: 'Voorwaarden', href: '/voorwaarden' },

@@ -26,13 +26,13 @@ Node 20+ is recommended.
 | Route | What it is |
 | --- | --- |
 | `/` | Homepage: hero, statement, featured vehicle, collection, name band, philosophy scene, services, magazine, location, enquiry, closing scene |
-| `/aanbod` | Inventory with search, filters, sorting and shareable URLs |
-| `/aanbod/[slug]` | Vehicle detail, generated for every vehicle in the data |
+| `/voorraad` | Inventory: status tiles that filter, search, filters, sorting, grid/list view, shareable URLs |
+| `/voorraad/[slug]` | Vehicle detail, generated for every vehicle in the data |
 | `/over-ons`, `/diensten`, `/contact` | Company pages |
 | `/magazine`, `/magazine/[slug]` | Editorial articles from Markdown |
 | `/privacy`, `/voorwaarden`, `/404` | Legal pages and not-found page |
 
-The earlier English URLs (`/vehicles`, `/about`, `/journal/…` …) redirect to
+The earlier URLs (`/vehicles`, `/aanbod`, `/about`, `/journal/…` …) redirect to
 their Dutch equivalents; see `redirects` in `astro.config.mjs`.
 
 ### Language
@@ -175,6 +175,7 @@ without an animation library.
 - **Scroll scenes:** reveals, camera moves and layered depth are driven by a single `--p` CSS variable, computed only for scenes on screen.
 - **Flow band:** a band of the collection's names flows continuously, speeds up and reverses with the scroll, and slows under the pointer.
 - **Header:** it steps out of the way while reading down and returns on scroll up, with a red reading-progress line.
+- **Phones:** a quick-action bar (Voorraad, Bellen, Contact) slides in after the first screen; the homepage collection becomes a swipe carousel; equipment lists fold. Vehicle pages use their own price bar instead (`dock={false}` on `BaseLayout`).
 - **Key figures:** power, 0–100 km/h, top speed and mileage shown large and counted up once when they come into view (`src/components/vehicles/KeyFigures.astro`). Add `performance: { accel, topSpeed }` to a vehicle to show them.
 - **Micro-interactions:** rolling button labels, magnetic primary buttons, card photos that drift with the pointer, and a red line drawn under a card image on hover.
 - **Page transitions:** a card image expands into the vehicle page (Chrome, Edge, Safari 18.2+).

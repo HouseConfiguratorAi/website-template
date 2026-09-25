@@ -208,6 +208,33 @@ const { eyebrow, index, headline, cta, linkRows = true } = Astro.props;
       display: none;
     }
   }
+
+  /* Phones: a shorter sticky frame and denser rows, so image and text share the screen. */
+  @media (max-width: 47.99rem) {
+    .services__grid {
+      row-gap: var(--s-6);
+    }
+    .services__frame {
+      aspect-ratio: 16 / 9;
+    }
+    .services__row {
+      grid-template-columns: 1fr;
+      padding-block: 18px;
+      padding-left: 14px;
+    }
+    .services__row .t-index {
+      display: none;
+    }
+    .services__summary {
+      grid-column: 1;
+    }
+    .services__title {
+      font-size: 1.625rem;
+    }
+    .services__item[data-active] .services__title {
+      transform: translateX(4px);
+    }
+  }
 </style>
 
 <script>

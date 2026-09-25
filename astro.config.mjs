@@ -12,8 +12,10 @@ export default defineConfig({
   integrations: [sitemap()],
   // Old English URLs keep working after the move to Dutch routes.
   redirects: {
-    '/vehicles': '/aanbod',
-    '/vehicles/[slug]': '/aanbod/[slug]',
+    '/vehicles': '/voorraad',
+    '/aanbod': '/voorraad',
+    '/aanbod/[slug]': '/voorraad/[slug]',
+    '/vehicles/[slug]': '/voorraad/[slug]',
     '/about': '/over-ons',
     '/services': '/diensten',
     '/journal': '/magazine',

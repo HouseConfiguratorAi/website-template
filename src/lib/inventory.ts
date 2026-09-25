@@ -40,7 +40,7 @@ export function vehicleTitle(v: Vehicle) {
 }
 
 export function vehicleUrl(v: Pick<Vehicle, 'slug'>) {
-  return `/aanbod/${v.slug}`;
+  return `/voorraad/${v.slug}`;
 }
 
 export function coverImage(v: Vehicle) {

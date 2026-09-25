@@ -10,6 +10,7 @@ import { resolveMedia } from '@/lib/media';
 import SiteHeader from '@/components/layout/SiteHeader.astro';
 import SiteFooter from '@/components/layout/SiteFooter.astro';
 import Cursor from '@/components/ui/Cursor.astro';
+import MobileDock from '@/components/layout/MobileDock.astro';
 
 interface Props {
   title?: string;
@@ -21,9 +22,11 @@ interface Props {
   noindex?: boolean;
   /** Hide the footer's closing border, e.g. when the page ends on a full-bleed scene. */
   bareFooter?: boolean;
+  /** Show the quick-action bar on phones (off where a page has its own sticky actions). */
+  dock?: boolean;
 }
 
-const { title, description = site.description, image = site.ogImage, type = 'website', jsonLd, noindex = false } = Astro.props;
+const { title, description = site.description, image = site.ogImage, type = 'website', jsonLd, noindex = false, dock = true } = Astro.props;
 
 const fullTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.description.split('.')[0]}`;
 const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', site.url).href;
@@ -103,6 +106,7 @@ const graph = [
       <slot />
     </main>
     <SiteFooter />
+    {dock && <MobileDock />}
     <Cursor />
     <script>
       import '@/scripts/motion';
