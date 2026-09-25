@@ -3,18 +3,16 @@ import { home } from '@/config/content';
 import { plain, splitWords } from '@/lib/text';
 import Label from '@/components/ui/Label.astro';
 
-interface Props { index?: string }
-const { index } = Astro.props;
 const s = home.statement;
 ---
 
 <section class="statement" data-tone="light">
-  <div class="container container--gallery statement__grid">
-    <Label text={s.eyebrow} index={index} class="statement__label" />
+  <div class="container statement__inner">
+    <Label text={s.eyebrow} align="center" />
     <h2 class="t-display statement__text" data-split>
       <span class="sr-only">{plain(s.lines.join(' '))}</span>
       <span aria-hidden="true">
-        {s.lines.map((line, n) => <span class="statement__line" style={`--delay:${n * 180}ms`} set:html={splitWords(line)} />)}
+        {s.lines.map((line) => <span class="statement__line" set:html={splitWords(line)} />)}
       </span>
     </h2>
     <p class="t-lead statement__body" data-reveal style="--delay:300ms">{s.body}</p>
@@ -23,54 +21,28 @@ const s = home.statement;
 
 <style>
   .statement {
-    padding-block: var(--section-l) var(--section-xl);
+    padding-block: var(--section-l);
   }
 
-  .statement__grid {
+  .statement__inner {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--gutter);
-    row-gap: var(--section-s);
-  }
-
-  :global(.statement__label) {
-    grid-column: 1 / -1;
+    justify-items: center;
+    gap: var(--s-7);
+    text-align: center;
   }
 
   .statement__text {
-    grid-column: 1 / -1;
-    font-size: clamp(2.9rem, 0.9rem + 7.6vw, 9.5rem);
-    line-height: 0.9;
+    max-width: 20ch;
+    font-size: clamp(1.9rem, 0.9rem + 3.6vw, 4.5rem);
+    line-height: 1;
   }
 
   .statement__line {
     display: block;
   }
 
-  /* The second line steps in — an editorial indent rather than a centred block. */
-  .statement__line:nth-child(2) {
-    padding-left: 16.66%;
-  }
-
   .statement__body {
-    grid-column: 7 / span 5;
-    max-width: 28em;
-    padding-top: var(--s-5);
-    border-top: 2px solid var(--accent-ink);
-  }
-
-  @media (max-width: 63.99rem) {
-    .statement__body {
-      grid-column: 3 / -1;
-    }
-  }
-
-  @media (max-width: 47.99rem) {
-    .statement__line:nth-child(2) {
-      padding-left: 0;
-    }
-    .statement__body {
-      grid-column: 1 / -1;
-    }
+    max-width: 30em;
+    color: var(--muted);
   }
 </style>

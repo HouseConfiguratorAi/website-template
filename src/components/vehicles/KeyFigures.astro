@@ -1,0 +1,121 @@
+---
+/**
+ * Large key figures in a row — value, small unit, label underneath.
+ * Numbers count up once when the strip scrolls into view (motion only);
+ * the final values are in the HTML, so nothing depends on the script.
+ */
+import type { KeyFigure } from '@/lib/specs';
+import { site } from '@/config/site';
+
+interface Props { figures: KeyFigure[]; class?: string }
+const { figures, class: className } = Astro.props;
+---
+
+<dl class:list={['figures', className]} data-figures data-locale={site.locale}>
+  {
+    figures.map((f, i) => (
+      <div class="figures__item" data-reveal style={`--delay:${i * 90}ms`}>
+        <dt class="t-meta muted">{f.label}</dt>
+        <dd>
+          <span class="figures__value" data-to={f.value ?? undefined} data-decimals={f.decimals ?? 0} style={f.value != null ? `min-width:${f.display.replace(/[.,]/g, '').length}ch` : undefined}>{f.display}</span>
+          {f.unit && <span class="figures__unit">{f.unit}</span>}
+        </dd>
+      </div>
+    ))
+  }
+</dl>
+
+<style>
+  .figures {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--border);
+  }
+
+  .figures__item {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: var(--s-6) var(--s-5) 0;
+    text-align: center;
+  }
+
+  .figures__item + .figures__item {
+    border-left: 1px solid var(--border);
+  }
+
+  .figures dd {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.25em;
+    white-space: nowrap;
+  }
+
+  .figures__value {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-stretch: var(--display-stretch);
+    font-size: clamp(2.2rem, 1.3rem + 2.8vw, 4.25rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums lining-nums;
+    /* Reserved width (inline min-width) keeps the row still while numbers count. */
+    text-align: right;
+  }
+
+  .figures__unit {
+    font-size: clamp(0.875rem, 0.8rem + 0.3vw, 1.125rem);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+
+  @media (max-width: 47.99rem) {
+    .figures {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .figures__item + .figures__item:nth-child(3) {
+      border-left: 0;
+    }
+    .figures__item:nth-child(n + 3) {
+      margin-top: var(--s-6);
+      border-top: 1px solid var(--border);
+    }
+    .figures__item {
+      padding-inline: var(--s-3);
+    }
+  }
+</style>
+
+<script>
+  const ease = (t: number) => 1 - Math.pow(1 - t, 4);
+  document.querySelectorAll<HTMLElement>('[data-figures]').forEach((root) => {
+    if (!document.documentElement.classList.contains('motion') || !('IntersectionObserver' in window)) return;
+    const fmt = (n: number, d: number) =>
+      new Intl.NumberFormat(root.dataset.locale, { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
+    const values = [...root.querySelectorAll<HTMLElement>('[data-to]')];
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        const start = performance.now();
+        const dur = 1600;
+        const tick = (now: number) => {
+          const t = Math.min(1, (now - start) / dur);
+          for (const el of values) {
+            const to = Number(el.dataset.to);
+            const d = Number(el.dataset.decimals) || 0;
+            el.textContent = fmt(to * ease(t), d);
+          }
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(root);
+  });
+</script>

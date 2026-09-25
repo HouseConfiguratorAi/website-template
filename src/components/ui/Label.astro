@@ -1,7 +1,8 @@
 ---
 /**
- * Section label: a mono index and an eyebrow, optionally on a hairline rule.
- * The index gives every page the rhythm of a numbered specification sheet.
+ * Section label: small tracked capitals, optionally with an index, a
+ * right-aligned detail and a hairline rule. Centred labels get a short
+ * brand-colour rule underneath instead.
  */
 interface Props {
   text: string;
@@ -9,13 +10,14 @@ interface Props {
   /** Right-aligned detail, e.g. a count or date. */
   meta?: string;
   rule?: boolean;
+  align?: 'start' | 'center';
   class?: string;
 }
-const { text, index, meta, rule = true, class: className } = Astro.props;
+const { text, index, meta, rule = false, align = 'start', class: className } = Astro.props;
 ---
 
-<p class:list={['label', { 'label--rule': rule }, className]} data-reveal="fade">
-  {index && <span class="t-index">({index})</span>}
+<p class:list={['label', `label--${align}`, { 'label--rule': rule }, className]} data-reveal="fade">
+  {index && <span class="t-index">{index}</span>}
   <span class="t-eyebrow">{text}</span>
   {meta && <span class="label__meta t-meta">{meta}</span>}
 </p>
@@ -32,10 +34,25 @@ const { text, index, meta, rule = true, class: className } = Astro.props;
     border-top: 1px solid var(--border);
   }
   .label .t-eyebrow {
-    color: var(--fg);
+    color: var(--muted);
   }
   .label__meta {
     margin-left: auto;
-    color: var(--muted);
+  }
+  .label--center {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+  }
+  .label--center::after {
+    content: '';
+    order: 3;
+    width: 28px;
+    height: 2px;
+    background: var(--accent);
+  }
+  .label--center .label__meta {
+    margin-left: 0;
   }
 </style>

@@ -62,7 +62,7 @@ const overlay = layout === 'scene' || layout === 'background';
     </div>
     {overlay && <div class="story__veil" aria-hidden="true" />}
     <div class="story__copy">
-      {eyebrow && <Label text={eyebrow} index={index} rule={!overlay} />}
+      {eyebrow && <Label text={eyebrow} index={index} />}
       <Heading as={H} size={size === 'large' ? 'headline' : 'title'} text={headline} reveal={layout === 'scene' ? 'none' : 'scroll'} />
       {
         body.length > 0 && (

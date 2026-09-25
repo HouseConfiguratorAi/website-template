@@ -35,7 +35,7 @@ const ldImage = m?.type === 'local' ? new URL((await getImage({ src: m.meta, wid
   type="article"
   jsonLd={[
     articleLd({ title: d.title, description: d.excerpt, date: d.date, url: postUrl(post), image: ldImage, author: d.author }),
-    breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Journal', path: '/journal' }, { name: d.title, path: postUrl(post) }]),
+    breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Magazine', path: '/magazine' }, { name: d.title, path: postUrl(post) }]),
   ]}
 >
   <Fragment slot="head">
@@ -47,10 +47,10 @@ const ldImage = m?.type === 'local' ? new URL((await getImage({ src: m.meta, wid
     <header class="ahead" data-tone="dark">
       <div class="container container--editorial ahead__inner">
         <p class="t-eyebrow ahead__meta" data-intro style="--intro:150ms">
-          <a class="link" href="/journal">Journal</a>
+          <a class="link" href="/magazine">Magazine</a>
           <span class="muted">{d.category}</span>
           <time class="muted" datetime={d.date.toISOString()}>{formatDate(d.date)}</time>
-          {d.readingTime && <span class="muted">{d.readingTime} min read</span>}
+          {d.readingTime && <span class="muted">{d.readingTime} min lezen</span>}
         </p>
         <Heading as="h1" size="headline" text={d.title} reveal="load" delay={200} />
         <p class="t-lead ahead__excerpt" data-intro style="--intro:400ms">{d.excerpt}</p>
@@ -69,7 +69,7 @@ const ldImage = m?.type === 'local' ? new URL((await getImage({ src: m.meta, wid
 
   <section class="amore" data-tone="light" aria-labelledby="more-title">
     <div class="container container--gallery">
-      <h2 id="more-title" class="t-eyebrow eyebrow-row">More from the journal</h2>
+      <h2 id="more-title" class="t-eyebrow eyebrow-row">Meer uit het magazine</h2>
       <ul class="amore__grid" role="list">
         {more.map((p, i) => <li><JournalCard post={p} variant="grid" delay={i * 90} /></li>)}
       </ul>

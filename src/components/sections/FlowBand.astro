@@ -8,7 +8,7 @@ import type { Vehicle } from '@/lib/inventory';
 import { vehicleUrl } from '@/lib/inventory';
 
 interface Props { vehicles: Vehicle[]; tone?: 'signal' | 'dark' | 'light'; label?: string }
-const { vehicles, tone = 'signal', label = 'In the collection' } = Astro.props;
+const { vehicles, tone = 'signal', label = 'In de collectie' } = Astro.props;
 const items = vehicles.map((v) => ({ text: `${v.brand} ${v.model}`, href: vehicleUrl(v) }));
 // Repeat so one copy is always wider than the widest screen.
 const run = Array.from({ length: Math.max(2, Math.ceil(8 / Math.max(1, items.length))) }, () => items).flat();
@@ -21,7 +21,7 @@ const run = Array.from({ length: Math.max(2, Math.ceil(8 / Math.max(1, items.len
         <ul class="flow__group" role="list" aria-hidden={copy === 1 ? 'true' : undefined}>
           {run.map((it) => (
             <li>
-              <a href={it.href} tabindex={copy === 1 ? -1 : undefined} data-cursor="View">
+              <a href={it.href} tabindex={copy === 1 ? -1 : undefined} data-cursor="Bekijk">
                 {it.text}
               </a>
               <span class="flow__mark" aria-hidden="true" />
@@ -59,6 +59,7 @@ const run = Array.from({ length: Math.max(2, Math.ceil(8 / Math.max(1, items.len
 
   .flow a {
     font-family: var(--font-display);
+    text-transform: var(--display-case, none);
     font-weight: var(--display-weight);
     font-stretch: var(--display-stretch);
     letter-spacing: var(--display-tracking);

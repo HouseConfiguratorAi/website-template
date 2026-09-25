@@ -68,6 +68,7 @@ const fallback = `${contact.hours[0].days} · ${contact.hours[0].time}`;
 
 <script>
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const dayNames = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
   const toMin = (t: string) => {
     const [h, m] = t.split(':').map(Number);
     return h * 60 + m;
@@ -88,7 +89,7 @@ const fallback = `${contact.hours[0].days} · ${contact.hours[0].time}`;
     const today = schedule[day];
     if (today && now >= toMin(today[0]) && now < toMin(today[1])) {
       status.dataset.state = 'open';
-      status.textContent = `Open now · until ${today[1]}`;
+      status.textContent = `Nu open · tot ${today[1]}`;
       return;
     }
     // Find the next opening, looking up to a week ahead.
@@ -97,11 +98,11 @@ const fallback = `${contact.hours[0].days} · ${contact.hours[0].time}`;
       const slot = schedule[d];
       if (!slot || (i === 0 && now >= toMin(slot[0]))) continue;
       status.dataset.state = 'closed';
-      status.textContent = `Closed · opens ${i === 0 ? 'today' : i === 1 ? 'tomorrow' : days[d]} ${slot[0]}`;
+      status.textContent = `Gesloten · open ${i === 0 ? 'vandaag' : i === 1 ? 'morgen' : dayNames[d]} ${slot[0]}`;
       return;
     }
     status.dataset.state = 'closed';
-    status.textContent = 'By appointment';
+    status.textContent = 'Op afspraak';
   }
 
   document.querySelectorAll<HTMLElement>('[data-live]').forEach((el) => {

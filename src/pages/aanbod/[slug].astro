@@ -10,7 +10,9 @@ import VehicleGallery from '@/components/vehicles/VehicleGallery.astro';
 import VehicleRail from '@/components/vehicles/VehicleRail.astro';
 import ContactSection from '@/components/sections/ContactSection.astro';
 import { getAllVehicles, getRelatedVehicles, coverImage, imageOfKind, statusLabel, vehicleTitle, type Vehicle } from '@/lib/inventory';
-import { formatDate, formatMileage, formatPrice } from '@/lib/format';
+import { formatDate, formatMileage, formatPrice, toPk } from '@/lib/format';
+import { keyFigures } from '@/lib/specs';
+import KeyFigures from '@/components/vehicles/KeyFigures.astro';
 import { resolveMedia } from '@/lib/media';
 import { vehicleLd, breadcrumbLd } from '@/lib/seo';
 import { site, contact } from '@/config/site';
@@ -32,22 +34,22 @@ const related = await getRelatedVehicles(v, 4);
 const isSold = v.status === 'sold';
 
 const specs = [
-  { k: 'Year', v: String(v.year) },
-  { k: 'Mileage', v: formatMileage(v.mileage) },
-  { k: 'Power', v: `${v.power.hp} hp` },
-  { k: 'Transmission', v: v.transmission },
-  { k: 'Fuel', v: v.fuel },
-  { k: 'Body', v: v.bodyType },
+  { k: 'Bouwjaar', v: String(v.year) },
+  { k: 'Kilometerstand', v: formatMileage(v.mileage) },
+  { k: 'Transmissie', v: v.transmission },
+  { k: 'Brandstof', v: v.fuel },
+  { k: 'Carrosserie', v: v.bodyType },
+  { k: 'Aandrijving', v: v.drivetrain ?? '—' },
 ];
 const details = [
-  { k: 'Engine', v: v.engine },
-  { k: 'Drivetrain', v: v.drivetrain },
-  { k: 'Exterior', v: v.exteriorColor },
-  { k: 'Interior', v: v.interiorColor },
-  { k: 'First registration', v: v.firstRegistration },
-  { k: 'Previous owners', v: v.owners != null ? String(v.owners) : undefined },
-  { k: 'Reference', v: v.id },
-  { k: 'Location', v: v.location },
+  { k: 'Motor', v: v.engine },
+  { k: 'Vermogen', v: `${toPk(v.power)} pk · ${v.power.kw} kW` },
+  { k: 'Exterieur', v: v.exteriorColor },
+  { k: 'Interieur', v: v.interiorColor },
+  { k: 'Eerste toelating', v: v.firstRegistration },
+  { k: 'Vorige eigenaren', v: v.owners != null ? String(v.owners) : undefined },
+  { k: 'Referentie', v: v.id },
+  { k: 'Locatie', v: v.location },
 ].filter((d) => d.v);
 
 // Absolute image URLs for structured data.
@@ -61,7 +63,7 @@ for (const img of v.images.slice(0, 4)) {
 
 <BaseLayout
   title={`${title}${v.variant ? ` ${v.variant}` : ''} (${v.year})`}
-  description={`${v.summary} ${formatMileage(v.mileage)}, ${v.transmission.toLowerCase()}, ${v.power.hp} hp. ${formatPrice(v.price)}.`}
+  description={`${v.summary} ${formatMileage(v.mileage)}, ${v.transmission.toLowerCase()}, ${toPk(v.power)} pk. ${formatPrice(v.price)}.`}
   image={cover?.src}
   type="product"
   noindex={isSold}
@@ -69,14 +71,14 @@ for (const img of v.images.slice(0, 4)) {
     vehicleLd(v, ldImages),
     breadcrumbLd([
       { name: 'Home', path: '/' },
-      { name: 'Vehicles', path: '/vehicles' },
-      { name: title, path: `/vehicles/${v.slug}` },
+      { name: 'Aanbod', path: '/aanbod' },
+      { name: title, path: `/aanbod/${v.slug}` },
     ]),
   ]}
 >
   <!-- Opening: the car, as large as the screen allows. -->
   <section class="vd-hero" data-tone="dark" data-scene="through">
-    <div class="vd-hero__media media marks">
+    <div class="vd-hero__media media">
       <div class="vd-hero__drift">
         <Media
           src={cover?.src}
@@ -92,40 +94,45 @@ for (const img of v.images.slice(0, 4)) {
   </section>
 
   <section class="vd-head" data-tone="dark">
-    <div class="container container--gallery vd-head__grid">
+    <div class="container container--gallery">
       <div class="vd-bar-top">
-        <nav class="vd-crumbs t-meta" aria-label="Breadcrumb">
+        <nav class="vd-crumbs t-meta" aria-label="Kruimelpad">
           <ol role="list">
-            <li><a class="link" href="/vehicles">Vehicles</a></li>
+            <li><a class="link" href="/aanbod">Aanbod</a></li>
             <li aria-current="page">{v.brand} {v.model}</li>
           </ol>
         </nav>
         <p class="vd-facts t-meta muted">
           <span>Ref. {v.id}</span>
-          {v.listed && <span>Listed {formatDate(new Date(v.listed))}</span>}
-          <span>{v.status === 'incoming' ? 'Inspection pending' : 'Inspected'}</span>
-          <span>{v.location}</span>
-          <button type="button" class="vd-copy" data-copy-link>Copy link</button>
+          {v.listed && <span>Geplaatst {formatDate(new Date(v.listed))}</span>}
+          <span>{v.status === 'incoming' ? 'Keuring volgt' : 'Gekeurd'}</span>
+          <button type="button" class="vd-copy" data-copy-link>Kopieer link</button>
         </p>
       </div>
-      <div class="vd-head__title">
-        <p class="t-eyebrow" data-intro style="--intro:150ms">{v.brand}</p>
-        <Heading as="h1" size="display" text={v.model} reveal="load" delay={200} class="vd-head__model" />
-        {v.variant && <p class="t-subhead muted" data-intro style="--intro:320ms">{v.variant} · {v.year}</p>}
-      </div>
-      <div class="vd-head__offer" data-intro style="--intro:420ms">
-        <p class="t-eyebrow status-dot muted" data-status={v.status}>{statusLabel[v.status]}</p>
-        <p class="vd-head__price">{isSold ? 'Sold' : formatPrice(v.price)}</p>
-        {!isSold && v.price != null && <p class="t-meta muted">Incl. VAT · Financing on request</p>}
-        {
-          !isSold && (
-            <div class="vd-head__actions">
-              <a class="btn btn--primary" href="#enquire">{v.status === 'incoming' ? 'Register interest' : 'Enquire'}<Arrow /></a>
-              <a class="btn btn--ghost" href={`tel:${contact.phoneHref}`}>Call</a>
-            </div>
-          )
-        }
-      </div>
+    </div>
+
+    <div class="container vd-head__title">
+      <p class="t-eyebrow muted" data-intro style="--intro:150ms">{v.brand}</p>
+      <Heading as="h1" size="display" text={v.model} reveal="load" delay={200} class="vd-head__model" />
+      {v.variant && <p class="vd-head__variant" data-intro style="--intro:320ms">{v.variant} · {v.year}</p>}
+    </div>
+
+    <div class="container container--gallery">
+      <KeyFigures figures={keyFigures(v)} class="vd-figures" />
+    </div>
+
+    <div class="container vd-head__offer" data-intro style="--intro:420ms">
+      <p class="t-eyebrow status-dot" data-status={v.status}>{statusLabel[v.status]}</p>
+      <p class="vd-head__price">{isSold ? 'Verkocht' : formatPrice(v.price)}</p>
+      {!isSold && v.price != null && <p class="t-meta muted">Incl. btw · Financiering op aanvraag</p>}
+      {
+        !isSold && (
+          <div class="vd-head__actions">
+            <a class="btn btn--primary" href="#aanvraag">{v.status === 'incoming' ? 'Houd mij op de hoogte' : 'Plan een bezichtiging'}<Arrow /></a>
+            <a class="btn btn--ghost" href={`tel:${contact.phoneHref}`}>Bel {contact.phone}</a>
+          </div>
+        )
+      }
     </div>
 
     <div class="container container--gallery">
@@ -147,8 +154,8 @@ for (const img of v.images.slice(0, 4)) {
       <div class="vd-notice" data-tone="light">
         <div class="container container--gallery">
           <p class="t-body">
-            This car has been sold and remains here as part of our archive. <a class="link" href="/vehicles">See what is available now</a> or{' '}
-            <a class="link" href="/services#sourcing">ask us to find one like it</a>.
+            Deze auto is verkocht en blijft hier staan als onderdeel van ons archief. <a class="link" href="/aanbod">Bekijk wat nu beschikbaar is</a> of{' '}
+            <a class="link" href="/diensten#zoekopdracht">vraag ons een vergelijkbare te zoeken</a>.
           </p>
         </div>
       </div>
@@ -161,7 +168,7 @@ for (const img of v.images.slice(0, 4)) {
   <section class="vd-story" data-tone="light">
     <div class="container container--gallery vd-story__grid">
       <div class="vd-story__text">
-        <Label text="The car" index="01" />
+        <Label text="De auto" />
         <p class="t-lead vd-story__summary" data-reveal>{v.summary}</p>
         <div class="vd-story__body" data-reveal>
           {v.description.map((p) => <p class="t-body">{p}</p>)}
@@ -174,8 +181,8 @@ for (const img of v.images.slice(0, 4)) {
           )
         }
       </div>
-      <aside class="vd-details" aria-label="Specification" data-reveal style="--delay:120ms">
-        <h2 class="t-eyebrow muted">Specification</h2>
+      <aside class="vd-details" aria-label="Specificaties" data-reveal style="--delay:120ms">
+        <h2 class="t-eyebrow muted">Specificaties</h2>
         <dl>
           {
             details.map((d) => (
@@ -192,7 +199,7 @@ for (const img of v.images.slice(0, 4)) {
     {
       v.features.length > 0 && (
         <div class="container container--gallery vd-equipment">
-          <h2 class="t-title" data-reveal>Equipment</h2>
+          <h2 class="t-title" data-reveal>Uitrusting</h2>
           <div class="vd-equipment__groups">
             {v.features.map((g, i) => (
               <div class="vd-equipment__group" data-reveal style={`--delay:${i * 80}ms`}>
@@ -211,15 +218,15 @@ for (const img of v.images.slice(0, 4)) {
   {
     !isSold && (
       <ContactSection
-        eyebrow="Enquire"
-        headline={`Interested in this *${v.model}?*`}
-        body="Ask for the full file, arrange a viewing, or simply ask a question. We reply personally."
+        eyebrow="Aanvraag"
+        headline={`Interesse in deze *${v.model}?*`}
+        body="Vraag het volledige dossier op, plan een bezichtiging of stel gewoon een vraag. We antwoorden persoonlijk."
         vehicle={v.slug}
       />
     )
   }
 
-  <VehicleRail vehicles={related} eyebrow="Also in the collection" headline="Similar *vehicles*" tone="dark" />
+  <VehicleRail vehicles={related} eyebrow="Ook in de collectie" headline="Vergelijkbare *auto’s*" tone="dark" />
 
   <!-- Compact offer bar on small screens once the header has scrolled away. -->
   {
@@ -229,7 +236,7 @@ for (const img of v.images.slice(0, 4)) {
           <p class="t-meta muted">{v.brand} {v.model}</p>
           <p class="t-price">{formatPrice(v.price)}</p>
         </div>
-        <a class="btn btn--primary" href="#enquire" tabindex="-1">Enquire</a>
+        <a class="btn btn--primary" href="#aanvraag" tabindex="-1">Aanvragen</a>
       </div>
     )
   }
@@ -259,16 +266,7 @@ for (const img of v.images.slice(0, 4)) {
     padding-bottom: var(--section-s);
   }
 
-  .vd-head__grid {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--gutter);
-    row-gap: var(--s-6);
-    align-items: end;
-  }
-
   .vd-bar-top {
-    grid-column: 1 / -1;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -315,29 +313,43 @@ for (const img of v.images.slice(0, 4)) {
     opacity: 0.6;
   }
 
+  /* Centred like a model page: brand, name, variant, figures, then the offer. */
   .vd-head__title {
-    grid-column: 1 / span 8;
     display: grid;
+    justify-items: center;
     gap: var(--s-4);
+    padding-top: var(--section-s);
+    text-align: center;
   }
 
   .vd-head__title :global(.vd-head__model) {
-    font-size: clamp(3.2rem, 1rem + 8vw, 10rem);
+    font-size: clamp(3rem, 0.8rem + 8.6vw, 10.5rem);
+    line-height: 0.9;
+  }
+
+  .vd-head__variant {
+    font-size: var(--fs-small);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .vd-head :global(.vd-figures) {
+    margin-top: var(--section-s);
   }
 
   .vd-head__offer {
-    grid-column: 9 / -1;
     display: grid;
+    justify-items: center;
     gap: var(--s-4);
-    justify-items: start;
-    padding-bottom: 0.4em;
+    padding-top: var(--section-s);
+    text-align: center;
   }
 
   .vd-head__price {
     font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);
     font-weight: 400;
-    font-stretch: 104%;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
     line-height: 1;
     font-variant-numeric: tabular-nums lining-nums;
   }
@@ -345,6 +357,7 @@ for (const img of v.images.slice(0, 4)) {
   .vd-head__actions {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: var(--s-3);
     margin-top: var(--s-3);
   }
@@ -468,8 +481,6 @@ for (const img of v.images.slice(0, 4)) {
   }
 
   @media (max-width: 63.99rem) {
-    .vd-head__title,
-    .vd-head__offer,
     .vd-story__text,
     .vd-details {
       grid-column: 1 / -1;
@@ -514,6 +525,12 @@ for (const img of v.images.slice(0, 4)) {
     .vd-details dl > div {
       grid-template-columns: 1fr 1fr;
     }
+    .vd-head__actions {
+      width: 100%;
+    }
+    .vd-head__actions .btn {
+      flex: 1 1 100%;
+    }
     .vd-equipment__groups {
       grid-template-columns: 1fr;
     }
@@ -550,18 +567,18 @@ for (const img of v.images.slice(0, 4)) {
     btn.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(location.href.split('?')[0]);
-        btn.textContent = 'Link copied';
+        btn.textContent = 'Link gekopieerd';
       } catch {
-        btn.textContent = 'Copy failed';
+        btn.textContent = 'Kopiëren mislukt';
       }
-      setTimeout(() => (btn.textContent = 'Copy link'), 2000);
+      setTimeout(() => (btn.textContent = 'Kopieer link'), 2000);
     });
   });
 
   // Offer bar: visible after the title block, hidden again near the enquiry form.
   const bar = document.querySelector<HTMLElement>('[data-offer-bar]');
   const head = document.querySelector('.vd-head');
-  const form = document.getElementById('enquire');
+  const form = document.getElementById('aanvraag');
   if (bar && head && 'IntersectionObserver' in window) {
     let pastHead = false, atForm = false;
     const sync = () => {

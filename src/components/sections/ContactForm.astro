@@ -22,44 +22,44 @@ const id = (s: string) => `${idPrefix}-${s}`;
 <form class="cform" data-contact-form action={contact.formEndpoint || undefined} method="post" novalidate data-endpoint={contact.formEndpoint}>
   <div class="cform__grid">
     <div class="field">
-      <label for={id('name')}>Name</label>
+      <label for={id('name')}>Naam</label>
       <input id={id('name')} name="name" type="text" autocomplete="name" required maxlength="120" aria-describedby={id('name-error')} />
       <p class="field__error" id={id('name-error')} aria-live="polite"></p>
     </div>
     <div class="field">
-      <label for={id('email')}>Email</label>
+      <label for={id('email')}>E-mail</label>
       <input id={id('email')} name="email" type="email" autocomplete="email" required maxlength="200" aria-describedby={id('email-error')} />
       <p class="field__error" id={id('email-error')} aria-live="polite"></p>
     </div>
     <div class="field">
-      <label for={id('phone')}>Phone <span class="field__opt">optional</span></label>
+      <label for={id('phone')}>Telefoon <span class="field__opt">optioneel</span></label>
       <input id={id('phone')} name="phone" type="tel" autocomplete="tel" maxlength="40" pattern="[0-9+()\\s.\\-]{6,40}" aria-describedby={id('phone-error')} />
       <p class="field__error" id={id('phone-error')} aria-live="polite"></p>
     </div>
     <div class="field">
-      <label for={id('vehicle')}>Vehicle of interest <span class="field__opt">optional</span></label>
+      <label for={id('vehicle')}>Interesse in <span class="field__opt">optioneel</span></label>
       <div class="field__select">
         <select id={id('vehicle')} name="vehicle" data-vehicle-select>
-          <option value="">Something else</option>
+          <option value="">Iets anders</option>
           {vehicles.map((v) => <option value={v.slug} selected={v.slug === vehicle}>{vehicleTitle(v)} · {v.year}{v.variant ? ` · ${v.variant}` : ''}</option>)}
         </select>
       </div>
     </div>
     <div class="field field--full">
-      <label for={id('message')}>Message</label>
+      <label for={id('message')}>Bericht</label>
       <textarea id={id('message')} name="message" rows="5" required minlength="10" maxlength="4000" aria-describedby={id('message-error')}></textarea>
       <p class="field__error" id={id('message-error')} aria-live="polite"></p>
     </div>
     <!-- Honeypot: invisible to people, tempting to bots. -->
     <div class="cform__hp" aria-hidden="true">
-      <label for={id('company')}>Company</label>
+      <label for={id('company')}>Bedrijf</label>
       <input id={id('company')} name="company" type="text" tabindex="-1" autocomplete="off" />
     </div>
   </div>
 
   <div class="cform__foot">
-    <p class="t-caption">We use your details only to reply. See our <a class="link" href="/privacy">privacy notice</a>.</p>
-    <button class="btn btn--primary" type="submit">Send enquiry <Arrow /></button>
+    <p class="t-caption">We gebruiken uw gegevens alleen om te antwoorden. Lees onze <a class="link" href="/privacy">privacyverklaring</a>.</p>
+    <button class="btn btn--primary" type="submit">Verstuur aanvraag <Arrow /></button>
   </div>
   <p class="cform__status t-small" role="status" aria-live="polite" data-status></p>
 </form>
@@ -222,11 +222,11 @@ const id = (s: string) => `${idPrefix}-${s}`;
 
 <script>
   const messages: Record<string, (el: HTMLInputElement | HTMLTextAreaElement) => string> = {
-    valueMissing: () => 'Please fill in this field.',
-    typeMismatch: () => 'Please enter a valid email address.',
-    patternMismatch: () => 'Please use digits, spaces and + ( ) - only.',
-    tooShort: (el) => `Please write at least ${el.getAttribute('minlength')} characters.`,
-    tooLong: (el) => `Please keep this under ${el.getAttribute('maxlength')} characters.`,
+    valueMissing: () => 'Vul dit veld in.',
+    typeMismatch: () => 'Vul een geldig e-mailadres in.',
+    patternMismatch: () => 'Gebruik alleen cijfers, spaties en + ( ) -.',
+    tooShort: (el) => `Schrijf minstens ${el.getAttribute('minlength')} tekens.`,
+    tooLong: (el) => `Houd het onder de ${el.getAttribute('maxlength')} tekens.`,
   };
 
   function validate(el: HTMLInputElement | HTMLTextAreaElement): boolean {
@@ -234,7 +234,7 @@ const id = (s: string) => `${idPrefix}-${s}`;
     let msg = '';
     if (!el.validity.valid) {
       const key = Object.keys(messages).find((k) => el.validity[k as keyof ValidityState]);
-      msg = key ? messages[key](el) : 'Please check this field.';
+      msg = key ? messages[key](el) : 'Controleer dit veld.';
     }
     el.setAttribute('aria-invalid', msg ? 'true' : 'false');
     if (error) error.textContent = msg;
@@ -268,7 +268,7 @@ const id = (s: string) => `${idPrefix}-${s}`;
       // Bots fill the honeypot; pretend success and drop the submission.
       if (String(data.get('company') || '').trim()) {
         form.reset();
-        status.textContent = 'Thank you. We will be in touch shortly.';
+        status.textContent = 'Dank u wel. We nemen snel contact met u op.';
         return;
       }
       // Normalise whitespace; the receiving endpoint must still validate and escape.
@@ -276,7 +276,7 @@ const id = (s: string) => `${idPrefix}-${s}`;
 
       const endpoint = form.dataset.endpoint;
       if (!endpoint) {
-        status.textContent = 'Demo mode — the form works, but nothing was sent. Set contact.formEndpoint in src/config/site.ts to receive enquiries.';
+        status.textContent = 'Demomodus — het formulier werkt, maar er is niets verzonden. Stel contact.formEndpoint in src/config/site.ts in om aanvragen te ontvangen.';
         return;
       }
       submit.disabled = true;
@@ -285,9 +285,9 @@ const id = (s: string) => `${idPrefix}-${s}`;
         const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
         if (!res.ok) throw new Error(String(res.status));
         form.reset();
-        status.textContent = 'Thank you. Your message has arrived and we will reply personally, usually the same day.';
+        status.textContent = 'Dank u wel. Uw bericht is ontvangen; we antwoorden persoonlijk, meestal dezelfde dag nog.';
       } catch {
-        status.textContent = 'Something went wrong while sending. Please try again, or email us directly.';
+        status.textContent = 'Er ging iets mis bij het verzenden. Probeer het opnieuw of mail ons rechtstreeks.';
       } finally {
         submit.disabled = false;
         submit.removeAttribute('aria-busy');

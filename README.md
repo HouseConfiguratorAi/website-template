@@ -2,7 +2,9 @@
 
 An editorial, image-led website template for automotive businesses: luxury and
 premium used-car dealers, performance and classic specialists, importers,
-sourcing agents and collectors. The demo brand, **Oberhall**, is fictional.
+sourcing agents and collectors. The demo brand, **Oberhall**, is a fictional
+showroom in Amsterdam; all demo copy, routes and formatting are in **Dutch**
+(`nl-NL`).
 
 Built with [Astro](https://astro.build): static HTML, almost no JavaScript,
 responsive AVIF/WebP images and generated SEO metadata.
@@ -23,12 +25,23 @@ Node 20+ is recommended.
 
 | Route | What it is |
 | --- | --- |
-| `/` | Homepage: hero, statement, featured vehicle, collection, philosophy scene, services, journal, location, enquiry, closing scene |
-| `/vehicles` | Inventory with search, filters, sorting and shareable URLs |
-| `/vehicles/[slug]` | Vehicle detail, generated for every vehicle in the data |
-| `/about`, `/services`, `/contact` | Company pages |
-| `/journal`, `/journal/[slug]` | Editorial articles from Markdown |
-| `/privacy`, `/terms`, `/404` | Legal pages and not-found page |
+| `/` | Homepage: hero, statement, featured vehicle, collection, name band, philosophy scene, services, magazine, location, enquiry, closing scene |
+| `/aanbod` | Inventory with search, filters, sorting and shareable URLs |
+| `/aanbod/[slug]` | Vehicle detail, generated for every vehicle in the data |
+| `/over-ons`, `/diensten`, `/contact` | Company pages |
+| `/magazine`, `/magazine/[slug]` | Editorial articles from Markdown |
+| `/privacy`, `/voorwaarden`, `/404` | Legal pages and not-found page |
+
+The earlier English URLs (`/vehicles`, `/about`, `/journal/…` …) redirect to
+their Dutch equivalents; see `redirects` in `astro.config.mjs`.
+
+### Language
+
+The site language is set by `site.locale` and `site.lang` in
+`src/config/site.ts`: prices (`€ 214.500`), numbers, dates (`12 september 2026`)
+and the live opening status follow it. Visible copy lives in `content.ts`,
+the data files, the journal Markdown and the page files. Power is shown in
+**pk** (metric horsepower), derived from the kW value.
 
 ---
 
@@ -52,7 +65,8 @@ You never need to edit a component to rebrand. Everything lives in five places:
 and a **signal** tone (the brand colour), because every page moves between
 them:
 
-- `corsa`: racing red, pure white and deep black, condensed grotesk display (default)
+- `rosso`: black, white and one racing red, uppercase display type, small tracked capitals for metadata — a manufacturer-grade showroom look (default)
+- `corsa`: racing red, pure white and deep black, condensed grotesk display with a monospace technical layer
 - `noir`: warm black, sand and cream, serif display
 - `atelier`: gallery white, charcoal and bronze, light serif
 - `heritage`: racing green, parchment and brass, for classic-car specialists
@@ -63,7 +77,7 @@ Switch presets with `themeConfig.preset`, then override single values:
 
 ```ts
 export const themeConfig = {
-  preset: 'corsa',
+  preset: 'rosso',
   overrides: { dark: { accent: '#0057B8', accentInk: '#4D94FF' } },
 };
 ```
@@ -79,9 +93,12 @@ Components only use semantic tokens (`--bg`, `--fg`, `--muted`, `--accent`,
 
 ### Typography
 
-- **Display:** Archivo, condensed and heavy (Corsa), or Newsreader (serif presets).
+- **Display:** Archivo, in capitals (Rosso), condensed and heavy (Corsa), or Newsreader (serif presets).
 - **Text:** Archivo.
-- **Technical layer:** Geist Mono for specifications, references, section numbers and metadata.
+- **Technical layer:** small tracked capitals (Rosso) or Geist Mono (Corsa) for specifications, references and metadata. Set with `type.metaFont`.
+
+Theme type options: `uppercase` sets display type in capitals, `emphasis:
+'light'` sets `*emphasised*` words in a light weight instead of the accent colour.
 
 ### Logo
 
@@ -91,8 +108,8 @@ The default is a typeset wordmark.
 
 ### Copy
 
-In `content.ts`, wrap a word in asterisks to set it as the italic accent in a
-headline: `'Cars worth *stopping* for.'`
+In `content.ts`, wrap a word in asterisks to emphasise it in a headline:
+`'Het wachten *waard.*'` (light weight in Rosso, italic in the serif themes).
 
 ---
 
@@ -158,6 +175,7 @@ without an animation library.
 - **Scroll scenes:** reveals, camera moves and layered depth are driven by a single `--p` CSS variable, computed only for scenes on screen.
 - **Flow band:** a band of the collection's names flows continuously, speeds up and reverses with the scroll, and slows under the pointer.
 - **Header:** it steps out of the way while reading down and returns on scroll up, with a red reading-progress line.
+- **Key figures:** power, 0–100 km/h, top speed and mileage shown large and counted up once when they come into view (`src/components/vehicles/KeyFigures.astro`). Add `performance: { accel, topSpeed }` to a vehicle to show them.
 - **Micro-interactions:** rolling button labels, magnetic primary buttons, card photos that drift with the pointer, and a red line drawn under a card image on hover.
 - **Page transitions:** a card image expands into the vehicle page (Chrome, Edge, Safari 18.2+).
 
@@ -184,7 +202,7 @@ tags, plus a generated 1200×630 social image. Structured data:
 - About 2 KB of JavaScript per page, with no framework runtime.
 - Images are served as AVIF/WebP at the right width, lazy-loaded below the fold, with fixed dimensions (no layout shift).
 - Scroll effects run only while their section is on screen, and animate `transform`, `opacity` and `clip-path` only.
-- Fonts: the default `corsa` theme loads Archivo and Geist Mono (about 110 KB). Serif presets add Newsreader, which is only downloaded when a theme uses it.
+- Fonts: the default `rosso` theme loads only Archivo (about 90 KB). Geist Mono and Newsreader are downloaded only when a theme uses them.
 
 ## Deployment
 

@@ -11,12 +11,12 @@ import { breadcrumbLd } from '@/lib/seo';
 
 <BaseLayout
   title="Services"
-  description="Vehicle sourcing, trade-in, financing, import and consignment — handled personally."
+  description="Zoekopdracht, inruil, financiering, import en consignatie — persoonlijk geregeld door Oberhall in Amsterdam."
   image="svc-sourcing"
-  jsonLd={breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Services', path: '/services' }])}
+  jsonLd={breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Diensten', path: '/diensten' }])}
 >
-  <PageIntro eyebrow="Services" headline="Beyond the *showroom.*" lead="Five things we do besides selling the cars in the collection. Each one is handled personally, from the first conversation to the handover.">
-    <nav class="svc-index" aria-label="Services on this page">
+  <PageIntro eyebrow="Diensten" headline="Meer dan een *showroom.*" lead="Vijf dingen die we doen naast het verkopen van de auto’s in de collectie. Elk ervan persoonlijk geregeld, van het eerste gesprek tot de aflevering.">
+    <nav class="svc-index" aria-label="Diensten op deze pagina">
       <ol role="list">
         {services.map((s, i) => <li><a class="link t-small" href={`#${s.slug}`}><span class="t-index">{pad(i + 1)}</span> {s.title}</a></li>)}
       </ol>
@@ -50,13 +50,14 @@ import { breadcrumbLd } from '@/lib/seo';
     ))
   }
 
-  <ContactSection eyebrow="Start a conversation" headline="Tell us what you *need.*" body="Whatever the service, it starts with a short, unhurried conversation." />
+  <ContactSection eyebrow="Begin een gesprek" headline="Vertel ons wat u *zoekt.*" body="Welke dienst het ook is, het begint met een kort gesprek zonder haast." />
 </BaseLayout>
 
 <style>
   .svc-index ol {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: var(--s-3) var(--s-6);
     margin-top: var(--s-6);
     padding-top: var(--s-5);
@@ -81,6 +82,10 @@ import { breadcrumbLd } from '@/lib/seo';
   .svc__media {
     grid-column: 1 / span 6;
     aspect-ratio: 4 / 5;
+  }
+  /* Long Dutch service names in capitals: sized to always fit their column. */
+  .svc__copy :global(.heading) {
+    font-size: clamp(1.9rem, 1rem + 2.6vw, 3.75rem);
   }
   .svc__copy {
     grid-column: 8 / -1;

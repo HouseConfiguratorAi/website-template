@@ -9,12 +9,14 @@
   --font-serif: 'Newsreader Variable', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
   --font-sans: 'Archivo Variable', 'Helvetica Neue', Arial, system-ui, sans-serif;
   --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  /* --font-meta, --meta-*, --display-case and --em-weight come from the theme
+     (src/config/theme.ts); rules that read them carry their own fallbacks. */
 
   /* ---- Type scale (fluid, 375px → 1600px) ----
      Contrast is the point: a 160px statement next to 12px metadata. */
-  --fs-display: clamp(3.5rem, 1.2rem + 9.6vw, 11.5rem);   /* ~56 → 184 */
-  --fs-headline: clamp(2.5rem, 1.3rem + 5vw, 6rem);       /* ~40 → 96 */
-  --fs-title: clamp(1.9rem, 1.3rem + 2.5vw, 3.75rem);     /* ~30 → 60 */
+  --fs-display: clamp(2.9rem, 1rem + 8vw, 9.5rem);        /* ~46 → 152 */
+  --fs-headline: clamp(2.1rem, 1.15rem + 4vw, 5rem);      /* ~34 → 80 */
+  --fs-title: clamp(1.6rem, 1.15rem + 1.9vw, 3rem);       /* ~26 → 48 */
   --fs-subhead: clamp(1.3rem, 1.1rem + 0.85vw, 1.875rem); /* ~21 → 30 */
   --fs-lead: clamp(1.2rem, 1.08rem + 0.55vw, 1.6rem);     /* ~19 → 26 */
   --fs-body: clamp(1rem, 0.97rem + 0.14vw, 1.125rem);     /* 16 → 18 */
@@ -22,6 +24,7 @@
   --fs-caption: 0.8125rem;                                /* 13 */
   --fs-eyebrow: 0.75rem;                                  /* 12 */
   --fs-mono: 0.75rem;                                     /* 12 */
+  --fs-meta: 0.6875rem;                                   /* 11 */
   --fs-nav: 0.875rem;                                     /* 14 */
   --fs-price: clamp(1.125rem, 1.02rem + 0.4vw, 1.5rem);
 

@@ -47,13 +47,68 @@ export type Theme = {
     displayWidth: number;
     /** Use italics for emphasised words in headlines (<em>). */
     italicAccents: boolean;
+    /** Set display type in capitals (with slightly opened tracking). */
+    uppercase?: boolean;
+    /** Emphasised words: 'accent' colours them, 'light' sets them in a lighter weight. */
+    emphasis?: 'accent' | 'light';
+    /** Technical layer (specs, references, metadata): monospace or small capitals of the text face. */
+    metaFont?: 'mono' | 'sans';
   };
   /** Corner radius for controls and images. 0 keeps everything architectural. */
   radius: { small: string; image: string };
 };
 
 export const presets = {
-  /** Default: racing red, pure white, deep black — precise and motorsport-led. */
+  /**
+   * Default: a manufacturer-grade showroom look. Pure black and white, large
+   * uppercase type, square controls and a single racing red used sparingly.
+   */
+  rosso: {
+    name: 'Rosso',
+    dark: {
+      background: '#000000',
+      surface: '#141414',
+      foreground: '#FFFFFF',
+      muted: '#9A9A9A',
+      accent: '#DA291C',
+      accentContrast: '#FFFFFF',
+      accentInk: '#FF4033',
+      border: 'rgba(255, 255, 255, 0.16)',
+    },
+    light: {
+      background: '#FFFFFF',
+      surface: '#F2F2F2',
+      foreground: '#000000',
+      muted: '#616161',
+      accent: '#DA291C',
+      accentContrast: '#FFFFFF',
+      accentInk: '#C8230F',
+      border: 'rgba(0, 0, 0, 0.12)',
+    },
+    signal: {
+      background: '#CF2317',
+      surface: '#B81E12',
+      foreground: '#FFFFFF',
+      muted: '#FFEAE8',
+      accent: '#000000',
+      accentContrast: '#FFFFFF',
+      accentInk: '#FFFFFF',
+      border: 'rgba(255, 255, 255, 0.32)',
+    },
+    type: {
+      display: 'sans',
+      displayWeight: 560,
+      displayTracking: '0.005em',
+      displayWidth: 100,
+      italicAccents: false,
+      uppercase: true,
+      emphasis: 'light',
+      metaFont: 'sans',
+    },
+    radius: { small: '0px', image: '0px' },
+  },
+
+  /** Racing red, pure white, deep black — condensed and motorsport-led. */
   corsa: {
     name: 'Corsa',
     dark: {
@@ -224,7 +279,7 @@ export type PresetName = keyof typeof presets;
  * accent colour: overrides: { dark: { accent: '#9FB4C7' } }
  */
 export const themeConfig: { preset: PresetName; overrides?: DeepPartial<Theme> } = {
-  preset: 'corsa',
+  preset: 'rosso',
   overrides: {},
 };
 
@@ -274,9 +329,18 @@ export function themeToCss(theme: Theme): string {
       `--${p}-border:${t.border}`,
     ].join(';');
   const serif = theme.type.display === 'serif';
-  return `:root{${tone(theme.dark, 'dark')};${tone(theme.light, 'light')};${tone(theme.signal ?? deriveSignal(theme.dark), 'signal')};--font-display:${
+  const upper = !!theme.type.uppercase;
+  const light = theme.type.emphasis === 'light';
+  const extra = [
+    `--display-case:${upper ? 'uppercase' : 'none'}`,
+    `--em-weight:${light ? 300 : 'inherit'}`,
+    `--font-meta:${theme.type.metaFont === 'sans' ? 'var(--font-sans)' : 'var(--font-mono)'}`,
+    `--meta-tracking:${theme.type.metaFont === 'sans' ? '0.14em' : '0.02em'}`,
+    `--meta-weight:${theme.type.metaFont === 'sans' ? 500 : 450}`,
+  ].join(';');
+  return `:root{${extra}}:root{${tone(theme.dark, 'dark')};${tone(theme.light, 'light')};${tone(theme.signal ?? deriveSignal(theme.dark), 'signal')};--font-display:${
     serif ? 'var(--font-serif)' : 'var(--font-sans)'
   };--display-weight:${theme.type.displayWeight};--display-tracking:${theme.type.displayTracking};--display-stretch:${
     serif ? 100 : theme.type.displayWidth
-  }%;--display-italic:${theme.type.italicAccents ? 'italic' : 'normal'};--font-lead:${serif ? 'var(--font-serif)' : 'var(--font-sans)'};--lead-weight:${serif ? 360 : 400};--lead-tracking:${serif ? '-0.005em' : '-0.015em'};--em-accent:${theme.type.italicAccents ? 0 : 1};--radius-s:${theme.radius.small};--radius-img:${theme.radius.image}}`;
+  }%;--display-italic:${theme.type.italicAccents ? 'italic' : 'normal'};--font-lead:${serif ? 'var(--font-serif)' : 'var(--font-sans)'};--lead-weight:${serif ? 360 : 400};--lead-tracking:${serif ? '-0.005em' : '-0.015em'};--em-accent:${theme.type.italicAccents || light ? 0 : 1};--radius-s:${theme.radius.small};--radius-img:${theme.radius.image}}`;
 }

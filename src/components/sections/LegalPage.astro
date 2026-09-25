@@ -6,10 +6,10 @@ const { title, description, updated } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description}>
-  <PageIntro eyebrow="Legal" headline={title} size="headline" />
+  <PageIntro eyebrow="Juridisch" headline={title} size="title" />
   <section class="legal" data-tone="light">
     <div class="container container--editorial">
-      <p class="t-caption legal__updated">Last updated {updated}. This is template placeholder text — have it reviewed for your business and jurisdiction before publishing.</p>
+      <p class="t-caption legal__updated">Laatst bijgewerkt {updated}. Dit is voorbeeldtekst uit de template — laat deze controleren voor uw bedrijf voordat u publiceert.</p>
       <div class="prose">
         <slot />
       </div>

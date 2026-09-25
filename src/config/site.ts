@@ -13,15 +13,15 @@ export const site = {
   /** Short brand name — used in the header, titles and structured data. */
   name: 'Oberhall',
   /** Registered / legal name — used in the footer and legal pages. */
-  legalName: 'Oberhall Automobiles (demo)',
+  legalName: 'Oberhall Automobielen B.V. (demo)',
   /** One line that describes the business. Used as the default meta description. */
   description:
-    'Oberhall is a small showroom for selected sports and grand touring cars. Every car is inspected, documented and photographed before it is offered.',
+    'Oberhall is een kleine showroom voor geselecteerde sport- en GT-auto’s in Amsterdam. Elke auto wordt gekeurd, gedocumenteerd en gefotografeerd voordat we hem aanbieden.',
   /** Production URL, no trailing slash. Used for canonical URLs, sitemap and OpenGraph. */
   url: 'https://oberhall.example',
-  locale: 'en-GB',
+  locale: 'nl-NL',
   /** BCP-47 language tag for <html lang>. */
-  lang: 'en',
+  lang: 'nl',
   currency: 'EUR',
   distanceUnit: 'km' as 'km' | 'mi',
 
@@ -48,23 +48,25 @@ export const site = {
 } as const;
 
 export const contact = {
-  email: 'hello@oberhall.example',
-  phone: '+32 3 000 00 00',
+  email: 'hallo@oberhall.example',
+  phone: '+31 20 000 00 00',
   /** tel: link — digits only. */
-  phoneHref: '+3230000000',
+  phoneHref: '+31200000000',
   address: {
-    street: 'Havenlaan 00',
-    postalCode: '2000',
-    city: 'Antwerp',
-    region: 'Antwerp',
-    country: 'Belgium',
-    countryCode: 'BE',
+    street: 'Danzigerkade 00',
+    postalCode: '1013 AP',
+    city: 'Amsterdam',
+    region: 'Noord-Holland',
+    country: 'Nederland',
+    countryCode: 'NL',
   },
+  /** Chamber of Commerce and VAT numbers, shown in the footer (placeholders). */
+  registration: { kvk: '00000000', vat: 'NL000000000B01' },
   /** Latitude/longitude for structured data and the directions link. */
-  geo: { lat: 51.2308, lng: 4.4089 },
-  directionsUrl: 'https://www.openstreetmap.org/?mlat=51.2308&mlon=4.4089#map=16/51.2308/4.4089',
+  geo: { lat: 52.3925, lng: 4.8836 },
+  directionsUrl: 'https://www.openstreetmap.org/?mlat=52.3925&mlon=4.8836#map=16/52.3925/4.8836',
   /** IANA timezone of the showroom — used for the live local time and open/closed status. */
-  timezone: 'Europe/Brussels',
+  timezone: 'Europe/Amsterdam',
   /**
    * Machine-readable weekly schedule (0 = Sunday … 6 = Saturday), 24h "HH:MM".
    * Drives the "Open now / Closed" indicator. Days without an entry are closed.
@@ -77,9 +79,9 @@ export const contact = {
     6: ['10:00', '16:00'],
   } as Record<number, [string, string]>,
   hours: [
-    { days: 'Tuesday – Friday', time: '10:00 – 18:00', schema: 'Tu-Fr 10:00-18:00' },
-    { days: 'Saturday', time: '10:00 – 16:00', schema: 'Sa 10:00-16:00' },
-    { days: 'Sunday – Monday', time: 'By appointment', schema: '' },
+    { days: 'Dinsdag – vrijdag', time: '10:00 – 18:00', schema: 'Tu-Fr 10:00-18:00' },
+    { days: 'Zaterdag', time: '10:00 – 16:00', schema: 'Sa 10:00-16:00' },
+    { days: 'Zondag – maandag', time: 'Op afspraak', schema: '' },
   ],
   /**
    * Where the contact form posts to. Leave empty to run the form in demo mode
@@ -94,15 +96,15 @@ export type NavItem = { label: string; href: string };
 
 export const navigation = {
   primary: [
-    { label: 'Vehicles', href: '/vehicles' },
-    { label: 'About', href: '/about' },
-    { label: 'Services', href: '/services' },
-    { label: 'Journal', href: '/journal' },
+    { label: 'Aanbod', href: '/aanbod' },
+    { label: 'Diensten', href: '/diensten' },
+    { label: 'Over ons', href: '/over-ons' },
+    { label: 'Magazine', href: '/magazine' },
     { label: 'Contact', href: '/contact' },
   ] satisfies NavItem[],
-  cta: { label: 'Explore collection', href: '/vehicles' },
+  cta: { label: 'Bekijk aanbod', href: '/aanbod' },
   legal: [
     { label: 'Privacy', href: '/privacy' },
-    { label: 'Terms', href: '/terms' },
+    { label: 'Voorwaarden', href: '/voorwaarden' },
   ] satisfies NavItem[],
 };

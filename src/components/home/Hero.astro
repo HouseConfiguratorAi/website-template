@@ -20,7 +20,7 @@ const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : u
           alt={h.imageAlt}
           priority
           sizes="100vw"
-          focal="70% 60%"
+          focal="62% 60%"
           mobileFocal="50% 80%"
         />
       </div>
@@ -29,33 +29,28 @@ const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : u
   <div class="hero__veil" aria-hidden="true"></div>
 
   <div class="hero__content">
-    <p class="hero__label" data-intro="fade" style="--intro:150ms">
-      <span class="t-index">(01)</span>
-      <span class="t-eyebrow">{h.eyebrow}</span>
-    </p>
+    <p class="hero__label t-eyebrow" data-intro="fade" style="--intro:150ms">{h.eyebrow}</p>
     <Heading as="h1" id="hero-title" size="display" text={h.headline} reveal="load" delay={250} class="hero__title" />
-    <div class="hero__row">
-      <p class="hero__support" data-intro style="--intro:450ms">{h.supporting}</p>
-      <div class="hero__actions" data-intro style="--intro:600ms">
-        <a class="btn btn--primary" href={h.primary.href}>{h.primary.label}<Arrow /></a>
-        <a class="btn btn--ghost" href={h.secondary.href}>{h.secondary.label}</a>
-      </div>
+    <p class="hero__support" data-intro style="--intro:450ms">{h.supporting}</p>
+    <div class="hero__actions" data-intro style="--intro:600ms">
+      <a class="btn btn--primary" href={h.primary.href}>{h.primary.label}<Arrow /></a>
+      <a class="btn btn--ghost" href={h.secondary.href}>{h.secondary.label}</a>
     </div>
   </div>
 
   <div class="hero__foot t-meta" data-intro="fade" style="--intro:900ms">
     {
       captionVehicle ? (
-        <a class="hero__caption link" href={vehicleUrl(captionVehicle)}>
-          <span class="muted">In the hall</span>
-          <span>{captionVehicle.brand} {captionVehicle.model} — {captionVehicle.variant}</span>
+        <a class="hero__caption" href={vehicleUrl(captionVehicle)}>
+          <span class="muted">In de hal</span>
+          <span class="link">{captionVehicle.brand} {captionVehicle.model} — {captionVehicle.variant}</span>
         </a>
       ) : (
         <span />
       )
     }
+    <span class="hero__scroll" aria-hidden="true"><i></i></span>
     <LiveStatus class="hero__hours" />
-    <span class="hero__scroll muted" aria-hidden="true">Scroll <i></i></span>
   </div>
 </section>
 
@@ -86,61 +81,47 @@ const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : u
     will-change: transform;
   }
 
+  /* Darkest at the foot, where the words sit, and a little at the top for the header. */
   .hero__veil {
     position: absolute;
     inset: 0;
     z-index: -1;
     background:
-      linear-gradient(to right, rgb(0 0 0 / 0.72) 0%, rgb(0 0 0 / 0.28) 45%, transparent 65%),
-      linear-gradient(to top, rgb(0 0 0 / 0.75) 0%, transparent 42%);
+      linear-gradient(to top, rgb(0 0 0 / 0.86) 0%, rgb(0 0 0 / 0.45) 32%, transparent 62%),
+      radial-gradient(120% 70% at 50% 100%, rgb(0 0 0 / 0.35), transparent 70%);
   }
 
+  /* Centred, like a model launch: label, name, one line, two actions. */
   .hero__content {
     align-self: end;
-    width: min(100% - 2 * var(--gutter), var(--w-gallery));
+    width: min(100% - 2 * var(--gutter), 64rem);
     margin-inline: auto;
     padding-top: calc(var(--header-h) + var(--s-8));
     padding-bottom: var(--s-8);
     display: grid;
-    gap: var(--s-6);
-  }
-
-  .hero__label {
-    display: flex;
-    align-items: baseline;
-    gap: 14px;
+    justify-items: center;
+    gap: var(--s-5);
+    text-align: center;
   }
 
   .hero__content :global(.hero__title) {
-    max-width: 6.4em;
-    font-size: clamp(3.5rem, 1rem + 9.6vw, 10rem);
-  }
-
-  .hero__row {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--gutter);
-    row-gap: var(--s-6);
-    align-items: end;
-    padding-top: var(--s-5);
-    border-top: 1px solid var(--border);
-    max-width: 62rem;
+    font-size: clamp(2.8rem, 0.8rem + 7vw, 8rem);
+    line-height: 0.92;
   }
 
   .hero__support {
-    grid-column: 1 / span 6;
-    max-width: 30rem;
+    max-width: 34rem;
     font-size: var(--fs-body);
     line-height: 1.55;
-    color: color-mix(in srgb, var(--fg) 80%, transparent);
+    color: color-mix(in srgb, var(--fg) 82%, transparent);
   }
 
   .hero__actions {
-    grid-column: 7 / -1;
-    justify-self: end;
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: var(--s-3);
+    margin-top: var(--s-3);
   }
 
   .hero__foot {
@@ -157,25 +138,24 @@ const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : u
   .hero__caption {
     justify-self: start;
     display: inline-flex;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 4px 12px;
   }
 
-  .hero__scroll {
+  .hero__foot :global(.hero__hours) {
     justify-self: end;
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
   }
 
-  .hero__scroll i {
+  /* Scroll cue: a red line travelling down a hairline, centred under the actions. */
+  .hero__scroll {
     position: relative;
     width: 1px;
-    height: 28px;
+    height: 36px;
     background: var(--border);
     overflow: hidden;
   }
 
-  :global(.motion) .hero__scroll i::after {
+  :global(.motion) .hero__scroll::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -189,18 +169,14 @@ const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : u
   }
 
   @media (max-width: 63.99rem) {
-    .hero__support {
-      grid-column: 1 / -1;
-    }
-    .hero__actions {
-      grid-column: 1 / -1;
-      justify-self: start;
-    }
     .hero__foot :global(.hero__hours) {
       display: none;
     }
     .hero__foot {
       grid-template-columns: 1fr auto;
+    }
+    .hero__scroll {
+      display: none;
     }
   }
 
@@ -210,24 +186,20 @@ const captionVehicle = h.captionVehicle ? await getVehicle(h.captionVehicle) : u
     .hero__content {
       align-self: start;
       padding-top: calc(var(--header-h) + var(--s-7));
-      gap: var(--s-5);
+      gap: var(--s-4);
     }
     .hero__veil {
       background:
-        linear-gradient(to bottom, rgb(0 0 0 / 0.82) 0%, rgb(0 0 0 / 0.4) 48%, transparent 64%),
+        linear-gradient(to bottom, rgb(0 0 0 / 0.82) 0%, rgb(0 0 0 / 0.4) 50%, transparent 66%),
         linear-gradient(to top, rgb(0 0 0 / 0.6) 0%, transparent 24%);
     }
-    .hero__row {
-      border-top: 0;
-      padding-top: 0;
+    .hero__actions {
+      width: 100%;
     }
     .hero__actions .btn {
       flex: 1 1 auto;
     }
     .hero__actions .btn--ghost {
-      display: none;
-    }
-    .hero__scroll {
       display: none;
     }
     .hero__foot {

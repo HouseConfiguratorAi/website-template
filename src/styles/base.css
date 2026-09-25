@@ -142,6 +142,7 @@ button {
   letter-spacing: var(--display-tracking);
   font-stretch: var(--display-stretch);
   font-optical-sizing: auto;
+  text-transform: var(--display-case, none);
   text-wrap: balance;
 }
 
@@ -164,6 +165,7 @@ button {
 .t-headline em,
 .t-title em {
   font-style: var(--display-italic);
+  font-weight: var(--em-weight, inherit);
   color: color-mix(in srgb, var(--accent-ink) calc(var(--em-accent) * 100%), currentColor);
 }
 
@@ -212,14 +214,15 @@ button {
   text-transform: uppercase;
 }
 
-/* Technical layer: specifications, references, prices in lists. */
+/* Technical layer: specifications, references, prices in lists.
+   Mono or small tracked capitals, depending on the theme. */
 .t-meta,
 .t-mono {
-  font-family: var(--font-mono);
-  font-size: var(--fs-mono);
+  font-family: var(--font-meta, var(--font-mono));
+  font-size: var(--fs-meta);
   line-height: 1.45;
-  font-weight: 450;
-  letter-spacing: 0.02em;
+  font-weight: var(--meta-weight, 450);
+  letter-spacing: var(--meta-tracking, 0.02em);
   font-variant-numeric: tabular-nums;
   text-transform: uppercase;
 }
@@ -235,7 +238,7 @@ button {
 }
 
 .t-spec {
-  font-family: var(--font-mono);
+  font-family: var(--font-meta, var(--font-mono));
   font-size: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
   line-height: 1.3;
   font-weight: 450;
@@ -244,10 +247,10 @@ button {
 }
 
 .t-index {
-  font-family: var(--font-mono);
-  font-size: var(--fs-mono);
+  font-family: var(--font-meta, var(--font-mono));
+  font-size: var(--fs-meta);
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--meta-tracking, 0.02em);
   font-variant-numeric: tabular-nums;
   color: var(--accent-ink);
 }

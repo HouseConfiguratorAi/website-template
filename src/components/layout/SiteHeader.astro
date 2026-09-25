@@ -2,7 +2,7 @@
 import { navigation, contact, site } from '@/config/site';
 import Logo from '@/components/ui/Logo.astro';
 import Arrow from '@/components/ui/Arrow.astro';
-import { pad } from '@/lib/format';
+import LiveStatus from '@/components/ui/LiveStatus.astro';
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isActive = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
@@ -10,33 +10,36 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
 
 <header class="site-header" data-tone="dark" data-state="top">
   <div class="site-header__inner">
+    <div class="site-header__start">
+      <button class="menu-toggle" type="button" aria-haspopup="dialog" aria-controls="site-menu" aria-label="Menu openen" data-menu-open>
+        <span class="menu-toggle__icon" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="menu-toggle__label">Menu</span>
+      </button>
+      <nav class="site-header__nav" aria-label="Hoofdmenu">
+        <ul role="list">
+          {
+            navigation.primary.slice(0, 3).map((item) => (
+              <li>
+                <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+
     <a class="site-header__logo" href="/" aria-label={`${site.name} — home`}>
       <Logo />
     </a>
 
-    <nav class="site-header__nav" aria-label="Main">
-      <ul role="list">
-        {
-          navigation.primary.map((item) => (
-            <li>
-              <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
-                {item.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
-
     <div class="site-header__actions">
-      <a class="site-header__cta btn btn--primary" href={navigation.cta.href}>
-        {navigation.cta.label}
-        <Arrow />
+      <a class="site-header__phone" href={`tel:${contact.phoneHref}`} aria-label={`Bel ${contact.phone}`}>
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 2.5l2 4-1.8 1.4a9 9 0 004.4 4.4l1.4-1.8 4 2-.6 3a1.6 1.6 0 01-1.7 1.3A14 14 0 012.2 4.8 1.6 1.6 0 013.5 3.1z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" /></svg>
+        <span>{contact.phone}</span>
       </a>
-      <button class="menu-toggle" type="button" aria-haspopup="dialog" aria-controls="site-menu" data-menu-open>
-        <span>Menu</span>
-        <span class="menu-toggle__icon" aria-hidden="true"><i></i><i></i></span>
-      </button>
+      <a class="site-header__cta btn btn--ghost" href="/contact">Contact</a>
     </div>
   </div>
   <span class="site-header__progress" aria-hidden="true"></span>
@@ -44,36 +47,44 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
 
 <dialog class="menu" id="site-menu" data-tone="dark" aria-label="Menu">
   <div class="menu__top">
-    <a href="/" class="menu__logo" aria-label={`${site.name} — home`}><Logo /></a>
-    <button class="menu-toggle is-close" type="button" data-menu-close>
-      <span>Close</span>
-      <span class="menu-toggle__icon" aria-hidden="true"><i></i><i></i></span>
+    <button class="menu-toggle is-close" type="button" aria-label="Menu sluiten" data-menu-close>
+      <span class="menu-toggle__icon" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="menu-toggle__label">Sluiten</span>
     </button>
+    <a href="/" class="menu__logo" aria-label={`${site.name} — home`}><Logo /></a>
+    <span class="menu__spacer" aria-hidden="true"></span>
   </div>
-  <nav class="menu__nav" aria-label="Main">
-    <ol role="list">
-      {
-        [{ label: 'Home', href: '/' }, ...navigation.primary].map((item, i) => (
-          <li style={`--i:${i}`}>
-            <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
-              <span class="t-index">{pad(i + 1)}</span>
-              <span class="menu__label">{item.label}</span>
-            </a>
-          </li>
-        ))
-      }
-    </ol>
-  </nav>
-  <div class="menu__foot">
-    <a class="btn btn--primary btn--block" href={navigation.cta.href}>
-      {navigation.cta.label}
-      <Arrow />
-    </a>
-    <dl class="menu__contact">
-      <div><dt class="t-meta muted">Email</dt><dd><a class="link" href={`mailto:${contact.email}`}>{contact.email}</a></dd></div>
-      <div><dt class="t-meta muted">Phone</dt><dd><a class="link" href={`tel:${contact.phoneHref}`}>{contact.phone}</a></dd></div>
-      <div><dt class="t-meta muted">Visit</dt><dd>{contact.address.street}, {contact.address.city}</dd></div>
-    </dl>
+  <div class="menu__body">
+    <nav class="menu__nav" aria-label="Hoofdmenu">
+      <ol role="list">
+        {
+          [{ label: 'Home', href: '/' }, ...navigation.primary].map((item, i) => (
+            <li style={`--i:${i}`}>
+              <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+                <span class="menu__label">{item.label}</span>
+                <Arrow class="menu__arrow" />
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+    <aside class="menu__aside" aria-label="Contactgegevens">
+      <div class="menu__block">
+        <p class="t-eyebrow muted">Showroom</p>
+        <address>{contact.address.street}<br />{contact.address.postalCode} {contact.address.city}</address>
+        <LiveStatus city={false} />
+      </div>
+      <div class="menu__block">
+        <p class="t-eyebrow muted">Contact</p>
+        <a class="link" href={`tel:${contact.phoneHref}`}>{contact.phone}</a>
+        <a class="link" href={`mailto:${contact.email}`}>{contact.email}</a>
+      </div>
+      <a class="btn btn--primary btn--block" href={navigation.cta.href}>
+        {navigation.cta.label}
+        <Arrow />
+      </a>
+    </aside>
   </div>
 </dialog>
 
@@ -96,14 +107,14 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
   .site-header::before {
     content: '';
     position: absolute;
-    inset: 0 0 -40px;
-    background: linear-gradient(to bottom, rgb(0 0 0 / 0.5), rgb(0 0 0 / 0));
+    inset: 0 0 -48px;
+    background: linear-gradient(to bottom, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0));
     pointer-events: none;
     transition: opacity 500ms var(--ease-standard);
   }
 
   .site-header[data-state='scrolled'] {
-    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    background: color-mix(in srgb, var(--bg) 94%, transparent);
     -webkit-backdrop-filter: blur(18px) saturate(1.2);
     backdrop-filter: blur(18px) saturate(1.2);
     border-bottom-color: var(--border);
@@ -125,7 +136,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     right: 0;
     bottom: -1px;
     height: 2px;
-    background: var(--accent-ink);
+    background: var(--accent);
     transform: scaleX(var(--progress, 0));
     transform-origin: 0 50%;
     opacity: 0;
@@ -136,19 +147,27 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     opacity: 1;
   }
 
+  /* Three columns: menu and links | centred mark | contact. */
   .site-header__inner {
     position: relative;
     height: 100%;
     width: min(100% - 2 * var(--gutter), var(--w-gallery));
     margin-inline: auto;
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
-    gap: var(--s-6);
+    gap: var(--s-5);
+  }
+
+  .site-header__start {
+    display: flex;
+    align-items: center;
+    gap: clamp(20px, 2.4vw, 40px);
+    min-width: 0;
   }
 
   .site-header__logo {
-    justify-self: start;
+    justify-self: center;
     min-width: 0;
     max-width: 100%;
     display: inline-flex;
@@ -157,17 +176,22 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
 
   .site-header__nav ul {
     display: flex;
-    gap: clamp(22px, 2.6vw, 44px);
+    gap: clamp(18px, 2vw, 32px);
   }
 
-  .site-header__nav a {
+  .site-header__nav a,
+  .site-header__phone {
     position: relative;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
     padding-block: 8px;
-    font-size: var(--fs-nav);
+    font-size: 0.75rem;
     font-weight: 500;
-    letter-spacing: 0.005em;
-    color: color-mix(in srgb, var(--fg) 78%, transparent);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: color-mix(in srgb, var(--fg) 80%, transparent);
     transition: color var(--dur-micro) var(--ease-standard);
   }
 
@@ -177,15 +201,16 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     left: 0;
     right: 0;
     bottom: 0;
-    height: 2px;
-    background: var(--accent-ink);
+    height: 1px;
+    background: currentColor;
     transform: scaleX(0);
     transform-origin: 100% 50%;
     transition: transform 500ms var(--ease-emphasis);
   }
 
   .site-header__nav a:hover,
-  .site-header__nav a[aria-current='page'] {
+  .site-header__nav a[aria-current='page'],
+  .site-header__phone:hover {
     color: var(--fg);
   }
 
@@ -193,6 +218,17 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
   .site-header__nav a[aria-current='page']::after {
     transform: scaleX(1);
     transform-origin: 0 50%;
+  }
+
+  .site-header__nav a[aria-current='page']::after {
+    background: var(--accent);
+    height: 2px;
+  }
+
+  .site-header__phone svg {
+    width: 16px;
+    height: 16px;
+    flex: none;
   }
 
   .site-header__actions {
@@ -203,9 +239,9 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
   }
 
   .site-header__cta {
-    min-height: 42px;
-    padding-inline: 18px;
-    font-size: 0.75rem;
+    min-height: 40px;
+    padding-inline: 20px;
+    font-size: 0.6875rem;
   }
 
   :global(.motion) .site-header__inner {
@@ -213,21 +249,20 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
   }
 
   .menu-toggle {
-    display: none;
+    display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     min-height: 44px;
-    padding-inline: 4px;
+    padding-right: 4px;
     font-size: 0.75rem;
-    font-weight: 600;
-    font-stretch: 110%;
+    font-weight: 500;
     letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
   .menu-toggle__icon {
     display: grid;
-    gap: 6px;
+    gap: 5px;
     width: 22px;
   }
 
@@ -235,34 +270,56 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     display: block;
     height: 1.5px;
     background: currentColor;
-    transition: transform var(--dur-standard) var(--ease-emphasis);
+    transform-origin: 50% 50%;
+    transition:
+      transform var(--dur-standard) var(--ease-emphasis),
+      opacity var(--dur-micro) var(--ease-standard),
+      width var(--dur-standard) var(--ease-emphasis);
   }
 
-  .menu-toggle__icon i:last-child {
+  .menu-toggle__icon i:nth-child(2) {
     width: 14px;
-    justify-self: end;
-    background: var(--accent-ink);
+  }
+
+  .menu-toggle:hover .menu-toggle__icon i:nth-child(2) {
+    width: 22px;
   }
 
   .menu-toggle.is-close .menu-toggle__icon i:first-child {
-    transform: translateY(3.75px) rotate(45deg);
+    transform: translateY(6.5px) rotate(45deg);
+  }
+
+  .menu-toggle.is-close .menu-toggle__icon i:nth-child(2) {
+    opacity: 0;
   }
 
   .menu-toggle.is-close .menu-toggle__icon i:last-child {
-    width: 22px;
-    transform: translateY(-3.75px) rotate(-45deg);
+    transform: translateY(-6.5px) rotate(-45deg);
+  }
+
+  @media (max-width: 79.99rem) {
+    .site-header__phone span {
+      display: none;
+    }
   }
 
   @media (max-width: 63.99rem) {
-    .site-header__inner {
-      grid-template-columns: minmax(0, 1fr) auto;
-    }
-    .site-header__nav,
-    .site-header__cta {
+    .site-header__nav {
       display: none;
     }
-    .menu-toggle {
-      display: inline-flex;
+  }
+
+  @media (max-width: 47.99rem) {
+    .site-header__cta,
+    .menu-toggle__label {
+      display: none;
+    }
+    .site-header__phone {
+      padding: 12px 0 12px 12px;
+    }
+    .site-header__phone svg {
+      width: 18px;
+      height: 18px;
     }
   }
 
@@ -305,11 +362,17 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
   .menu__top {
     height: var(--header-h);
     flex: none;
-    gap: var(--s-5);
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
-    justify-content: space-between;
+    gap: var(--s-5);
+    width: min(100%, var(--w-gallery));
+    margin-inline: auto;
     border-bottom: 1px solid var(--border);
+  }
+
+  .menu__top .menu-toggle {
+    justify-self: start;
   }
 
   .menu__logo {
@@ -317,15 +380,23 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     display: flex;
   }
 
-  .menu__nav {
+  .menu__body {
     flex: 1;
-    display: flex;
-    align-items: center;
+    width: min(100%, var(--w-gallery));
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--s-7);
+    align-content: center;
     padding-block: var(--s-7);
   }
 
+  .menu__nav {
+    grid-column: 1 / span 7;
+  }
+
   .menu__nav ol {
-    width: 100%;
     display: grid;
   }
 
@@ -335,9 +406,10 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
 
   .menu__nav a {
     display: flex;
-    align-items: baseline;
+    align-items: center;
+    justify-content: space-between;
     gap: var(--s-5);
-    padding-block: 10px;
+    padding-block: clamp(10px, 0.4rem + 0.8vw, 18px);
   }
 
   .menu__label {
@@ -345,18 +417,36 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     font-weight: var(--display-weight);
     font-stretch: var(--display-stretch);
     letter-spacing: var(--display-tracking);
-    font-size: clamp(2.4rem, 1.4rem + 5vw, 4.5rem);
+    text-transform: var(--display-case, none);
+    font-size: clamp(2rem, 1.2rem + 3.4vw, 3.75rem);
     line-height: 1;
-    transition: color var(--dur-micro) var(--ease-standard), transform 500ms var(--ease-emphasis);
+    transition:
+      color var(--dur-micro) var(--ease-standard),
+      transform 500ms var(--ease-emphasis);
   }
 
-  .menu__nav a:hover .menu__label,
-  .menu__nav a[aria-current='page'] .menu__label {
-    color: var(--accent-ink);
+  .menu__nav :global(.menu__arrow) {
+    width: 26px;
+    height: 14px;
+    opacity: 0;
+    transform: translateX(-12px);
+    transition:
+      opacity var(--dur-micro) var(--ease-standard),
+      transform 500ms var(--ease-emphasis);
   }
 
   .menu__nav a:hover .menu__label {
-    transform: translateX(8px);
+    transform: translateX(12px);
+  }
+
+  .menu__nav a:hover :global(.menu__arrow),
+  .menu__nav a[aria-current='page'] :global(.menu__arrow) {
+    opacity: 1;
+    transform: none;
+  }
+
+  .menu__nav a[aria-current='page'] .menu__label {
+    color: var(--accent-ink);
   }
 
   .menu__nav li {
@@ -373,25 +463,46 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     }
   }
 
-  .menu__foot {
+  .menu__aside {
+    grid-column: 9 / -1;
+    align-self: end;
     display: grid;
-    gap: var(--s-6);
-  }
-
-  .menu__contact {
-    display: grid;
-    gap: 10px;
+    gap: var(--s-7);
     font-size: var(--fs-small);
   }
 
-  .menu__contact div {
+  .menu__block {
     display: grid;
-    grid-template-columns: 5rem 1fr;
-    align-items: baseline;
+    gap: 10px;
+    justify-items: start;
   }
 
-  .menu__contact dd {
-    margin: 0;
+  .menu__block address {
+    font-style: normal;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 63.99rem) {
+    .menu__nav,
+    .menu__aside {
+      grid-column: 1 / -1;
+    }
+    .menu__body {
+      align-content: start;
+    }
+    .menu__aside {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--s-6);
+    }
+    .menu__aside .btn {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 29.99rem) {
+    .menu__aside {
+      grid-template-columns: 1fr;
+    }
   }
 
   :global(html:has(.menu[open])) {
@@ -450,6 +561,5 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
       openBtn.focus();
     });
     menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => menu.close()));
-    matchMedia('(min-width: 64rem)').addEventListener('change', (e) => e.matches && menu.open && menu.close());
-  }
+      }
 </script>

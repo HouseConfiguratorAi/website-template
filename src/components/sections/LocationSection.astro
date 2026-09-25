@@ -8,8 +8,6 @@ import LiveStatus from '@/components/ui/LiveStatus.astro';
 import Media from '@/components/ui/Media.astro';
 import Arrow from '@/components/ui/Arrow.astro';
 
-interface Props { index?: string }
-const { index } = Astro.props;
 const l = home.location;
 ---
 
@@ -20,25 +18,25 @@ const l = home.location;
   <div class="location__veil" aria-hidden="true"></div>
   <div class="container container--gallery location__inner">
     <div class="location__intro">
-      <Label text={l.eyebrow} index={index} rule={false} />
+      <Label text={l.eyebrow} />
       <Heading as="h2" size="headline" text={l.headline} />
       <p class="t-body location__body" data-reveal>{l.body}</p>
     </div>
     <div class="location__card" data-reveal style="--delay:150ms">
       <div class="location__top">
         <p class="location__city">{contact.address.city}</p>
-        <p class="t-meta muted location__coords">{contact.geo.lat.toFixed(4)}° N<br />{contact.geo.lng.toFixed(4)}° E</p>
+        <p class="t-meta muted location__coords">{contact.geo.lat.toFixed(4).replace('.', ',')}° NB<br />{contact.geo.lng.toFixed(4).replace('.', ',')}° OL</p>
       </div>
       <LiveStatus city={false} />
       <dl class="location__facts">
         <div>
-          <dt class="t-eyebrow muted">Address</dt>
+          <dt class="t-eyebrow muted">Adres</dt>
           <dd>
             <address>{contact.address.street}<br />{contact.address.postalCode} {contact.address.city}</address>
           </dd>
         </div>
         <div>
-          <dt class="t-eyebrow muted">Opening hours</dt>
+          <dt class="t-eyebrow muted">Openingstijden</dt>
           <dd>
             <ul role="list">{contact.hours.map((h) => <li><span>{h.days}</span><span class="muted">{h.time}</span></li>)}</ul>
           </dd>
@@ -51,7 +49,7 @@ const l = home.location;
           </dd>
         </div>
       </dl>
-      <a class="link-arrow" href={contact.directionsUrl} target="_blank" rel="noopener">Directions<span class="sr-only"> (opens in a new tab)</span> <Arrow direction="up-right" /></a>
+      <a class="link-arrow" href={contact.directionsUrl} target="_blank" rel="noopener">Routebeschrijving<span class="sr-only"> (opent in een nieuw tabblad)</span> <Arrow direction="up-right" /></a>
     </div>
   </div>
 </section>
@@ -122,6 +120,7 @@ const l = home.location;
   }
   .location__coords {
     text-align: right;
+    white-space: nowrap;
   }
   .location__city {
     font-family: var(--font-sans);
@@ -140,7 +139,7 @@ const l = home.location;
   }
   .location__facts > div {
     display: grid;
-    grid-template-columns: 9rem 1fr;
+    grid-template-columns: 11rem 1fr;
     gap: var(--s-4);
     padding-top: var(--s-4);
     border-top: 1px solid var(--border);
@@ -169,6 +168,13 @@ const l = home.location;
     }
   }
   @media (max-width: 29.99rem) {
+    .location__city {
+      font-size: 1.35rem;
+      letter-spacing: 0.12em;
+    }
+    .location__coords {
+      white-space: normal;
+    }
     .location__facts > div {
       grid-template-columns: 1fr;
       gap: 6px;
